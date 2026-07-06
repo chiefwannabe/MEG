@@ -179,7 +179,7 @@ button{font-family:inherit;cursor:pointer}
   <footer class="ftr">
     Add a game: copy <kbd>.html</kbd> into <kbd>offline/</kbd>
     &rarr; <kbd>node offline/generate-games.js</kbd>
-    &rarr; commit &amp; push
+    &rarr; commit &amp; push &mdash; accessible at <kbd>/games</kbd> or <kbd>/offline/</kbd>
   </footer>
 </div>
 
@@ -192,6 +192,22 @@ button{font-family:inherit;cursor:pointer}
 ═══════════════════════════════════════════ */
 const PAGE_SIZE = 50;
 const LS_FAV_KEY = 'glFavs_v1';
+
+/* ═══════════════════════════════════════════
+   BASE URL — derived from the current page's
+   location so this file works correctly from
+   /offline/, /games, or any other mounted path.
+
+   WHY NOT new URL('.', location.href)?
+   When the URL has no trailing slash (e.g. /games),
+   the browser treats 'games' as a filename, so
+   new URL('.') resolves to the root '/' — wrong.
+
+   SAFE FIX: take origin + pathname and force a
+   trailing slash. Works for /games, /games/, and
+   /offline/ equally.
+═══════════════════════════════════════════ */
+const BASE_URL = (location.origin + location.pathname).replace(/\/?$/, '/');
 
 /* ═══════════════════════════════════════════
    STATE
@@ -221,7 +237,7 @@ loadGames();
 
 async function loadGames() {
   try {
-    const res = await fetch('games.json');
+    const res = await fetch(BASE_URL + 'games.json');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     allGames = data.games || [];
@@ -329,7 +345,7 @@ function buildCard(g) {
       '</div>' +
       '<div class="card-actions">' +
         '<button class="btn btn-fav' + (isSaved ? ' saved' : '') + '" data-fid="' + g.id + '">' + (isSaved ? 'Saved' : 'Save') + '</button>' +
-        '<a class="btn btn-play" href="' + esc(g.file) + '" rel="noopener">Play</a>' +
+        '<a class="btn btn-play" href="' + esc(BASE_URL + g.file) + '" rel="noopener">Play</a>' +
       '</div>' +
     '</div>';
 
