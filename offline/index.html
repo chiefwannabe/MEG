@@ -236,32 +236,53 @@ const elStb      = document.getElementById('stb');
 loadGames();
 
 async function loadGames() {
+  // ── Diagnostic: log the exact URL being fetched ──────────────────────────
+  const jsonURL = BASE_URL + 'games.json';
+  console.log('[GameLauncher] BASE_URL =', BASE_URL);
+  console.log('[GameLauncher] Fetching:', jsonURL);
+
+  let data;
   try {
-    const res = await fetch(BASE_URL + 'games.json');
+    const res = await fetch(jsonURL);
+    console.log('[GameLauncher] Response status:', res.status, '| ok:', res.ok);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    allGames = data.games || [];
 
-    const meta = data.meta || {};
-    elTotal.textContent = (meta.totalGames || allGames.length) + ' games';
-
-    // Categories
-    const cats = (meta.categories || []).filter(Boolean);
-    if (cats.length) {
-      cats.forEach(c => {
-        const o = document.createElement('option');
-        o.value = c; o.textContent = c;
-        elCatSel.appendChild(o);
-      });
-      elCatSel.classList.remove('hidden');
-    }
-
-    render();
+    const text = await res.text();
+    console.log('[GameLauncher] Raw response (first 200 chars):', text.slice(0, 200));
+    data = JSON.parse(text);
+    console.log('[GameLauncher] Parsed data:', data);
   } catch (err) {
-    elGrid.innerHTML = '<div class="empty"><p class="empty-title">Could not load games.json</p><p class="empty-sub">Run <code>node offline/generate-games.js</code> to generate it.</p></div>';
+    // Only fetch / JSON-parse errors reach here.
+    // render() errors are intentionally outside this block so they
+    // don't falsely show "Could not load games.json".
+    console.error('[GameLauncher] Load error:', err);
+    elGrid.innerHTML = '<div class="empty"><p class="empty-title">Could not load games.json</p><p class="empty-sub">Run <code>node offline/generate-games.js</code> to generate it.<br><small style="opacity:.6">Error: ' + err.message + '</small></p></div>';
     elTotal.textContent = 'Error';
-    console.error(err);
+    return;
   }
+
+  // ── Parse succeeded — populate state ────────────────────────────────────
+  allGames = data.games || [];
+  console.log('[GameLauncher] allGames.length =', allGames.length);
+
+  const meta = data.meta || {};
+  elTotal.textContent = (meta.totalGames || allGames.length) + ' games';
+
+  // Categories
+  const cats = (meta.categories || []).filter(Boolean);
+  if (cats.length) {
+    cats.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      elCatSel.appendChild(o);
+    });
+    elCatSel.classList.remove('hidden');
+  }
+
+  // render() is intentionally OUTSIDE the try so any rendering bug
+  // surfaces as its own uncaught error in the console, not as a
+  // false "Could not load games.json" message.
+  render();
 }
 
 /* ═══════════════════════════════════════════
