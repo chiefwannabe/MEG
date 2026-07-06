@@ -1,8 +1,8 @@
 {
   "meta": {
-    "totalGames": 3,
+    "totalGames": 5,
     "categories": [],
-    "generatedAt": "2026-07-06T20:40:55.171Z"
+    "generatedAt": "2026-07-06T20:55:27.390Z"
   },
   "games": [
     {
@@ -14,13 +14,27 @@
     },
     {
       "id": 2,
+      "title": "Chess",
+      "slug": "chess",
+      "file": "chess.html",
+      "category": null
+    },
+    {
+      "id": 3,
       "title": "Cluster Rush",
       "slug": "clusterrush",
       "file": "clusterrush.html",
       "category": null
     },
     {
-      "id": 3,
+      "id": 4,
+      "title": "Crazy Cars",
+      "slug": "crazycars",
+      "file": "crazycars.html",
+      "category": null
+    },
+    {
+      "id": 5,
       "title": "Dadish 3",
       "slug": "dadish3",
       "file": "dadish3.html",
