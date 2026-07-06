@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Previous Year Question Papers (PYQs) - IGNOU Hub</title>
+  <meta name="description" content="Download free IGNOU Previous Year Question Papers (PYQs) for MEG, MHD, BCA, MCA, MBA, and other programmes. Filter by course code and year.">
+  <style>
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Courier New', 'IBM Plex Mono', Courier, monospace;
+      color: #1a1a1a;
+      line-height: 1.65;
+      background-color: #f4f0e8;
+      /* Paper texture matching index.html */
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(160, 140, 110, 0.03) 3px,
+          rgba(160, 140, 110, 0.03) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 5px,
+          rgba(140, 120, 90, 0.02) 5px,
+          rgba(140, 120, 90, 0.02) 6px
+        ),
+        linear-gradient(
+          175deg,
+          #f5f1e9 0%,
+          #f0eadc 25%,
+          #ece5d5 50%,
+          #f2ece0 75%,
+          #f6f2ea 100%
+        );
+      background-attachment: fixed;
+    }
+
+    /* ============================================
+       TYPOGRAPHY
+       ============================================ */
+    h1, h2, h3, h4 {
+      font-family: Georgia, 'Playfair Display', 'Times New Roman', serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h1 { font-size: clamp(2rem, 4vw, 3.5rem); }
+    h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+    h3 { font-size: 1.3rem; }
+
+    p, li, td, span, label, input, select, button {
+      font-family: 'Courier New', 'IBM Plex Mono', Courier, monospace;
+      font-size: 0.95rem;
+    }
+
+    a {
+      color: #1a5276;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    a:hover {
+      color: #0e8a5f;
+      border-color: #0e8a5f;
+    }
+
+    /* ============================================
+       PAGE WRAPPER
+       ============================================ */
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 253, 248, 0.85);
+      box-shadow:
+        -2px 0 15px rgba(0,0,0,0.08),
+        2px 0 15px rgba(0,0,0,0.08),
+        0 0 40px rgba(0,0,0,0.04);
+      border-left: 1px solid #d4c9b8;
+      border-right: 1px solid #d4c9b8;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 30px;
+      background: linear-gradient(to right, rgba(0,0,0,0.04), transparent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .page::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; right: 0;
+      width: 30px;
+      background: linear-gradient(to left, rgba(0,0,0,0.04), transparent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       MASTHEAD
+       ============================================ */
+    .masthead {
+      text-align: center;
+      padding: 2.5rem 2rem 1.5rem;
+      border-bottom: 3px double #1a1a1a;
+      position: relative;
+    }
+
+    .masthead::before {
+      content: 'Vol. XXVI · No. 7 · July 2026 · Est. 2024';
+      display: block;
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+
+    .masthead h1 {
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      margin-bottom: 0.3rem;
+    }
+
+    .masthead .tagline {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* ============================================
+       NAVIGATION
+       ============================================ */
+    .toc-nav {
+      background: #1a1a1a;
+      color: #f4f0e8;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid #333;
+    }
+
+    .toc-nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.5rem 2rem;
+    }
+
+    .toc-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      color: #c8bfb0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border-bottom: none;
+      transition: all 0.3s ease;
+    }
+
+    .toc-nav a:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ============================================
+       CONTENT SECTION
+       ============================================ */
+    .content-section {
+      padding: 3rem 2rem;
+      flex: 1;
+    }
+
+    .section-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: #999;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      margin-bottom: 2rem;
+      color: #1a1a1a;
+      border-bottom: 1px solid #d4c9b8;
+      padding-bottom: 0.8rem;
+    }
+
+    /* ============================================
+       FILTER INTERFACE
+       ============================================ */
+    .filter-panel {
+      background: #fffcf5;
+      border: 1px solid #d4c9b8;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+      margin-bottom: 0.4rem;
+      font-weight: bold;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #d4c9b8;
+      background: #fff;
+      color: #1a1a1a;
+      border-radius: 2px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      border-color: #1a5276;
+      box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.15);
+    }
+
+    /* ============================================
+       INDEX TABLE (Magazine Index Style)
+       ============================================ */
+    .index-table-container {
+      background: #fff;
+      border: 1px solid #d4c9b8;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid #ece5d5;
+    }
+
+    th {
+      background: #f0eadc;
+      font-family: Georgia, serif;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    tr:hover td {
+      background-color: #fffcf5;
+    }
+
+    .course-code {
+      font-weight: bold;
+      color: #1a5276;
+    }
+
+    .session-badge {
+      display: inline-block;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.7rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: bold;
+    }
+
+    .session-june {
+      background-color: #e8f4f8;
+      color: #1a5276;
+      border: 1px solid rgba(26, 82, 118, 0.2);
+    }
+
+    .session-dec {
+      background-color: #e8f8f0;
+      color: #0e8a5f;
+      border: 1px solid rgba(14, 138, 95, 0.2);
+    }
+
+    .session-both {
+      background-color: #f5eef8;
+      color: #8e44ad;
+      border: 1px solid rgba(142, 68, 173, 0.2);
+    }
+
+    /* ============================================
+       BUTTONS
+       ============================================ */
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.9rem;
+      font-family: Georgia, serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: #2ecc71;
+      border: 1px solid #27ae60;
+      color: #1a1a1a;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-download:hover {
+      background: #27ae60;
+      color: #fff;
+    }
+
+    .btn-download.downloading {
+      background: #1a5276;
+      border-color: #0e4a3a;
+      color: #fff;
+      cursor: wait;
+    }
+
+    /* ============================================
+       NO RESULTS STATE
+       ============================================ */
+    .no-results {
+      padding: 3rem;
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      display: none;
+    }
+
+    /* ============================================
+       DOWNLOAD MODAL / PROGRESS BAR
+       ============================================ */
+    .download-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .download-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .download-modal {
+      background: #fffcf5;
+      border: 2px solid #1a1a1a;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 450px;
+      padding: 2rem;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .download-modal h3 {
+      font-family: Georgia, serif;
+      color: #1a1a1a;
+      margin-bottom: 0.5rem;
+    }
+
+    .download-modal p {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #ece5d5;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2ecc71, #1a5276);
+      transition: width 0.1s linear;
+    }
+
+    .progress-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #1a5276;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .footer {
+      background: #1a1a1a;
+      color: #999;
+      padding: 2.5rem;
+      font-size: 0.8rem;
+      line-height: 1.8;
+      margin-top: auto;
+    }
+
+    .footer-bottom {
+      text-align: center;
+    }
+
+    .footer-issn {
+      font-family: Georgia, serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-legal {
+      font-size: 0.72rem;
+      color: #666;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 900px) {
+      .content-section {
+        padding: 2rem 1.5rem;
+      }
+      .filter-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- ==========================================
+         MASTHEAD
+         ========================================== -->
+    <header class="masthead">
+      <h1>IGNOU Study Resource Hub</h1>
+      <p class="tagline">Previous Year Question Papers Collection · Free Direct Download</p>
+    </header>
+
+    <!-- ==========================================
+         NAVIGATION
+         ========================================== -->
+    <nav class="toc-nav" aria-label="Main Navigation">
+      <ul>
+        <li><a href="index.html"><span style="color: #2ecc71;">←</span> Back to Home</a></li>
+        <li style="color: #c8bfb0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: bold; padding: 0.5rem 1rem;">Document Archive</li>
+      </ul>
+    </nav>
+
+    <!-- ==========================================
+         MAIN CONTENT
+         ========================================== -->
+    <main class="content-section">
+      <span class="section-label">Archive Catalog</span>
+      <h2 class="section-title">Previous Year Question Papers (PYQs)</h2>
+
+      <!-- Filtering Panel -->
+      <section class="filter-panel" style="padding: 1.5rem; border-bottom: 1px solid #d4c9b8; animation: none;">
+        <div class="filter-group">
+          <label for="searchQuery">Search Course Code / Title</label>
+          <input type="text" id="searchQuery" placeholder="e.g., MEG-01, Programming">
+        </div>
+
+        <div class="filter-group">
+          <label for="programmeFilter">Programme Category</label>
+          <select id="programmeFilter">
+            <option value="all">All Programmes</option>
+            <option value="meg">MEG (M.A. English)</option>
+            <option value="mhd">MHD (M.A. Hindi)</option>
+            <option value="bca-mca">BCA / MCA (Computer Applications)</option>
+            <option value="others">Others (BAG, BCOMG, MBA)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="yearFilter">Exam Year</label>
+          <select id="yearFilter">
+            <option value="all">All Years</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Archive Table -->
+      <div class="index-table-container">
+        <table id="pyqTable">
+          <thead>
+            <tr>
+              <th>Course Code</th>
+              <th>Course Title</th>
+              <th>Exam Year</th>
+              <th>Session</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="pyqTableBody">
+            <!-- Table data injected dynamically via script -->
+          </tbody>
+        </table>
+        <div id="noResults" class="no-results">
+          No question papers match your filtering criteria. Try resetting the filters.
+        </div>
+      </div>
+    </main>
+
+    <!-- ==========================================
+         DOWNLOAD MODAL (Interactive Feedback)
+         ========================================== -->
+    <div class="download-modal-overlay" id="downloadOverlay" aria-hidden="true" role="dialog">
+      <div class="download-modal">
+        <h3 id="modalCourseTitle">MEG-01 British Poetry</h3>
+        <p id="modalFileInfo">Exam: June 2025 · PDF Document (1.2 MB)</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-status">
+          <span id="progressText">Initializing download...</span>
+          <span id="progressPercentage">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="footer">
+      <div class="footer-bottom">
+        <div class="footer-issn">ISSN 2847-6319 · Registered Independent Educational Publication</div>
+        <div class="footer-legal">
+          © 2024–2026 IGNOU Free Study Resource Hub. All rights reserved.<br>
+          This is an independent, non-profit educational initiative. Not affiliated with IGNOU.
+        </div>
+      </div>
+    </footer>
+
+  </div><!-- .page -->
+
+  <!-- ==========================================
+       DYNAMICS & INTERACTIVE LOGIC
+       ========================================== -->
+  <script>
+    // Mock Database of PYQs (One row per course covering 2023–2026 June & December)
+    const pyqDatabase = [
+      { code: "MEG-01", title: "British Poetry", year: "2023–2026", session: "June & December", type: "meg" },
+      { code: "MEG-02", title: "British Drama", year: "2023–2026", session: "June & December", type: "meg" },
+      { code: "MEG-03", title: "British Novel", year: "2023–2026", session: "June & December", type: "meg" },
+      { code: "MEG-04", title: "Aspects of Language", year: "2023–2026", session: "June & December", type: "meg" },
+      { code: "MEG-05", title: "Literary Criticism & Theory", year: "2023–2026", session: "June & December", type: "meg" },
+      
+      { code: "MHD-01", title: "Hindi Kavya", year: "2023–2026", session: "June & December", type: "mhd" },
+      { code: "MHD-02", title: "Adhunik Hindi Kavya", year: "2023–2026", session: "June & December", type: "mhd" },
+      { code: "MHD-03", title: "Upanyas Aur Kahani", year: "2023–2026", session: "June & December", type: "mhd" },
+
+      { code: "MCS-011", title: "Problem Solving and Programming", year: "2023–2026", session: "June & December", type: "bca-mca" },
+      { code: "MCS-012", title: "Computer Organization & Assembly Language", year: "2023–2026", session: "June & December", type: "bca-mca" },
+      { code: "BCS-011", title: "Computer Basics and PC Software", year: "2023–2026", session: "June & December", type: "bca-mca" },
+      { code: "MCS-021", title: "Data and File Structures", year: "2023–2026", session: "June & December", type: "bca-mca" },
+
+      { code: "BCOLA-138", title: "Business Communication", year: "2023–2026", session: "June & December", type: "others" },
+      { code: "MS-08", title: "Quantitative Analysis for Managerial Applications", year: "2023–2026", session: "June & December", type: "others" },
+      { code: "ECO-01", title: "Business Organisation", year: "2023–2026", session: "June & December", type: "others" },
+      { code: "MCO-01", title: "Organisation Theory and Behaviour", year: "2023–2026", session: "June & December", type: "others" }
+    ];
+
+    const tableBody = document.getElementById('pyqTableBody');
+    const noResults = document.getElementById('noResults');
+    const searchInput = document.getElementById('searchQuery');
+    const programmeSelect = document.getElementById('programmeFilter');
+    const yearSelect = document.getElementById('yearFilter');
+
+    // Render Database to Table
+    function renderTable(data) {
+      tableBody.innerHTML = "";
+      if (data.length === 0) {
+        noResults.style.display = "block";
+        return;
+      }
+      noResults.style.display = "none";
+
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        let badgeClass = "session-both";
+        if (item.session === "June") {
+          badgeClass = "session-june";
+        } else if (item.session === "December") {
+          badgeClass = "session-dec";
+        }
+        
+        tr.innerHTML = `
+          <td><span class="course-code">${item.code}</span></td>
+          <td>${item.title}</td>
+          <td>${item.year}</td>
+          <td><span class="session-badge ${badgeClass}">${item.session}</span></td>
+          <td>
+            <button class="btn-download" onclick="startSimulatedDownload('${item.code}', '${item.title}', '${item.year}', '${item.session}')">
+              <span class="btn-icon">💾</span> Download PDF
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const search = searchInput.value.toLowerCase().trim();
+      const prog = programmeSelect.value;
+      const year = yearSelect.value;
+
+      const filtered = pyqDatabase.filter(item => {
+        const matchesSearch = item.code.toLowerCase().includes(search) || item.title.toLowerCase().includes(search);
+        const matchesProg = prog === "all" || item.type === prog;
+        const matchesYear = year === "all" || ["2023", "2024", "2025", "2026"].some(y => item.year.includes(y));
+
+        return matchesSearch && matchesProg && matchesYear;
+      });
+
+      renderTable(filtered);
+    }
+
+    // Input Listeners
+    searchInput.addEventListener('input', applyFilters);
+    programmeSelect.addEventListener('change', applyFilters);
+    yearSelect.addEventListener('change', applyFilters);
+
+    // Simulated Download Action
+    const overlay = document.getElementById('downloadOverlay');
+    const modalTitle = document.getElementById('modalCourseTitle');
+    const modalInfo = document.getElementById('modalFileInfo');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercentage = document.getElementById('progressPercentage');
+
+    function startSimulatedDownload(code, title, year, session) {
+      // Setup Modal Info
+      modalTitle.textContent = `${code} ${title}`;
+      modalInfo.textContent = `Exam: ${session} ${year} · PDF Document (${(Math.random() * 1.5 + 0.5).toFixed(1)} MB)`;
+      
+      // Reset progress
+      progressBar.style.width = "0%";
+      progressPercentage.textContent = "0%";
+      progressText.textContent = "Connecting to server...";
+      
+      // Open Modal
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 15) + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          progressBar.style.width = "100%";
+          progressPercentage.textContent = "100%";
+          progressText.textContent = "Download complete!";
+          
+          // Close after 1 second
+          setTimeout(() => {
+            overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+            // Trigger actual mock download to browser
+            const blob = new Blob([`Mock PDF content for ${code} (${year})`], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            const cleanSession = session.replace(/\s+/g, '_').replace(/&/g, 'And');
+            const cleanYear = year.replace(/–/g, '_');
+            link.download = `${code}_PYQ_${cleanSession}_${cleanYear}.pdf`;
+            link.click();
+          }, 1000);
+        } else {
+          progressBar.style.width = `${progress}%`;
+          progressPercentage.textContent = `${progress}%`;
+          if (progress < 30) {
+            progressText.textContent = "Requesting document archive...";
+          } else if (progress < 70) {
+            progressText.textContent = "Downloading PDF bytes...";
+          } else {
+            progressText.textContent = "Verifying checksum...";
+          }
+        }
+      }, 150);
+    }
+
+    // Initial render
+    renderTable(pyqDatabase);
+  </script>
+</body>
+</html>

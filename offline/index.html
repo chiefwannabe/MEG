@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Game Launcher</title>
+<meta name="description" content="Offline HTML5 game launcher — fast, searchable, works without internet."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d0f18;--surface:#111420;--card:#161929;--card-h:#1c2035;
+  --border:rgba(255,255,255,.07);--border-h:rgba(139,92,246,.45);
+  --accent:#8b5cf6;--accent-dim:rgba(139,92,246,.14);--accent-text:#c4b5fd;
+  --text:#dde3f0;--muted:#64748b;--dim:#94a3b8;
+  --r:8px;--tr:.16s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* ── layout ── */
+.wrap{max-width:1360px;margin:0 auto;padding:0 20px 80px}
+
+/* ── header ── */
+.hdr{padding:44px 0 32px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.hdr-row{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hdr h1{font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.hdr-sub{font-size:.85rem;color:var(--muted);margin-top:3px}
+.total-badge{font-size:.82rem;font-weight:600;color:var(--accent-text);background:var(--accent-dim);
+  border:1px solid rgba(139,92,246,.25);padding:5px 14px;border-radius:20px;white-space:nowrap}
+
+/* ── controls bar ── */
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.ctrl-search{flex:1;min-width:220px;position:relative}
+.ctrl-search input{width:100%;padding:10px 14px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--card);color:var(--text);
+  font-family:inherit;font-size:.9rem;outline:none;transition:border-color var(--tr),box-shadow var(--tr)}
+.ctrl-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+.ctrl-search input::placeholder{color:var(--muted)}
+.ctrl select{padding:10px 34px 10px 13px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--card);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;
+  color:var(--text);font-family:inherit;font-size:.88rem;outline:none;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  transition:border-color var(--tr)}
+.ctrl select:focus{border-color:var(--accent)}
+.btn-favtog{padding:10px 18px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--card);color:var(--dim);font-size:.88rem;font-weight:500;
+  transition:border-color var(--tr),color var(--tr),background var(--tr)}
+.btn-favtog.active{border-color:var(--border-h);color:var(--accent-text);background:var(--accent-dim)}
+.hidden{display:none!important}
+
+/* ── results bar ── */
+.rbar{display:flex;align-items:center;justify-content:space-between;
+  font-size:.82rem;color:var(--muted);margin-bottom:20px;flex-wrap:wrap;gap:8px}
+.rbar strong{color:var(--dim)}
+.rbar-clear{color:var(--accent-text);font-size:.82rem;background:none;border:none;
+  padding:0;cursor:pointer;transition:opacity var(--tr)}
+.rbar-clear:hover{opacity:.75}
+
+/* ── grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+
+/* ── card ── */
+.card{display:flex;flex-direction:column;border:1px solid var(--border);
+  border-radius:var(--r);background:var(--card);overflow:hidden;
+  transition:border-color var(--tr),background var(--tr),transform var(--tr),box-shadow var(--tr)}
+.card:hover{border-color:var(--border-h);background:var(--card-h);
+  transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.card-top{height:3px;background:linear-gradient(90deg,var(--accent),#6366f1)}
+.card-body{padding:18px 18px 16px;flex:1;display:flex;flex-direction:column;gap:12px}
+.card-info{flex:1}
+.card-title{font-size:.975rem;font-weight:600;color:var(--text);line-height:1.35;
+  margin-bottom:5px;word-break:break-word}
+.card-cat{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;padding:2px 8px;border-radius:4px;
+  background:var(--accent-dim);color:var(--accent-text);
+  border:1px solid rgba(139,92,246,.2)}
+.card-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;
+  padding:7px 14px;border-radius:6px;font-size:.8rem;font-weight:600;
+  letter-spacing:.02em;transition:background var(--tr),color var(--tr),
+  border-color var(--tr),opacity var(--tr);white-space:nowrap}
+.btn-play{background:var(--accent);color:#fff;border:1px solid transparent;flex:1;text-align:center}
+.btn-play:hover{opacity:.88}
+.btn-fav{background:transparent;color:var(--muted);border:1px solid var(--border);
+  padding:7px 10px}
+.btn-fav:hover{border-color:var(--border-h);color:var(--accent-text)}
+.btn-fav.saved{border-color:rgba(139,92,246,.4);color:var(--accent-text);
+  background:var(--accent-dim)}
+
+/* ── empty state ── */
+.empty{grid-column:1/-1;padding:80px 20px;text-align:center}
+.empty-title{font-size:1.05rem;font-weight:600;margin-bottom:6px}
+.empty-sub{font-size:.875rem;color:var(--muted)}
+
+/* ── pagination ── */
+.pag{display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:36px;flex-wrap:wrap}
+.pag-info{width:100%;text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.pag-btn{min-width:38px;height:38px;border-radius:6px;border:1px solid var(--border);
+  background:var(--card);color:var(--dim);font-family:inherit;font-size:.85rem;
+  font-weight:500;cursor:pointer;transition:border-color var(--tr),color var(--tr),
+  background var(--tr),opacity var(--tr)}
+.pag-btn:hover:not(:disabled){border-color:var(--border-h);color:var(--text)}
+.pag-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.pag-btn:disabled{opacity:.3;cursor:not-allowed}
+.pag-btn.wide{min-width:70px;padding:0 12px}
+.pag-dots{font-size:.85rem;color:var(--muted);padding:0 2px;user-select:none}
+
+/* ── footer ── */
+.ftr{margin-top:60px;padding:20px 0;border-top:1px solid var(--border);
+  font-size:.78rem;color:var(--muted);text-align:center}
+.ftr kbd{display:inline-block;padding:1px 7px;border-radius:4px;border:1px solid var(--border);
+  background:var(--card);font-size:.75rem;color:var(--dim)}
+
+/* ── scroll-top ── */
+#stb{position:fixed;bottom:24px;right:24px;width:40px;height:40px;border-radius:8px;
+  border:1px solid var(--border-h);background:rgba(139,92,246,.2);backdrop-filter:blur(8px);
+  color:var(--accent-text);font-size:1.1rem;font-weight:600;cursor:pointer;
+  opacity:0;transform:translateY(12px);transition:opacity var(--tr),transform var(--tr);z-index:50}
+#stb.show{opacity:1;transform:translateY(0)}
+
+/* ── responsive ── */
+@media(max-width:600px){
+  .wrap{padding:0 14px 60px}
+  .hdr{padding:28px 0 20px}
+  .ctrl{gap:8px}
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card-body{padding:14px 14px 12px}
+  .card-title{font-size:.89rem}
+}
+@media(max-width:380px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <div class="hdr-row">
+      <div>
+        <h1>Game Launcher</h1>
+        <p class="hdr-sub">Offline HTML5 games &mdash; no internet required</p>
+      </div>
+      <span class="total-badge" id="total-badge">Loading&hellip;</span>
+    </div>
+  </header>
+
+  <div class="ctrl">
+    <div class="ctrl-search">
+      <input id="search" type="search" placeholder="Search games&hellip; (press / to focus)"
+             autocomplete="off" spellcheck="false" aria-label="Search games"/>
+    </div>
+    <select id="cat-select" class="hidden" aria-label="Filter by category">
+      <option value="">All categories</option>
+    </select>
+    <select id="sort-select" aria-label="Sort order">
+      <option value="az">A to Z</option>
+      <option value="za">Z to A</option>
+    </select>
+    <button id="fav-tog" class="btn-favtog" aria-pressed="false">Favorites</button>
+  </div>
+
+  <div class="rbar">
+    <span id="rbar-count"><strong>0</strong> games</span>
+    <button id="clear-btn" class="rbar-clear hidden">Clear filters</button>
+  </div>
+
+  <main id="grid" class="grid" aria-label="Games list">
+    <!-- rendered by JS -->
+  </main>
+
+  <nav id="pag" class="pag" aria-label="Pagination"></nav>
+
+  <footer class="ftr">
+    Add a game: copy <kbd>.html</kbd> into <kbd>offline/</kbd>
+    &rarr; <kbd>node offline/generate-games.js</kbd>
+    &rarr; commit &amp; push
+  </footer>
+</div>
+
+<button id="stb" title="Back to top" aria-label="Scroll to top">&#8593;</button>
+
+<script>
+'use strict';
+/* ═══════════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════════ */
+const PAGE_SIZE = 50;
+const LS_FAV_KEY = 'glFavs_v1';
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let allGames = [];
+let favorites = loadFavs();
+let state = { q:'', cat:'', sort:'az', showFavs:false, page:1 };
+
+/* ═══════════════════════════════════════════
+   ELEMENTS
+═══════════════════════════════════════════ */
+const elGrid     = document.getElementById('grid');
+const elSearch   = document.getElementById('search');
+const elCatSel   = document.getElementById('cat-select');
+const elSortSel  = document.getElementById('sort-select');
+const elFavTog   = document.getElementById('fav-tog');
+const elPag      = document.getElementById('pag');
+const elTotal    = document.getElementById('total-badge');
+const elRCount   = document.getElementById('rbar-count');
+const elClearBtn = document.getElementById('clear-btn');
+const elStb      = document.getElementById('stb');
+
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+loadGames();
+
+async function loadGames() {
+  try {
+    const res = await fetch('games.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    allGames = data.games || [];
+
+    const meta = data.meta || {};
+    elTotal.textContent = (meta.totalGames || allGames.length) + ' games';
+
+    // Categories
+    const cats = (meta.categories || []).filter(Boolean);
+    if (cats.length) {
+      cats.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        elCatSel.appendChild(o);
+      });
+      elCatSel.classList.remove('hidden');
+    }
+
+    render();
+  } catch (err) {
+    elGrid.innerHTML = '<div class="empty"><p class="empty-title">Could not load games.json</p><p class="empty-sub">Run <code>node offline/generate-games.js</code> to generate it.</p></div>';
+    elTotal.textContent = 'Error';
+    console.error(err);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FILTER + SORT + PAGINATE
+═══════════════════════════════════════════ */
+function getFiltered() {
+  const q = state.q;
+  let games = allGames;
+
+  if (state.showFavs) games = games.filter(g => favorites.has(String(g.id)));
+  if (state.cat)      games = games.filter(g => g.category === state.cat);
+  if (q)              games = games.filter(g =>
+    g.title.toLowerCase().includes(q) ||
+    (g.category && g.category.toLowerCase().includes(q))
+  );
+
+  // Sort (sort a shallow copy)
+  games = games.slice().sort((a, b) =>
+    state.sort === 'az'
+      ? a.title.localeCompare(b.title)
+      : b.title.localeCompare(a.title)
+  );
+
+  return games;
+}
+
+function render() {
+  const filtered = getFiltered();
+  const total    = filtered.length;
+  const pages    = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // Clamp current page
+  if (state.page > pages) state.page = pages;
+  if (state.page < 1)     state.page = 1;
+
+  const start     = (state.page - 1) * PAGE_SIZE;
+  const pageSlice = filtered.slice(start, start + PAGE_SIZE);
+
+  renderCards(pageSlice, total);
+  renderPag(state.page, pages, total, start);
+  updateRbar(total, filtered.length !== allGames.length || state.showFavs);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER CARDS
+═══════════════════════════════════════════ */
+function renderCards(games, total) {
+  if (!games.length) {
+    const isEmpty = total === 0;
+    elGrid.innerHTML = '<div class="empty">' +
+      '<p class="empty-title">' + (isEmpty ? (state.showFavs ? 'No favorites saved yet.' : 'No games found.') : 'No games match your search.') + '</p>' +
+      '<p class="empty-sub">' + (isEmpty
+        ? (state.showFavs ? 'Click &ldquo;Save&rdquo; on any game card to add it to favorites.' : 'Run <code>node offline/generate-games.js</code> to populate the library.')
+        : 'Try a different search term or clear the filters.') +
+      '</p></div>';
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  games.forEach(g => frag.appendChild(buildCard(g)));
+  elGrid.innerHTML = '';
+  elGrid.appendChild(frag);
+}
+
+function buildCard(g) {
+  const isSaved = favorites.has(String(g.id));
+  const art  = document.createElement('article');
+  art.className = 'card';
+  art.dataset.id = g.id;
+
+  const catHtml = g.category
+    ? '<span class="card-cat">' + esc(g.category) + '</span>'
+    : '';
+
+  art.innerHTML =
+    '<div class="card-top"></div>' +
+    '<div class="card-body">' +
+      '<div class="card-info">' +
+        '<p class="card-title">' + esc(g.title) + '</p>' +
+        catHtml +
+      '</div>' +
+      '<div class="card-actions">' +
+        '<button class="btn btn-fav' + (isSaved ? ' saved' : '') + '" data-fid="' + g.id + '">' + (isSaved ? 'Saved' : 'Save') + '</button>' +
+        '<a class="btn btn-play" href="' + esc(g.file) + '" rel="noopener">Play</a>' +
+      '</div>' +
+    '</div>';
+
+  art.querySelector('.btn-fav').addEventListener('click', function() {
+    toggleFav(String(g.id), this);
+  });
+
+  return art;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER PAGINATION
+═══════════════════════════════════════════ */
+function renderPag(cur, total, count, start) {
+  if (total <= 1) { elPag.innerHTML = ''; return; }
+
+  const end = Math.min(start + PAGE_SIZE, count);
+  let html = '<p class="pag-info">Showing ' + (start + 1) + '&ndash;' + end + ' of ' + count + ' games</p>';
+
+  html += '<button class="pag-btn wide" data-p="' + (cur - 1) + '"' + (cur === 1 ? ' disabled' : '') + '>Prev</button>';
+
+  const range = pageRange(cur, total);
+  for (const p of range) {
+    if (p === '...') {
+      html += '<span class="pag-dots">&hellip;</span>';
+    } else {
+      html += '<button class="pag-btn' + (p === cur ? ' active' : '') + '" data-p="' + p + '">' + p + '</button>';
+    }
+  }
+
+  html += '<button class="pag-btn wide" data-p="' + (cur + 1) + '"' + (cur === total ? ' disabled' : '') + '>Next</button>';
+
+  elPag.innerHTML = html;
+  elPag.querySelectorAll('[data-p]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (this.disabled) return;
+      state.page = parseInt(this.dataset.p, 10);
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+}
+
+function pageRange(cur, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  if (cur <= 4)   return [1, 2, 3, 4, 5, '...', total];
+  if (cur >= total - 3) return [1, '...', total-4, total-3, total-2, total-1, total];
+  return [1, '...', cur - 1, cur, cur + 1, '...', total];
+}
+
+/* ═══════════════════════════════════════════
+   RESULTS BAR
+═══════════════════════════════════════════ */
+function updateRbar(count, hasFilters) {
+  elRCount.innerHTML = '<strong>' + count + '</strong> game' + (count !== 1 ? 's' : '');
+  elClearBtn.classList.toggle('hidden', !hasFilters);
+}
+
+/* ═══════════════════════════════════════════
+   FAVORITES
+═══════════════════════════════════════════ */
+function loadFavs() {
+  try { return new Set(JSON.parse(localStorage.getItem(LS_FAV_KEY) || '[]')); }
+  catch { return new Set(); }
+}
+
+function saveFavs() {
+  try { localStorage.setItem(LS_FAV_KEY, JSON.stringify([...favorites])); } catch {}
+}
+
+function toggleFav(id, btn) {
+  if (favorites.has(id)) {
+    favorites.delete(id);
+    btn.textContent = 'Save';
+    btn.classList.remove('saved');
+    // If "Show Favorites" is active, re-render (card disappears from list)
+    if (state.showFavs) { state.page = 1; render(); return; }
+  } else {
+    favorites.add(id);
+    btn.textContent = 'Saved';
+    btn.classList.add('saved');
+  }
+  saveFavs();
+}
+
+/* ═══════════════════════════════════════════
+   EVENT LISTENERS
+═══════════════════════════════════════════ */
+elSearch.addEventListener('input', debounce(function() {
+  state.q = this.value.trim().toLowerCase();
+  state.page = 1;
+  render();
+}, 200));
+
+elCatSel.addEventListener('change', function() {
+  state.cat = this.value;
+  state.page = 1;
+  render();
+});
+
+elSortSel.addEventListener('change', function() {
+  state.sort = this.value;
+  state.page = 1;
+  render();
+});
+
+elFavTog.addEventListener('click', function() {
+  state.showFavs = !state.showFavs;
+  this.classList.toggle('active', state.showFavs);
+  this.setAttribute('aria-pressed', String(state.showFavs));
+  state.page = 1;
+  render();
+});
+
+elClearBtn.addEventListener('click', function() {
+  state.q = ''; state.cat = ''; state.showFavs = false; state.page = 1;
+  elSearch.value = '';
+  elCatSel.value = '';
+  elFavTog.classList.remove('active');
+  elFavTog.setAttribute('aria-pressed', 'false');
+  render();
+});
+
+// "/" shortcut focuses search
+document.addEventListener('keydown', function(e) {
+  if (e.key === '/' && document.activeElement !== elSearch) {
+    e.preventDefault(); elSearch.focus();
+  }
+  if (e.key === 'Escape' && document.activeElement === elSearch) {
+    elSearch.blur();
+  }
+});
+
+// Scroll-to-top button
+window.addEventListener('scroll', function() {
+  elStb.classList.toggle('show', window.scrollY > 400);
+}, { passive: true });
+
+elStb.addEventListener('click', function() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function debounce(fn, ms) {
+  let t;
+  return function() {
+    clearTimeout(t);
+    t = setTimeout(fn.bind(this), ms);
+  };
+}
+</script>
+</body>
+</html>

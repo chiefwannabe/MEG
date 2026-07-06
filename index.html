@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IGNOU Free Study Resource Hub</title>
+  <style>
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Courier New', 'IBM Plex Mono', Courier, monospace;
+      color: #1a1a1a;
+      line-height: 1.65;
+      background-color: #f4f0e8;
+      /* Paper texture via layered CSS gradients */
+      background-image:
+        /* Fine noise grain */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        /* Subtle fiber lines */
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(160, 140, 110, 0.03) 3px,
+          rgba(160, 140, 110, 0.03) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 5px,
+          rgba(140, 120, 90, 0.02) 5px,
+          rgba(140, 120, 90, 0.02) 6px
+        ),
+        /* Warm paper base gradient */
+        linear-gradient(
+          175deg,
+          #f5f1e9 0%,
+          #f0eadc 25%,
+          #ece5d5 50%,
+          #f2ece0 75%,
+          #f6f2ea 100%
+        );
+      background-attachment: fixed;
+    }
+
+    /* ============================================
+       TYPOGRAPHY — Magazine Serif + Monospace
+       ============================================ */
+    h1, h2, h3, h4 {
+      font-family: Georgia, 'Playfair Display', 'Times New Roman', serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h1 { font-size: clamp(2.8rem, 6vw, 5.5rem); }
+    h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+    h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); }
+    h4 { font-size: 1rem; }
+
+    p, li, td, span, label, input, button {
+      font-family: 'Courier New', 'IBM Plex Mono', Courier, monospace;
+      font-size: 0.95rem;
+    }
+
+    a {
+      color: #1a5276;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    a:hover {
+      color: #0e8a5f;
+      border-color: #0e8a5f;
+    }
+
+    /* ============================================
+       PAGE WRAPPER — Magazine Spread
+       ============================================ */
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 253, 248, 0.85);
+      box-shadow:
+        -2px 0 15px rgba(0,0,0,0.08),
+        2px 0 15px rgba(0,0,0,0.08),
+        0 0 40px rgba(0,0,0,0.04);
+      border-left: 1px solid #d4c9b8;
+      border-right: 1px solid #d4c9b8;
+      position: relative;
+    }
+
+    /* Page edge shadow (simulates page turn) */
+    .page::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 30px;
+      background: linear-gradient(to right, rgba(0,0,0,0.04), transparent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .page::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; right: 0;
+      width: 30px;
+      background: linear-gradient(to left, rgba(0,0,0,0.04), transparent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ============================================
+       NOISE OVERLAY (global, subtle)
+       ============================================ */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       MASTHEAD / MAGAZINE HEADER
+       ============================================ */
+    .masthead {
+      text-align: center;
+      padding: 2.5rem 2rem 1.5rem;
+      border-bottom: 3px double #1a1a1a;
+      position: relative;
+    }
+
+    .masthead::before {
+      content: 'Vol. XXVI · No. 7 · July 2026 · Est. 2024';
+      display: block;
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+
+    .masthead h1 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      margin-bottom: 0.3rem;
+    }
+
+    .masthead .tagline {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #666;
+      letter-spacing: 0.05em;
+    }
+
+    /* ============================================
+       MAGAZINE TABLE OF CONTENTS NAVIGATION
+       ============================================ */
+    .toc-nav {
+      background: #1a1a1a;
+      color: #f4f0e8;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 2px solid #333;
+    }
+
+    .toc-nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .toc-nav li {
+      position: relative;
+    }
+
+    .toc-nav a {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      padding: 0.85rem 1.3rem;
+      color: #c8bfb0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border-bottom: none;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .toc-nav a:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .toc-num {
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0e8a5f;
+      transition: font-size 0.3s ease, color 0.3s ease;
+      min-width: 1.5em;
+    }
+
+    .toc-nav a:hover .toc-num {
+      font-size: 1.6rem;
+      color: #2ecc71;
+    }
+
+    /* ============================================
+       SECTION DIVIDERS — Magazine Page Breaks
+       ============================================ */
+    section {
+      padding: 4rem 3rem;
+      border-bottom: 1px solid #d4c9b8;
+      position: relative;
+    }
+
+    section::before {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: #1a5276;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: #999;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      margin-bottom: 2rem;
+      color: #1a1a1a;
+      position: relative;
+    }
+
+    /* Page number markers */
+    .page-marker {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-family: Georgia, serif;
+      font-size: 0.75rem;
+      color: #bbb;
+    }
+
+    /* ============================================
+       HERO SECTION — Magazine Cover Spread
+       ============================================ */
+    .hero {
+      background:
+        linear-gradient(135deg, #1a5276 0%, #0e4a3a 50%, #1a5276 100%);
+      color: #f4f0e8;
+      padding: 6rem 3rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        #2ecc71 0, #2ecc71 8px,
+        transparent 8px, transparent 16px
+      );
+    }
+
+    /* Offset headline — bleeds left past viewport edge */
+    .hero-headline {
+      font-size: clamp(3.2rem, 7vw, 6rem);
+      line-height: 1.0;
+      margin-left: -4rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      text-shadow: 2px 3px 0 rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-headline em {
+      font-style: italic;
+      color: #2ecc71;
+    }
+
+    .hero-sub {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(1rem, 1.8vw, 1.3rem);
+      color: #c8d8c4;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================
+       BUTTONS — Magazine Pull-Quote Style
+       ============================================ */
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border: 2px solid #fff;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      border-bottom: 2px solid #fff;
+    }
+
+    .btn:hover {
+      background: #fff;
+      color: #1a5276;
+      border-color: #fff;
+    }
+
+    .btn-primary {
+      background: #2ecc71;
+      border-color: #2ecc71;
+      color: #1a1a1a;
+    }
+
+    .btn-primary:hover {
+      background: #27ae60;
+      border-color: #27ae60;
+      color: #fff;
+    }
+
+    .btn-outline {
+      border-color: #1a5276;
+      color: #1a5276;
+    }
+
+    .btn-outline:hover {
+      background: #1a5276;
+      color: #fff;
+    }
+
+    /* ============================================
+       MULTI-COLUMN GRID — Magazine Layouts
+       ============================================ */
+    .col-grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .col-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .col-grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .col-grid-asym {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .col-grid-asym-rev {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .col-grid-mixed {
+      grid-template-columns: 1.5fr 1fr 1.5fr;
+    }
+
+    /* ============================================
+       CARDS — Magazine Feature Boxes
+       ============================================ */
+    .card {
+      background: #fffcf5;
+      border: 1px solid #d4c9b8;
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: #1a5276;
+    }
+
+    .card h3 {
+      color: #1a5276;
+      margin-bottom: 0.8rem;
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      color: #555;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    /* Sepia + noise on images */
+    .card-img {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #d4c5a9, #b8a88a);
+      border-radius: 3px;
+      margin-bottom: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      filter: sepia(0.2);
+    }
+
+    .card-img::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* ============================================
+       ABOUT SECTION
+       ============================================ */
+    .about-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .about-content p {
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    .about-sidebar {
+      background: #f0eadc;
+      padding: 1.5rem;
+      border-left: 3px solid #0e8a5f;
+      font-style: italic;
+      font-family: Georgia, serif;
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    /* ============================================
+       RESOURCES SECTION — 2×3 Grid
+       ============================================ */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    /* ============================================
+       COURSES SECTION — Horizontal Scroll Cards
+       ============================================ */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .course-card {
+      background: #fff;
+      border: 1px solid #d4c9b8;
+      border-radius: 4px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: #1a5276;
+    }
+
+    .course-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      border-color: #1a5276;
+    }
+
+    .course-card h4 {
+      font-size: 1.3rem;
+      color: #1a5276;
+      margin-bottom: 0.3rem;
+    }
+
+    .course-card p {
+      font-size: 0.78rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ============================================
+       FEATURES (Why Choose Us) — Horizontal Strip
+       ============================================ */
+    .features-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0;
+      border: 1px solid #d4c9b8;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .feature-item {
+      padding: 2rem 1rem;
+      text-align: center;
+      border-right: 1px solid #d4c9b8;
+      transition: background 0.3s ease;
+    }
+
+    .feature-item:last-child {
+      border-right: none;
+    }
+
+    .feature-item:hover {
+      background: #f0eadc;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.8rem;
+    }
+
+    .feature-item h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #1a5276;
+      margin-bottom: 0.3rem;
+    }
+
+    .feature-item p {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    /* ============================================
+       FAQ SECTION — Magazine Column Style
+       ============================================ */
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    .faq-item {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px dashed #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .faq-q {
+      font-family: Georgia, serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a5276;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .faq-q::before {
+      content: 'Q. ';
+      color: #0e8a5f;
+      font-weight: 700;
+    }
+
+    .faq-a {
+      color: #555;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      padding-left: 1.5rem;
+    }
+
+    .faq-a::before {
+      content: 'A. ';
+      color: #999;
+      font-weight: 700;
+    }
+
+    /* ============================================
+       CTA SECTION — Full-Width Magazine Spread
+       ============================================ */
+    .cta-section {
+      background: linear-gradient(135deg, #0e4a3a, #1a5276);
+      color: #f4f0e8;
+      text-align: center;
+      padding: 5rem 3rem;
+      border-bottom: none;
+    }
+
+    .cta-section::before {
+      background: #2ecc71;
+      margin: 0 auto 1.5rem;
+    }
+
+    .cta-section h2 {
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: #b8c8b4;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    /* ============================================
+       FOOTER — Magazine Copyright Page
+       ============================================ */
+    .footer {
+      background: #1a1a1a;
+      color: #999;
+      padding: 3rem;
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer h4 {
+      color: #d4c9b8;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .footer a {
+      color: #888;
+      border-bottom: 1px solid transparent;
+    }
+
+    .footer a:hover {
+      color: #2ecc71;
+      border-color: #2ecc71;
+    }
+
+    .footer ul {
+      list-style: none;
+    }
+
+    .footer li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #333;
+      padding-top: 2rem;
+      text-align: center;
+    }
+
+    .footer-issn {
+      font-family: Georgia, serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #555;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-legal {
+      font-size: 0.72rem;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .footer-disclaimer {
+      max-width: 700px;
+      margin: 1rem auto 0;
+      font-size: 0.7rem;
+      color: #555;
+      font-style: italic;
+      font-family: Georgia, serif;
+    }
+
+    /* ============================================
+       DECORATIVE — Magazine Flourishes
+       ============================================ */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      color: #ccc;
+      font-family: Georgia, serif;
+      font-size: 0.8rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #d4c9b8;
+    }
+
+    .dropcap::first-letter {
+      font-family: Georgia, serif;
+      font-size: 3.5rem;
+      float: left;
+      line-height: 0.8;
+      margin-right: 0.5rem;
+      margin-top: 0.1rem;
+      color: #1a5276;
+      font-weight: 700;
+    }
+
+    /* Pull quote style */
+    .pull-quote {
+      font-family: Georgia, serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #1a5276;
+      border-left: 4px solid #2ecc71;
+      padding: 1rem 0 1rem 1.5rem;
+      margin: 2rem 0;
+      line-height: 1.5;
+    }
+
+    /* ============================================
+       RESPONSIVE — Mobile Magazine
+       ============================================ */
+    @media (max-width: 900px) {
+      section {
+        padding: 3rem 1.5rem;
+      }
+
+      .hero {
+        padding: 4rem 1.5rem 3rem;
+      }
+
+      .hero-headline {
+        margin-left: -1rem;
+        font-size: clamp(2.2rem, 8vw, 3.5rem);
+      }
+
+      .col-grid-2,
+      .col-grid-3,
+      .col-grid-asym,
+      .col-grid-asym-rev,
+      .col-grid-mixed {
+        grid-template-columns: 1fr;
+      }
+
+      .resources-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .courses-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .features-strip {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .feature-item:nth-child(3) {
+        border-right: none;
+      }
+
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .toc-nav a {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .resources-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .courses-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .features-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .feature-item {
+        border-right: none;
+        border-bottom: 1px solid #d4c9b8;
+      }
+
+      .feature-item:nth-child(even) {
+        border-bottom: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-headline {
+        margin-left: 0;
+      }
+
+      .toc-nav ul {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .masthead h1 {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ============================================
+       PAGE TRANSITION ANCHORS
+       ============================================ */
+    section[id] {
+      scroll-margin-top: 60px;
+    }
+
+    /* Smooth fade-in on scroll (CSS-only with animation-timeline if supported) */
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    section {
+      animation: fadeSlideIn 0.6s ease both;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- ==========================================
+         MASTHEAD — Magazine Header
+         ========================================== -->
+    <header class="masthead">
+      <h1>IGNOU Free Study Resource Hub</h1>
+      <p class="tagline">An Independent, Non-Profit Educational Initiative · Free Resources for Every Student</p>
+    </header>
+
+    <!-- ==========================================
+         TABLE OF CONTENTS — Magazine Navigation
+         ========================================== -->
+    <nav class="toc-nav" aria-label="Main Navigation">
+      <ul>
+        <li><a href="#home"><span class="toc-num">01</span> Home</a></li>
+        <li><a href="#about"><span class="toc-num">02</span> About</a></li>
+        <li><a href="#resources"><span class="toc-num">03</span> Resources</a></li>
+        <li><a href="#courses"><span class="toc-num">04</span> Courses</a></li>
+        <li><a href="#why-us"><span class="toc-num">05</span> Why Us</a></li>
+        <li><a href="#faq"><span class="toc-num">06</span> FAQ</a></li>
+        <li><a href="#cta"><span class="toc-num">07</span> Start</a></li>
+      </ul>
+    </nav>
+
+    <!-- ==========================================
+         01 · HERO — Magazine Cover Spread
+         ========================================== -->
+    <section class="hero" id="home">
+      <span class="section-label">Cover Story</span>
+      <h2 class="hero-headline">Free IGNOU<br><em>Study Resources</em></h2>
+      <p class="hero-sub">Helping IGNOU students succeed with free Previous Year Question Papers, Notes, and Study Materials.</p>
+      <div class="hero-actions">
+        <a href="downloads.html" class="btn btn-primary">Download PYQs</a>
+        <a href="#resources" class="btn">Download Notes</a>
+         <a href="/games" class="btn">Games</a>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         02 · ABOUT US
+         ========================================== -->
+    <section id="about">
+      <span class="section-label">Section 02</span>
+      <h2 class="section-title">About This Initiative</h2>
+      <span class="page-marker">pg. 2</span>
+
+      <div class="about-content">
+        <div>
+          <p class="dropcap">We are a group of IGNOU alumni and current students who believe that quality education should be accessible to everyone, regardless of financial constraints. This non-profit initiative was born out of a simple observation: too many students struggle to find reliable, free study materials for their IGNOU courses.</p>
+          <p>Our mission is to bridge that gap by curating and sharing Previous Year Question Papers, handwritten notes, solved assignments, syllabus documents, and study guides — all completely free of charge. No hidden fees, no premium tiers, no registration walls.</p>
+          <p>Every resource on this platform is contributed by students, reviewed by our volunteer team, and made available to the entire IGNOU community. We are not officially affiliated with Indira Gandhi National Open University, but we are deeply committed to supporting its students.</p>
+        </div>
+
+        <aside class="about-sidebar">
+          "Education is the most powerful weapon which you can use to change the world."
+          <br><br>— Nelson Mandela
+        </aside>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         03 · RESOURCES — Feature Cards
+         ========================================== -->
+    <section id="resources">
+      <span class="section-label">Section 03</span>
+      <h2 class="section-title">Study Resources</h2>
+      <span class="page-marker">pg. 3</span>
+
+      <div class="resources-grid">
+        <!-- PYQs -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Previous Year Question Papers"></div>
+          <h3>Previous Year Question Papers</h3>
+          <p>Access a comprehensive collection of IGNOU PYQs from the last 10 years. Organized by course code, semester, and subject for quick reference.</p>
+          <br>
+          <a href="downloads.html" class="btn btn-outline">Download PYQs →</a>
+        </article>
+
+        <!-- Handwritten Notes -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Handwritten Notes"></div>
+          <h3>Handwritten Notes</h3>
+          <p>High-quality handwritten notes contributed by toppers and senior students. Clear, concise, and exam-focused for effective last-minute revision.</p>
+          <br>
+          <a href="#" class="btn btn-outline">View Notes →</a>
+        </article>
+
+        <!-- Solved Assignments -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Solved Assignments"></div>
+          <h3>Solved Assignments</h3>
+          <p>Expertly solved assignments for all major IGNOU programmes. Use them as reference to understand answer patterns and scoring techniques.</p>
+          <br>
+          <a href="#" class="btn btn-outline">Get Assignments →</a>
+        </article>
+
+        <!-- Study Guides -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Study Guides"></div>
+          <h3>Study Guides</h3>
+          <p>Curated study guides that break down complex topics into digestible chapters. Includes key concepts, important questions, and exam strategies.</p>
+          <br>
+          <a href="#" class="btn btn-outline">Read Guides →</a>
+        </article>
+
+        <!-- Syllabus -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Syllabus Documents"></div>
+          <h3>Syllabus</h3>
+          <p>Complete and up-to-date syllabus documents for all IGNOU programmes. Download PDFs and plan your study schedule with confidence.</p>
+          <br>
+          <a href="#" class="btn btn-outline">View Syllabus →</a>
+        </article>
+
+        <!-- Important Updates -->
+        <article class="card">
+          <div class="card-img" role="img" aria-label="Important Updates"></div>
+          <h3>Important Updates</h3>
+          <p>Stay informed about exam dates, assignment deadlines, re-registration windows, and other critical announcements from IGNOU.</p>
+          <br>
+          <a href="#" class="btn btn-outline">Check Updates →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         04 · POPULAR COURSES
+         ========================================== -->
+    <section id="courses">
+      <span class="section-label">Section 04</span>
+      <h2 class="section-title">Popular Courses</h2>
+      <span class="page-marker">pg. 4</span>
+
+      <p style="margin-bottom: 2rem; color: #666; max-width: 700px;">
+        Browse resources for the most popular IGNOU programmes. Select your course to find tailored question papers, notes, and study materials.
+      </p>
+
+      <div class="courses-grid">
+        <article class="course-card">
+          <h4>MEG</h4>
+          <p>Master of Arts<br>English</p>
+        </article>
+        <article class="course-card">
+          <h4>MHD</h4>
+          <p>Master of Arts<br>Hindi</p>
+        </article>
+        <article class="course-card">
+          <h4>BAG</h4>
+          <p>Bachelor of Arts<br>General</p>
+        </article>
+        <article class="course-card">
+          <h4>BCOMG</h4>
+          <p>Bachelor of<br>Commerce</p>
+        </article>
+        <article class="course-card">
+          <h4>BCA</h4>
+          <p>Bachelor of Computer<br>Applications</p>
+        </article>
+        <article class="course-card">
+          <h4>MCA</h4>
+          <p>Master of Computer<br>Applications</p>
+        </article>
+        <article class="course-card">
+          <h4>MBA</h4>
+          <p>Master of Business<br>Administration</p>
+        </article>
+        <article class="course-card">
+          <h4>MA Eng</h4>
+          <p>Master of Arts<br>English Literature</p>
+        </article>
+        <article class="course-card">
+          <h4>BA Eng</h4>
+          <p>Bachelor of Arts<br>English</p>
+        </article>
+        <article class="course-card">
+          <h4>BSc</h4>
+          <p>Bachelor of<br>Science</p>
+        </article>
+        <article class="course-card">
+          <h4>MCom</h4>
+          <p>Master of<br>Commerce</p>
+        </article>
+        <article class="course-card">
+          <h4>更多</h4>
+          <p>Explore All<br>Programmes</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         05 · WHY CHOOSE US — Feature Strip
+         ========================================== -->
+    <section id="why-us">
+      <span class="section-label">Section 05</span>
+      <h2 class="section-title">Why Choose Us</h2>
+      <span class="page-marker">pg. 5</span>
+
+      <div class="features-strip">
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Free">✦</span>
+          <h4>100% Free</h4>
+          <p>No hidden charges, ever.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="No Registration">◇</span>
+          <h4>No Registration</h4>
+          <p>No sign-up required.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Updated">↻</span>
+          <h4>Regularly Updated</h4>
+          <p>Fresh content added weekly.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Mobile">▣</span>
+          <h4>Mobile Friendly</h4>
+          <p>Works on any device.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Fast">⚡</span>
+          <h4>Fast Downloads</h4>
+          <p>Quick access to files.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Community">☺</span>
+          <h4>Community Driven</h4>
+          <p>Built by students.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         06 · FAQ — Magazine Column Layout
+         ========================================== -->
+    <section id="faq">
+      <span class="section-label">Section 06</span>
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <span class="page-marker">pg. 6</span>
+
+      <div class="faq-grid">
+        <div>
+          <div class="faq-item">
+            <div class="faq-q">Are the resources really free?</div>
+            <div class="faq-a">Yes, absolutely. Every resource on this platform is 100% free. We do not charge for downloads, and there are no premium or paid tiers. Our mission is to make education accessible to all IGNOU students.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Is registration required to download materials?</div>
+            <div class="faq-a">No. You can browse and download all resources without creating an account. We believe in removing barriers to education, not creating them.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Are the PYQs updated every year?</div>
+            <div class="faq-a">Yes. We update our question paper collection after every exam session. Our volunteer team works to ensure the latest papers are uploaded within weeks of the examination.</div>
+          </div>
+        </div>
+        <div>
+          <div class="faq-item">
+            <div class="faq-q">Can I contribute my notes or papers?</div>
+            <div class="faq-a">Absolutely! We encourage students to contribute their notes, solved papers, and study materials. Every contribution helps the community. Reach out via our contact page to get started.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Is this website officially affiliated with IGNOU?</div>
+            <div class="faq-a">No. This is an independent, non-profit educational initiative. We are not officially affiliated with Indira Gandhi National Open University. We are students helping students.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">How often is new content added?</div>
+            <div class="faq-a">We add new resources weekly. Major updates happen at the start of each semester and after examination results are declared. Follow us to stay informed about new additions.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         07 · CALL TO ACTION
+         ========================================== -->
+    <section class="cta-section" id="cta">
+      <span class="section-label" style="color: #8ab8a0;">Section 07</span>
+      <h2>Start Learning Today</h2>
+      <p>Join thousands of IGNOU students who are already benefiting from free study resources. Your success is our mission.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="#resources" class="btn btn-primary">Explore Resources</a>
+        <a href="#courses" class="btn">Browse Courses</a>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         FOOTER — Magazine Copyright Page
+         ========================================== -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <h4>About</h4>
+          <p>IGNOU Free Study Resource Hub is an independent, non-profit educational initiative dedicated to making quality study materials accessible to every IGNOU student. We are a community of learners, by learners, for learners.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#resources">Resources</a></li>
+            <li><a href="#courses">Courses</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="downloads.html">PYQ Papers</a></li>
+            <li><a href="#">Notes</a></li>
+            <li><a href="#">Assignments</a></li>
+            <li><a href="#">Syllabus</a></li>
+            <li><a href="#">Study Guides</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Disclaimer</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-issn">ISSN 2847-6319 · Registered Independent Educational Publication</div>
+        <div class="footer-legal">
+          © 2024–2026 IGNOU Free Study Resource Hub. All rights reserved.<br>
+          This is an independent, non-profit educational initiative.<br>
+          Not officially affiliated with Indira Gandhi National Open University (IGNOU).
+        </div>
+        <p class="footer-disclaimer">
+          All resources are provided for educational purposes only. The content is contributed by students and volunteers. While we strive for accuracy, we make no warranties regarding the completeness or correctness of the materials. IGNOU® is a registered trademark of Indira Gandhi National Open University.
+        </p>
+      </div>
+    </footer>
+
+  </div><!-- .page -->
+
+</body>
+</html>
