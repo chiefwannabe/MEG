@@ -2,5 +2,15 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".",
   "installCommand": "echo 'no npm dependencies'",
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/games",
+      "destination": "/offline/index.html"
+    },
+    {
+      "source": "/games/:path*",
+      "destination": "/offline/:path*"
+    }
+  ]
 }
