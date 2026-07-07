@@ -627,7 +627,7 @@
   <script>
     // Mock Database of PYQs (One row per course covering 2023–2026 June & December)
     const pyqDatabase = [
-      { code: "MEG-01", title: "British Poetry", year: "2023–2026", session: "June & December", type: "meg" },
+      { code: "MEG-01", title: "British Poetry", year: "2023–2026", session: "June & December", type: "meg", url: "https://files.catbox.moe/5931m6.pdf" },
       { code: "MEG-02", title: "British Drama", year: "2023–2026", session: "June & December", type: "meg" },
       { code: "MEG-03", title: "British Novel", year: "2023–2026", session: "June & December", type: "meg" },
       { code: "MEG-04", title: "Aspects of Language", year: "2023–2026", session: "June & December", type: "meg" },
@@ -673,13 +673,14 @@
           badgeClass = "session-dec";
         }
         
+        const itemUrl = item.url || '';
         tr.innerHTML = `
           <td><span class="course-code">${item.code}</span></td>
           <td>${item.title}</td>
           <td>${item.year}</td>
           <td><span class="session-badge ${badgeClass}">${item.session}</span></td>
           <td>
-            <button class="btn-download" onclick="startSimulatedDownload('${item.code}', '${item.title}', '${item.year}', '${item.session}')">
+            <button class="btn-download" onclick="startSimulatedDownload('${item.code}', '${item.title}', '${item.year}', '${item.session}', '${itemUrl}')">
               <span class="btn-icon">💾</span> Download PDF
             </button>
           </td>
@@ -718,7 +719,7 @@
     const progressText = document.getElementById('progressText');
     const progressPercentage = document.getElementById('progressPercentage');
 
-    function startSimulatedDownload(code, title, year, session) {
+    function startSimulatedDownload(code, title, year, session, url) {
       // Setup Modal Info
       modalTitle.textContent = `${code} ${title}`;
       modalInfo.textContent = `Exam: ${session} ${year} · PDF Document (${(Math.random() * 1.5 + 0.5).toFixed(1)} MB)`;
@@ -746,13 +747,22 @@
           setTimeout(() => {
             overlay.classList.remove('active');
             overlay.setAttribute('aria-hidden', 'true');
-            // Trigger actual mock download to browser
-            const blob = new Blob([`Mock PDF content for ${code} (${year})`], { type: 'application/pdf' });
+
             const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
             const cleanSession = session.replace(/\s+/g, '_').replace(/&/g, 'And');
             const cleanYear = year.replace(/–/g, '_');
             link.download = `${code}_PYQ_${cleanSession}_${cleanYear}.pdf`;
+
+            if (url) {
+              // Real PDF URL — trigger direct download
+              link.href = url;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+            } else {
+              // Fallback mock download
+              const blob = new Blob([`Mock PDF content for ${code} (${year})`], { type: 'application/pdf' });
+              link.href = window.URL.createObjectURL(blob);
+            }
             link.click();
           }, 1000);
         } else {
