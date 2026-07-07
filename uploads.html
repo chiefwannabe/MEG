@@ -322,16 +322,9 @@
     const fileCount = document.getElementById('fileCount');
 
     try{
-      const res = await fetch(FOLDER);
-      if(!res.ok) throw new Error('folder not reachable');
-      const html = await res.text();
-
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const links = Array.from(doc.querySelectorAll('a'))
-        .map(a => a.getAttribute('href'))
-        .filter(href => href && !href.startsWith('?') && !href.startsWith('/') && href !== '../' && href !== './');
-
-      const files = [...new Set(links)].map(href => decodeURIComponent(href.replace(/\/$/, '')));
+      const res = await fetch(FOLDER + 'files.json');
+      if(!res.ok) throw new Error('files.json not reachable');
+      const files = await res.json();
 
       if(files.length === 0){
         grid.innerHTML = emptyState(`Drop files into <code>Html_files</code> and refresh this page.`);
