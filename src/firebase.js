@@ -1,14 +1,14 @@
 /**
- * firebase.js — Firebase App + Analytics Initialization
+ * firebase.js — Firebase App + Analytics + Firestore Initialization
  * IGNOU Study Hub
  *
  * Import this module wherever Firebase services are needed.
- * Analytics is initialized lazily to respect browser environments
- * that may block it (e.g., SSR / pre-render).
+ * Analytics and Firestore are initialized using the modular SDK.
  */
 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey:            "AIzaSyDAOlHfIej0D54kaSmPdfBCl9l5WEcnZ1E",
@@ -22,7 +22,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+// Initialize Firestore
+const db = getFirestore(app);
+
 // Analytics — only meaningful in browser environments
 const analytics = (typeof window !== "undefined") ? getAnalytics(app) : null;
 
-export { app, analytics };
+export { app, db, analytics };

@@ -30,6 +30,8 @@ import {
   updateProfile,
 } from "firebase/auth";
 
+import { createUserDocument } from "../src/firestore.js";
+
 /* ================================================================
    AUTH INSTANCE
    ================================================================ */
@@ -422,6 +424,11 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Persistent Auth State Listener ─────────────────────────── */
   onAuthStateChanged(auth, (user) => {
     handleAuthStateChanged(user);
+    if (user) {
+      createUserDocument(user).catch((err) => {
+        console.error("[Auth] Failed to handle user document setup:", err);
+      });
+    }
   });
 
   /* ── Modal open / close ─────────────────────────────────────── */
