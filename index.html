@@ -7,6 +7,17 @@
 <meta name="description" content="Free IGNOU Previous Year Question Papers, Notes, Assignments, Syllabus and Study Resources for all courses.">
 <link rel="stylesheet" href="auth/auth.css">
 
+<!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+    "firebase/auth":     "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+    "firebase/analytics":"https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js"
+  }
+}
+</script>
+
 <style>
   /* ===================== RESET & BASE ===================== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -914,6 +925,6 @@
   </div><!-- /auth-card -->
 </div><!-- /auth-overlay -->
 
-<script src="auth/auth.js"></script>
+<script type="module" src="auth/auth.js"></script>
 </body>
 </html>
