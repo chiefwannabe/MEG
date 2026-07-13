@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard – MEGOL | IGNOU Study Hub</title>
+<meta name="description" content="Your personal IGNOU study dashboard — track courses, notes, bookmarks and quiz scores in one place.">
+
+<!-- Font Awesome (icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="dashboard.css">
+
+<!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+    "firebase/auth":     "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+    "firebase/analytics":"https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- Skip link for keyboard/screen reader users -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <div class="sidebar-top">
+      <a href="#" class="brand" aria-label="MEGOL home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-text">MEGOL</span>
+      </a>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <nav class="side-nav">
+      <ul>
+        <li><a href="#" class="nav-link active" data-nav="dashboard"><i class="fa-solid fa-grid-2" aria-hidden="true"></i><span>Dashboard</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="profile"><i class="fa-regular fa-user" aria-hidden="true"></i><span>My Profile</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="bookmarks"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span>Bookmarks</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="progress"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Reading Progress</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="notes"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><span>My Notes</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="quiz"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Quiz Scores</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="downloads"><i class="fa-solid fa-download" aria-hidden="true"></i><span>Downloads</span></a></li>
+      </ul>
+
+      <div class="nav-divider" role="separator"></div>
+
+      <ul>
+        <li><a href="#" class="nav-link" data-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>Settings</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="help"><i class="fa-regular fa-circle-question" aria-hidden="true"></i><span>Help</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <!-- STUDY STREAK: replace with dynamic streak value -->
+      <div class="streak-chip">
+        <i class="fa-solid fa-fire" aria-hidden="true"></i>
+        <div>
+          <strong data-dynamic="studyStreak">12</strong>
+          <span>day streak</span>
+        </div>
+      </div>
+      <a href="#" class="nav-link logout" data-nav="logout">
+        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-col">
+
+    <!-- ============ TOP BAR ============ -->
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+
+      <form class="search-form" role="search" action="#" onsubmit="return false;">
+        <label class="sr-only" for="globalSearch">Search notes, PYQs, courses</label>
+        <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+        <input type="search" id="globalSearch" placeholder="Search notes, PYQs, courses…" autocomplete="off">
+        <kbd class="search-kbd">/</kbd>
+      </form>
+
+      <div class="topbar-actions">
+        <button class="icon-btn" id="notifBtn" aria-haspopup="true" aria-expanded="false" aria-label="Notifications, 3 unread">
+          <i class="fa-regular fa-bell" aria-hidden="true"></i>
+          <span class="badge-dot" data-dynamic="unreadCount">3</span>
+        </button>
+
+        <div class="notif-panel" id="notifPanel" role="menu" hidden>
+          <div class="notif-panel-head">
+            <h2>Notifications</h2>
+            <button class="text-btn">Mark all read</button>
+          </div>
+          <!-- NOTIFICATIONS: map dynamic notifications array here -->
+          <ul class="notif-list">
+            <li class="notif-item unread">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              <div><p>Your MEG-05 quiz was auto-graded: <strong>84%</strong></p><time>2h ago</time></div>
+            </li>
+            <li class="notif-item unread">
+              <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+              <div><p>New PYQ set added for <strong>BEGC-132</strong></p><time>6h ago</time></div>
+            </li>
+            <li class="notif-item unread">
+              <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+              <div><p>Assignment deadline in <strong>3 days</strong></p><time>1d ago</time></div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="user-menu">
+          <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
+            <!-- USER AVATAR: replace src with dynamic profile image -->
+            <img class="avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Ravi%20Kumar&backgroundColor=2563eb&textColor=ffffff" alt="" width="36" height="36">
+            <span class="user-name" data-dynamic="displayName">Ravi Kumar</span>
+            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+          </button>
+
+          <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
+            <li role="none"><a role="menuitem" href="#"><i class="fa-regular fa-user" aria-hidden="true"></i>My Profile</a></li>
+            <li role="none"><a role="menuitem" href="#"><i class="fa-solid fa-gear" aria-hidden="true"></i>Settings</a></li>
+            <li role="none"><a role="menuitem" href="#"><i class="fa-regular fa-circle-question" aria-hidden="true"></i>Help</a></li>
+            <li class="dropdown-divider" role="none"></li>
+            <li role="none"><a role="menuitem" href="#" class="danger"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main id="main-content" class="content">
+
+      <!-- 1. WELCOME CARD -->
+      <section class="card welcome-card" aria-labelledby="welcomeHeading">
+        <div class="welcome-text">
+          <p class="eyebrow" data-dynamic="currentDate">Tuesday, 14 July 2026</p>
+          <h1 id="welcomeHeading">Welcome back, <span data-dynamic="displayName">Ravi</span> <span aria-hidden="true">👋</span></h1>
+          <p class="quote" data-dynamic="motivationalQuote">
+            <i class="fa-solid fa-quote-left" aria-hidden="true"></i>
+            "Success is the sum of small efforts, repeated day in and day out."
+          </p>
+          <button class="btn btn-primary" id="continueLearningBtn">
+            Continue Learning <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="welcome-visual" aria-hidden="true">
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <svg viewBox="0 0 200 200" class="welcome-svg">
+            <circle cx="100" cy="100" r="72" class="ring ring-track"></circle>
+            <circle cx="100" cy="100" r="72" class="ring ring-progress"></circle>
+            <text x="100" y="95" text-anchor="middle" class="ring-num">68%</text>
+            <text x="100" y="116" text-anchor="middle" class="ring-label">Overall</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 2. QUICK STATISTICS -->
+      <section class="stats-grid" aria-label="Quick statistics">
+        <!-- STATS: repeat/populate this card pattern per stat object -->
+        <article class="card stat-card">
+          <div class="stat-icon icon-blue"><i class="fa-solid fa-book-open" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="coursesEnrolled">6</span>
+            <span class="stat-label">Courses Enrolled</span>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <div class="stat-icon icon-violet"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="notesRead">142</span>
+            <span class="stat-label">Notes Read</span>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <div class="stat-icon icon-amber"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="bookmarkCount">28</span>
+            <span class="stat-label">Bookmarks</span>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <div class="stat-icon icon-green"><i class="fa-solid fa-square-poll-vertical" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="quizAverage">81%</span>
+            <span class="stat-label">Quiz Average</span>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <div class="stat-icon icon-rose"><i class="fa-solid fa-fire" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="studyStreakStat">12</span>
+            <span class="stat-label">Study Streak (days)</span>
+          </div>
+        </article>
+        <article class="card stat-card">
+          <div class="stat-icon icon-cyan"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
+          <div class="stat-body">
+            <span class="stat-value" data-dynamic="readingProgress">68%</span>
+            <span class="stat-label">Reading Progress</span>
+          </div>
+        </article>
+      </section>
+
+      <div class="content-grid">
+        <div class="content-main">
+
+          <!-- 3. CONTINUE LEARNING -->
+          <section class="card section-card" aria-labelledby="continueHeading">
+            <div class="section-head">
+              <h2 id="continueHeading">Continue Learning</h2>
+              <a href="#" class="text-link">View all courses</a>
+            </div>
+            <!-- COURSES: map over enrolled courses array -->
+            <div class="course-list">
+              <article class="course-item">
+                <div class="course-icon">MEG-01</div>
+                <div class="course-info">
+                  <div class="course-top">
+                    <h3>British Poetry</h3>
+                    <span class="course-pct" data-dynamic="progress">80%</span>
+                  </div>
+                  <div class="progress-track" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" aria-label="British Poetry progress">
+                    <div class="progress-fill" style="--fill:80%"></div>
+                  </div>
+                  <p class="course-meta">Block 4 of 5 · Last read 2h ago</p>
+                </div>
+                <button class="btn btn-ghost">Resume</button>
+              </article>
+
+              <article class="course-item">
+                <div class="course-icon icon-alt">MEG-02</div>
+                <div class="course-info">
+                  <div class="course-top">
+                    <h3>British Drama</h3>
+                    <span class="course-pct" data-dynamic="progress">40%</span>
+                  </div>
+                  <div class="progress-track" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="British Drama progress">
+                    <div class="progress-fill" style="--fill:40%"></div>
+                  </div>
+                  <p class="course-meta">Block 2 of 5 · Last read yesterday</p>
+                </div>
+                <button class="btn btn-ghost">Resume</button>
+              </article>
+
+              <article class="course-item">
+                <div class="course-icon icon-alt2">BEGC-132</div>
+                <div class="course-info">
+                  <div class="course-top">
+                    <h3>English Grammar</h3>
+                    <span class="course-pct" data-dynamic="progress">55%</span>
+                  </div>
+                  <div class="progress-track" role="progressbar" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100" aria-label="English Grammar progress">
+                    <div class="progress-fill" style="--fill:55%"></div>
+                  </div>
+                  <p class="course-meta">Block 3 of 6 · Last read 3d ago</p>
+                </div>
+                <button class="btn btn-ghost">Resume</button>
+              </article>
+            </div>
+          </section>
+
+          <!-- 4. RECENT ACTIVITY -->
+          <section class="card section-card" aria-labelledby="activityHeading">
+            <div class="section-head">
+              <h2 id="activityHeading">Recent Activity</h2>
+            </div>
+            <!-- ACTIVITY: map over activity timeline array, newest first -->
+            <ol class="timeline">
+              <li class="timeline-item">
+                <span class="timeline-dot dot-blue"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
+                <div class="timeline-body">
+                  <p>Opened notes for <strong>MEG-01, Block 4</strong></p>
+                  <time>Today, 10:24 AM</time>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot dot-green"><i class="fa-solid fa-download" aria-hidden="true"></i></span>
+                <div class="timeline-body">
+                  <p>Downloaded PDF: <strong>BEGC-132 PYQ 2025</strong></p>
+                  <time>Yesterday, 6:41 PM</time>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot dot-amber"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+                <div class="timeline-body">
+                  <p>Completed quiz: <strong>MEG-05, Assessment 2</strong> — scored 84%</p>
+                  <time>2 days ago</time>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <span class="timeline-dot dot-violet"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></span>
+                <div class="timeline-body">
+                  <p>Bookmarked <strong>"Modernism in British Poetry"</strong></p>
+                  <time>3 days ago</time>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <!-- 8. QUIZ PERFORMANCE -->
+          <section class="card section-card" aria-labelledby="quizHeading">
+            <div class="section-head">
+              <h2 id="quizHeading">Quiz Performance</h2>
+              <a href="#" class="text-link">View all scores</a>
+            </div>
+            <!-- QUIZ SCORES: map over quiz results array -->
+            <div class="quiz-grid">
+              <div class="quiz-ring-card">
+                <svg viewBox="0 0 120 120" class="quiz-ring" aria-hidden="true">
+                  <circle cx="60" cy="60" r="50" class="qr-track"></circle>
+                  <circle cx="60" cy="60" r="50" class="qr-fill" style="--pct:81"></circle>
+                </svg>
+                <div class="quiz-ring-text">
+                  <strong>81%</strong>
+                  <span>Average</span>
+                </div>
+              </div>
+              <ul class="quiz-list">
+                <li><span>MEG-01 · Assessment 1</span><strong class="score-good">92%</strong></li>
+                <li><span>MEG-02 · Assessment 1</span><strong class="score-mid">74%</strong></li>
+                <li><span>MEG-05 · Assessment 2</span><strong class="score-good">84%</strong></li>
+                <li><span>BEGC-132 · Assessment 1</span><strong class="score-low">68%</strong></li>
+              </ul>
+            </div>
+          </section>
+
+        </div>
+
+        <aside class="content-side">
+
+          <!-- 5. UPCOMING TASKS -->
+          <section class="card section-card" aria-labelledby="tasksHeading">
+            <div class="section-head">
+              <h2 id="tasksHeading">Upcoming Tasks</h2>
+            </div>
+            <!-- TASKS: map over tasks array; toggling should update backend later -->
+            <ul class="task-list">
+              <li class="task-item">
+                <label>
+                  <input type="checkbox">
+                  <span class="task-check" aria-hidden="true"></span>
+                  <span class="task-text">Submit TMA 1 – MEG-01</span>
+                </label>
+                <span class="task-due due-soon">Due in 3d</span>
+              </li>
+              <li class="task-item">
+                <label>
+                  <input type="checkbox">
+                  <span class="task-check" aria-hidden="true"></span>
+                  <span class="task-text">Revise Block 3 – BEGC-132</span>
+                </label>
+                <span class="task-due">Due in 6d</span>
+              </li>
+              <li class="task-item">
+                <label>
+                  <input type="checkbox" checked>
+                  <span class="task-check" aria-hidden="true"></span>
+                  <span class="task-text">Attend counselling session</span>
+                </label>
+                <span class="task-due task-done">Completed</span>
+              </li>
+              <li class="task-item">
+                <label>
+                  <input type="checkbox">
+                  <span class="task-check" aria-hidden="true"></span>
+                  <span class="task-text">Practice MEG-02 PYQ set</span>
+                </label>
+                <span class="task-due">Due in 9d</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- 9. STUDY CALENDAR -->
+          <section class="card section-card" aria-labelledby="calHeading">
+            <div class="section-head">
+              <h2 id="calHeading">Study Calendar</h2>
+            </div>
+            <!-- CALENDAR: generated by dashboard.js; highlighted dates come from a study-log array -->
+            <div class="mini-cal" id="miniCal"></div>
+          </section>
+
+          <!-- 6. BOOKMARKS PREVIEW -->
+          <section class="card section-card" aria-labelledby="bmHeading">
+            <div class="section-head">
+              <h2 id="bmHeading">Bookmarks</h2>
+              <a href="#" class="text-link">View all</a>
+            </div>
+            <!-- BOOKMARKS: map over saved bookmarks array -->
+            <ul class="mini-list">
+              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Modernism in British Poetry</a></li>
+              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Structure of a Business Letter</a></li>
+              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Key Themes – "The Tempest"</a></li>
+            </ul>
+          </section>
+
+          <!-- 7. NOTES PREVIEW -->
+          <section class="card section-card" aria-labelledby="notesHeading">
+            <div class="section-head">
+              <h2 id="notesHeading">My Notes</h2>
+              <a href="#" class="text-link">View all</a>
+            </div>
+            <!-- NOTES: map over personal notes array -->
+            <ul class="mini-list">
+              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Summary — Romantic Poets</a></li>
+              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Grammar cheat sheet</a></li>
+              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Essay outline — Drama unit</a></li>
+            </ul>
+          </section>
+
+        </aside>
+      </div>
+
+      <!-- 10. RESOURCES -->
+      <section class="card resources-card" aria-labelledby="resourcesHeading">
+        <div class="section-head">
+          <h2 id="resourcesHeading">Resources</h2>
+        </div>
+        <div class="resources-grid">
+          <a href="#" class="resource-tile">
+            <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+            <span>Notes</span>
+          </a>
+          <a href="#" class="resource-tile">
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+            <span>PYQs</span>
+          </a>
+          <a href="#" class="resource-tile">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+            <span>Assignments</span>
+          </a>
+          <a href="#" class="resource-tile">
+            <i class="fa-solid fa-video" aria-hidden="true"></i>
+            <span>Videos</span>
+          </a>
+          <a href="#" class="resource-tile">
+            <i class="fa-solid fa-book" aria-hidden="true"></i>
+            <span>Books</span>
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="copyrightYear">2026</span> MEGOL — IGNOU Study Hub. All rights reserved.</p>
+    </footer>
+  </div>
+</div>
+
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>
