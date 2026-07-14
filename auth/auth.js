@@ -537,14 +537,14 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Dropdown nav links ─────────────────────────────────────── */
   document.querySelectorAll(".ud-nav-link").forEach((link) => {
     link.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeUserMenu();
       const href = link.getAttribute("href");
-      if (href && href !== "#") {
-        window.location.href = href;
-      } else {
+      closeUserMenu();
+      if (!href || href === "#") {
+        e.preventDefault();
         console.info("[Auth] Navigate to:", link.dataset.page);
       }
+      // Real hrefs (e.g. dashboard/dashboard.html) fall through
+      // to native <a> navigation — no preventDefault needed.
     });
   });
 
