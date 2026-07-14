@@ -5,7 +5,7 @@
 
 import { app } from "../src/firebase.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
-import { createUserDocument, getUserProfile, updateUserProfile, getPublishedResources, getRelatedResources, toggleBookmark, logReadingProgress, logDownload, updateUserSettings, getUserNotes, addUserNote, deleteUserNote, getUserQuizzes, addUserQuizScore } from "../src/firestore.js";
+import { createUserDocument, getUserProfile, updateUserProfile, getPublishedResources, getRelatedResources, toggleBookmark, logDownload, updateUserSettings, getUserNotes, addUserNote, deleteUserNote, getUserQuizzes, addUserQuizScore } from "../src/firestore.js";
 
 (async function () {
   "use strict";
@@ -181,9 +181,6 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
     coursesEnrolled: 6,
     notesRead: 142,
     bookmarkCount: 28,
-    quizAverage: "81%",
-    studyStreak: 12,
-    readingProgress: "68%",
     unreadCount: 3,
     motivationalQuotes: [
       "Success is the sum of small efforts, repeated day in and day out.",
@@ -208,10 +205,6 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
   applyDynamicText("coursesEnrolled", userData.coursesEnrolled);
   applyDynamicText("notesRead", userData.notesRead);
   applyDynamicText("bookmarkCount", userData.bookmarkCount);
-  applyDynamicText("quizAverage", userData.quizAverage);
-  applyDynamicText("studyStreak", userData.studyStreak);
-  applyDynamicText("studyStreakStat", userData.studyStreak);
-  applyDynamicText("readingProgress", userData.readingProgress);
   applyDynamicText("unreadCount", userData.unreadCount);
 
   /* ---------------------------------------------------------
@@ -287,7 +280,7 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
 
     const views = [
       "dashboard", "profile", "resources", "bookmarks",
-      "progress", "notes", "quiz", "downloads", "settings", "help"
+      "notes", "quiz", "downloads", "settings", "help"
     ];
 
     views.forEach((v) => {
@@ -301,8 +294,6 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
       renderResourcesCatalog();
     } else if (viewName === "bookmarks") {
       renderBookmarksView();
-    } else if (viewName === "progress") {
-      renderProgressView();
     } else if (viewName === "notes") {
       renderNotesView();
     } else if (viewName === "quiz") {
@@ -678,9 +669,7 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
       openBtn.onclick = () => {
         const user = auth.currentUser;
         if (user) {
-          logReadingProgress(user.uid, res.id).then(() => {
-            getUserProfile(user.uid).then(updateDashboardStats);
-          });
+          getUserProfile(user.uid).then(updateDashboardStats);
         }
       };
     }
@@ -836,38 +825,7 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
     }
   }
 
-  async function renderProgressView() {
-    const grid = document.getElementById("progress-grid");
-    const empty = document.getElementById("progress-empty");
-    const barFill = document.getElementById("progress-bar-fill");
-    const textLabel = document.getElementById("progress-text-label");
-    if (!grid) return;
-    grid.innerHTML = "";
-    
-    const user = auth.currentUser;
-    if (!user) return;
-    
-    try {
-      const profile = await getUserProfile(user.uid);
-      const progress = profile.progress || [];
-      const openedItems = cachedResources.filter((r) => progress.includes(r.id));
-      
-      const totalCount = cachedResources.length || 1;
-      const pct = Math.round((openedItems.length / totalCount) * 100);
-      if (barFill) barFill.style.width = `${pct}%`;
-      if (textLabel) textLabel.textContent = `${pct}% Completed`;
-      
-      if (openedItems.length === 0) {
-        if (empty) empty.style.display = "block";
-        return;
-      }
-      if (empty) empty.style.display = "none";
-      
-      renderCardGrid(grid, openedItems);
-    } catch (err) {
-      console.error(err);
-    }
-  }
+
 
   async function renderNotesView() {
     const grid = document.getElementById("notes-grid");

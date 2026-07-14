@@ -53,7 +53,6 @@
         <li><a href="#" class="nav-link" data-nav="resources"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>Resources</span></a></li>
         <li><a href="#" class="nav-link" data-nav="profile"><i class="fa-regular fa-user" aria-hidden="true"></i><span>My Profile</span></a></li>
         <li><a href="#" class="nav-link" data-nav="bookmarks"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span>Bookmarks</span></a></li>
-        <li><a href="#" class="nav-link" data-nav="progress"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Reading Progress</span></a></li>
         <li><a href="#" class="nav-link" data-nav="notes"><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><span>My Notes</span></a></li>
         <li><a href="#" class="nav-link" data-nav="quiz"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Quiz Scores</span></a></li>
         <li><a href="#" class="nav-link" data-nav="downloads"><i class="fa-solid fa-download" aria-hidden="true"></i><span>Downloads</span></a></li>
@@ -68,14 +67,6 @@
     </nav>
 
     <div class="sidebar-bottom">
-      <!-- STUDY STREAK: replace with dynamic streak value -->
-      <div class="streak-chip">
-        <i class="fa-solid fa-fire" aria-hidden="true"></i>
-        <div>
-          <strong data-dynamic="studyStreak">12</strong>
-          <span>day streak</span>
-        </div>
-      </div>
       <a href="#" class="nav-link logout" data-nav="logout">
         <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Logout</span>
       </a>
@@ -163,7 +154,6 @@
             Continue Learning <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
-        <!-- welcome-visual (Overall Progress) removed completely -->
       </section>
 
       <!-- 2. QUICK STATISTICS -->
@@ -536,27 +526,7 @@
         </div>
       </div>
 
-      <!-- ============ READING PROGRESS VIEW ============ -->
-      <div id="view-progress" hidden>
-        <div class="panel-header-actions" style="margin-bottom: 24px;">
-          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Reading Progress</h2>
-        </div>
-        <div class="card" style="padding: 24px; margin-bottom: 24px;">
-          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Overall Progress</h3>
-          <div style="background: var(--color-accent-soft); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 8px;">
-            <div id="progress-bar-fill" style="background: var(--color-accent); height: 100%; width: 0%; transition: width 0.3s;"></div>
-          </div>
-          <span style="font-size: 14px; font-weight: 600;" id="progress-text-label">0% Completed</span>
-        </div>
-        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Opened Resources</h4>
-        <div id="progress-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-          <!-- Loaded dynamically -->
-        </div>
-        <div id="progress-empty" class="card" style="text-align: center; padding: 48px; display: none;">
-          <i class="fa-solid fa-chart-line" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
-          <p style="color: var(--color-text-soft);">No reading history logged yet.</p>
-        </div>
-      </div>
+
 
       <!-- ============ MY NOTES VIEW ============ -->
       <div id="view-notes" hidden>
