@@ -50,6 +50,7 @@
     <nav class="side-nav">
       <ul>
         <li><a href="#" class="nav-link active" data-nav="dashboard"><i class="fa-solid fa-grid-2" aria-hidden="true"></i><span>Dashboard</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="resources"><i class="fa-solid fa-folder-open" aria-hidden="true"></i><span>Resources</span></a></li>
         <li><a href="#" class="nav-link" data-nav="profile"><i class="fa-regular fa-user" aria-hidden="true"></i><span>My Profile</span></a></li>
         <li><a href="#" class="nav-link" data-nav="bookmarks"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span>Bookmarks</span></a></li>
         <li><a href="#" class="nav-link" data-nav="progress"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Reading Progress</span></a></li>
@@ -136,9 +137,9 @@
           </button>
 
           <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
-            <li role="none"><a role="menuitem" href="#"><i class="fa-regular fa-user" aria-hidden="true"></i>My Profile</a></li>
-            <li role="none"><a role="menuitem" href="#"><i class="fa-solid fa-gear" aria-hidden="true"></i>Settings</a></li>
-            <li role="none"><a role="menuitem" href="#"><i class="fa-regular fa-circle-question" aria-hidden="true"></i>Help</a></li>
+            <li role="none"><a role="menuitem" href="#" data-nav="profile"><i class="fa-regular fa-user" aria-hidden="true"></i>My Profile</a></li>
+            <li role="none"><a role="menuitem" href="#" data-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i>Settings</a></li>
+            <li role="none"><a role="menuitem" href="#" data-nav="help"><i class="fa-regular fa-circle-question" aria-hidden="true"></i>Help</a></li>
             <li class="dropdown-divider" role="none"></li>
             <li role="none"><a role="menuitem" href="#" class="danger"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Logout</a></li>
           </ul>
@@ -148,9 +149,9 @@
 
     <!-- ============ MAIN CONTENT ============ -->
     <main id="main-content" class="content">
-
-      <!-- 1. WELCOME CARD -->
-      <section class="card welcome-card" aria-labelledby="welcomeHeading">
+      <div id="view-dashboard">
+        <!-- 1. WELCOME CARD -->
+        <section class="card welcome-card" aria-labelledby="welcomeHeading">
         <div class="welcome-text">
           <p class="eyebrow" data-dynamic="currentDate">Tuesday, 14 July 2026</p>
           <h1 id="welcomeHeading">Welcome back, <span data-dynamic="displayName">Ravi</span> <span aria-hidden="true">👋</span></h1>
@@ -279,69 +280,26 @@
             </div>
           </section>
 
-          <!-- 4. RECENT ACTIVITY -->
-          <section class="card section-card" aria-labelledby="activityHeading">
+          <!-- 4. RECENTLY ADDED RESOURCES -->
+          <section class="card section-card" aria-labelledby="recentlyAddedHeading">
             <div class="section-head">
-              <h2 id="activityHeading">Recent Activity</h2>
+              <h2 id="recentlyAddedHeading">Recently Added Resources</h2>
+              <a href="#" class="text-link" data-action-nav="resources">View all</a>
             </div>
-            <!-- ACTIVITY: map over activity timeline array, newest first -->
-            <ol class="timeline">
-              <li class="timeline-item">
-                <span class="timeline-dot dot-blue"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span>
-                <div class="timeline-body">
-                  <p>Opened notes for <strong>MEG-01, Block 4</strong></p>
-                  <time>Today, 10:24 AM</time>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <span class="timeline-dot dot-green"><i class="fa-solid fa-download" aria-hidden="true"></i></span>
-                <div class="timeline-body">
-                  <p>Downloaded PDF: <strong>BEGC-132 PYQ 2025</strong></p>
-                  <time>Yesterday, 6:41 PM</time>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <span class="timeline-dot dot-amber"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
-                <div class="timeline-body">
-                  <p>Completed quiz: <strong>MEG-05, Assessment 2</strong> — scored 84%</p>
-                  <time>2 days ago</time>
-                </div>
-              </li>
-              <li class="timeline-item">
-                <span class="timeline-dot dot-violet"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></span>
-                <div class="timeline-body">
-                  <p>Bookmarked <strong>"Modernism in British Poetry"</strong></p>
-                  <time>3 days ago</time>
-                </div>
-              </li>
-            </ol>
+            <ul class="mini-list" id="recently-added-resources-list">
+              <!-- Dynamically populated -->
+            </ul>
           </section>
 
-          <!-- 8. QUIZ PERFORMANCE -->
-          <section class="card section-card" aria-labelledby="quizHeading">
+          <!-- 8. RECOMMENDED RESOURCES -->
+          <section class="card section-card" aria-labelledby="recommendedHeading">
             <div class="section-head">
-              <h2 id="quizHeading">Quiz Performance</h2>
-              <a href="#" class="text-link">View all scores</a>
+              <h2 id="recommendedHeading">Recommended Resources</h2>
+              <a href="#" class="text-link" data-action-nav="resources">View all</a>
             </div>
-            <!-- QUIZ SCORES: map over quiz results array -->
-            <div class="quiz-grid">
-              <div class="quiz-ring-card">
-                <svg viewBox="0 0 120 120" class="quiz-ring" aria-hidden="true">
-                  <circle cx="60" cy="60" r="50" class="qr-track"></circle>
-                  <circle cx="60" cy="60" r="50" class="qr-fill" style="--pct:81"></circle>
-                </svg>
-                <div class="quiz-ring-text">
-                  <strong>81%</strong>
-                  <span>Average</span>
-                </div>
-              </div>
-              <ul class="quiz-list">
-                <li><span>MEG-01 · Assessment 1</span><strong class="score-good">92%</strong></li>
-                <li><span>MEG-02 · Assessment 1</span><strong class="score-mid">74%</strong></li>
-                <li><span>MEG-05 · Assessment 2</span><strong class="score-good">84%</strong></li>
-                <li><span>BEGC-132 · Assessment 1</span><strong class="score-low">68%</strong></li>
-              </ul>
-            </div>
+            <ul class="mini-list" id="recommended-resources-list">
+              <!-- Dynamically populated -->
+            </ul>
           </section>
 
         </div>
@@ -399,31 +357,25 @@
             <div class="mini-cal" id="miniCal"></div>
           </section>
 
-          <!-- 6. BOOKMARKS PREVIEW -->
-          <section class="card section-card" aria-labelledby="bmHeading">
+          <!-- 6. LATEST PYQS -->
+          <section class="card section-card" aria-labelledby="pyqsHeading">
             <div class="section-head">
-              <h2 id="bmHeading">Bookmarks</h2>
-              <a href="#" class="text-link">View all</a>
+              <h2 id="pyqsHeading">Latest PYQs</h2>
+              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="PYQs">View all</a>
             </div>
-            <!-- BOOKMARKS: map over saved bookmarks array -->
-            <ul class="mini-list">
-              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Modernism in British Poetry</a></li>
-              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Structure of a Business Letter</a></li>
-              <li><i class="fa-regular fa-bookmark" aria-hidden="true"></i><a href="#">Key Themes – "The Tempest"</a></li>
+            <ul class="mini-list" id="latest-pyqs-list">
+              <!-- Dynamically populated -->
             </ul>
           </section>
 
-          <!-- 7. NOTES PREVIEW -->
+          <!-- 7. LATEST NOTES -->
           <section class="card section-card" aria-labelledby="notesHeading">
             <div class="section-head">
-              <h2 id="notesHeading">My Notes</h2>
-              <a href="#" class="text-link">View all</a>
+              <h2 id="notesHeading">Latest Notes</h2>
+              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="Notes">View all</a>
             </div>
-            <!-- NOTES: map over personal notes array -->
-            <ul class="mini-list">
-              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Summary — Romantic Poets</a></li>
-              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Grammar cheat sheet</a></li>
-              <li><i class="fa-regular fa-note-sticky" aria-hidden="true"></i><a href="#">Essay outline — Drama unit</a></li>
+            <ul class="mini-list" id="latest-notes-list">
+              <!-- Dynamically populated -->
             </ul>
           </section>
 
@@ -436,34 +388,232 @@
           <h2 id="resourcesHeading">Resources</h2>
         </div>
         <div class="resources-grid">
-          <a href="#" class="resource-tile">
+          <a href="#" class="resource-tile" data-tile-nav="Notes">
             <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
             <span>Notes</span>
           </a>
-          <a href="#" class="resource-tile">
+          <a href="#" class="resource-tile" data-tile-nav="PYQs">
             <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
             <span>PYQs</span>
           </a>
-          <a href="#" class="resource-tile">
+          <a href="#" class="resource-tile" data-tile-nav="Assignments">
             <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
             <span>Assignments</span>
           </a>
-          <a href="#" class="resource-tile">
+          <a href="#" class="resource-tile" data-tile-nav="Videos">
             <i class="fa-solid fa-video" aria-hidden="true"></i>
             <span>Videos</span>
           </a>
-          <a href="#" class="resource-tile">
+          <a href="#" class="resource-tile" data-tile-nav="Books">
             <i class="fa-solid fa-book" aria-hidden="true"></i>
             <span>Books</span>
           </a>
         </div>
       </section>
+      </div> <!-- /#view-dashboard -->
+
+      <!-- ============ STUDENT RESOURCES VIEW ============ -->
+      <div id="view-resources" hidden>
+        <div class="panel-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Study Resources Catalog</h2>
+        </div>
+        <!-- Filters & Sorting Grid -->
+        <div class="card filters-card" style="padding: 20px; margin-bottom: 24px; border: 1px solid var(--color-border);">
+          <div class="filters-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+            <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; font-weight: 700; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Search</label>
+              <input type="text" id="student-search-input" placeholder="Search by title, tags...">
+            </div>
+            <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; font-weight: 700; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Type</label>
+              <select id="student-type-select">
+                <option value="">All Types</option>
+                <option value="Notes">Notes</option>
+                <option value="PYQs">PYQs</option>
+                <option value="Assignments">Assignments</option>
+                <option value="Books">Books</option>
+                <option value="Videos">Videos</option>
+                <option value="External Links">External Links</option>
+              </select>
+            </div>
+            <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; font-weight: 700; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Course</label>
+              <select id="student-course-select">
+                <option value="">All Courses</option>
+                <option value="MEG-01">MEG-01</option>
+                <option value="MEG-02">MEG-02</option>
+                <option value="MEG-03">MEG-03</option>
+                <option value="MEG-04">MEG-04</option>
+                <option value="MEG-05">MEG-05</option>
+                <option value="BEGC-132">BEGC-132</option>
+              </select>
+            </div>
+            <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; font-weight: 700; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Semester</label>
+              <input type="text" id="student-semester-input" placeholder="e.g. 1st Year">
+            </div>
+            <div class="filter-group" style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; font-weight: 700; color: var(--color-text-soft); text-transform: uppercase; letter-spacing: 0.5px;">Sort By</label>
+              <select id="student-sort-select">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="az">A–Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div id="student-resources-skeleton" style="display: none; margin-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <div class="card skeleton-card-item" style="height: 320px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading-skeleton 1.5s infinite;"></div>
+            <div class="card skeleton-card-item" style="height: 320px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading-skeleton 1.5s infinite;"></div>
+            <div class="card skeleton-card-item" style="height: 320px; background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading-skeleton 1.5s infinite;"></div>
+          </div>
+        </div>
+
+        <!-- Student Cards Grid -->
+        <div id="student-resources-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="student-resources-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-regular fa-folder-open" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">No resources found matching the criteria.</p>
+        </div>
+      </div> <!-- /#view-resources -->
+
+      <!-- ============ MY PROFILE VIEW ============ -->
+      <div id="view-profile" hidden>
+        <div class="profile-layout-grid">
+          <!-- Left Column: Avatar & Read-only Meta -->
+          <div class="card profile-sidebar-card">
+            <div class="profile-avatar-wrapper">
+              <img id="profile-avatar-preview" class="profile-large-avatar" src="" alt="User Avatar">
+            </div>
+            <div class="profile-meta-details">
+              <div class="meta-item">
+                <label>User ID</label>
+                <span id="profile-meta-uid" class="read-only-text"></span>
+              </div>
+              <div class="meta-item">
+                <label>Email Address</label>
+                <span id="profile-meta-email" class="read-only-text"></span>
+              </div>
+              <div class="meta-item">
+                <label>Joined On</label>
+                <span id="profile-meta-created" class="read-only-text"></span>
+              </div>
+              <div class="meta-item">
+                <label>Last Sign In</label>
+                <span id="profile-meta-lastlogin" class="read-only-text"></span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column: Edit Profile Form -->
+          <div class="card profile-form-card">
+            <div class="section-head">
+              <h2>Personal & Academic Profile</h2>
+            </div>
+            <form id="profileForm" novalidate>
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label for="profile-name">Full Name</label>
+                  <input type="text" id="profile-name" placeholder="Your name">
+                </div>
+                <div class="form-group full-width">
+                  <label for="profile-photo">Avatar URL</label>
+                  <input type="url" id="profile-photo" placeholder="https://example.com/avatar.jpg">
+                </div>
+                <div class="form-group full-width">
+                  <label for="profile-bio">Bio</label>
+                  <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="profile-university">University</label>
+                  <input type="text" id="profile-university" placeholder="IGNOU or other university">
+                </div>
+                <div class="form-group">
+                  <label for="profile-course">Course / Program</label>
+                  <input type="text" id="profile-course" placeholder="e.g. MEG (Master of Arts in English)">
+                </div>
+                <div class="form-group">
+                  <label for="profile-semester">Semester / Year</label>
+                  <input type="text" id="profile-semester" placeholder="e.g. 1st Year, 2nd Semester">
+                </div>
+                <div class="form-group">
+                  <label for="profile-country">Country</label>
+                  <input type="text" id="profile-country" placeholder="e.g. India">
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
+                <div id="profile-form-message" class="form-message" aria-live="polite"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div> <!-- /#view-profile -->
 
     </main>
 
     <footer class="site-footer">
       <p>&copy; <span id="copyrightYear">2026</span> MEGOL — IGNOU Study Hub. All rights reserved.</p>
     </footer>
+  </div>
+</div>
+
+<!-- RESOURCE DETAILS MODAL -->
+<div class="modal-backdrop" id="resourceDetailsModal" hidden>
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="detailsResourceTitle" style="max-width: 700px;">
+    <div class="modal-header">
+      <h2 id="detailsResourceTitle">Resource Details</h2>
+      <button class="modal-close-btn" id="closeDetailsModalBtn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="padding: 24px;">
+      <div style="display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: start;">
+        <img id="details-thumbnail" src="" alt="Resource Thumbnail" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--color-border); aspect-ratio: 3/4; object-fit: cover;">
+        <div>
+          <span class="badge" id="details-type-badge" style="margin-bottom: 8px;">Notes</span>
+          <h3 id="details-title" style="font-size: 20px; font-weight: 800; margin-bottom: 8px;"></h3>
+          <p id="details-description" style="font-size: 14px; color: var(--color-text-soft); line-height: 1.5; margin-bottom: 16px;"></p>
+          
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13.5px; margin-bottom: 16px;">
+            <div><strong>Course:</strong> <span id="details-course"></span></div>
+            <div><strong>Subject:</strong> <span id="details-subject"></span></div>
+            <div><strong>Semester:</strong> <span id="details-semester"></span></div>
+            <div><strong>Published:</strong> <span id="details-date"></span></div>
+          </div>
+          
+          <div id="details-tags-list" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+            <!-- Tags -->
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="#" target="_blank" class="btn btn-primary" id="details-open-btn">Open Resource</a>
+            <a href="#" download class="btn btn-secondary" id="details-download-btn" style="border: 1px solid var(--color-border); padding: 10px 16px; border-radius: var(--radius-sm); background: var(--color-surface); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-download"></i> Download
+            </a>
+            <button class="btn btn-secondary" id="details-share-btn" style="border: 1px solid var(--color-border); padding: 10px 16px; border-radius: var(--radius-sm); background: var(--color-surface); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-share-nodes"></i> Share
+            </button>
+            <button class="btn btn-secondary" id="details-bookmark-btn" style="border: 1px solid var(--color-border); padding: 10px 16px; border-radius: var(--radius-sm); background: var(--color-surface); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-regular fa-bookmark"></i> Bookmark (Placeholder)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 32px; border-top: 1px solid var(--color-border); padding-top: 24px;">
+        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 14px;">Related Resources</h4>
+        <div id="details-related-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <!-- Related cards -->
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

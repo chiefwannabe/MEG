@@ -30,7 +30,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 
-import { createUserDocument } from "../src/firestore.js";
+import { createUserDocument, getUserProfile } from "../src/firestore.js";
 
 /* ================================================================
    AUTH INSTANCE
@@ -180,15 +180,38 @@ function switchTab(tab) {
    AUTH STATE — update UI when user logs in or out
    ================================================================ */
 
-function handleAuthStateChanged(user) {
+async function handleAuthStateChanged(user) {
   AuthState.currentUser = user;
 
   const signinBtn = document.getElementById("btn-signin");
   const userMenu  = document.getElementById("user-menu");
 
+  const mDashboard = document.querySelector(".mobile-nav-item-dashboard");
+  const mAdmin = document.querySelector(".mobile-nav-item-admin");
+  const mLogout = document.querySelector(".mobile-nav-item-logout");
+  const dAdmin = document.querySelector(".ud-admin-link");
+
   if (user) {
     // --- Logged in ---
     if (signinBtn) signinBtn.style.display = "none";
+
+    // Show mobile items
+    if (mDashboard) mDashboard.style.display = "block";
+    if (mLogout) mLogout.style.display = "block";
+
+    // Fetch user profile to check for admin role
+    try {
+      const profile = await getUserProfile(user.uid);
+      if (profile && profile.role === "admin") {
+        if (mAdmin) mAdmin.style.display = "block";
+        if (dAdmin) dAdmin.style.display = "block";
+      } else {
+        if (mAdmin) mAdmin.style.display = "none";
+        if (dAdmin) dAdmin.style.display = "none";
+      }
+    } catch (e) {
+      console.error("[Auth] Error fetching user role:", e);
+    }
 
     if (userMenu) {
       userMenu.classList.add("active");
@@ -220,6 +243,12 @@ function handleAuthStateChanged(user) {
   } else {
     // --- Logged out ---
     if (signinBtn) signinBtn.style.display = "";
+
+    // Hide mobile items
+    if (mDashboard) mDashboard.style.display = "none";
+    if (mAdmin) mAdmin.style.display = "none";
+    if (mLogout) mLogout.style.display = "none";
+    if (dAdmin) dAdmin.style.display = "none";
 
     if (userMenu) {
       userMenu.classList.remove("active", "open");
@@ -502,16 +531,70 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Logout button ──────────────────────────────────────────── */
   document.getElementById("btn-logout")
     ?.addEventListener("click", handleLogout);
+  document.getElementById("mobile-logout-btn")
+    ?.addEventListener("click", handleLogout);
 
   /* ── Dropdown nav links ─────────────────────────────────────── */
-  // These currently close the menu and log the target page.
-  // Wire to real pages once they are built.
   document.querySelectorAll(".ud-nav-link").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
       closeUserMenu();
-      // TODO: Route to the appropriate page when ready
       console.info("[Auth] Navigate to:", link.dataset.page);
+    });
+  });
+
+  /* ── Mobile Hamburger Drawer Actions ────────────────────────── */
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+  const mobileNavOverlay = document.getElementById("mobile-nav-overlay");
+  const mobileNavClose = document.getElementById("mobile-nav-close");
+  const drawerLinks = document.querySelectorAll(".mobile-nav-links a");
+
+  function openMobileNav() {
+    if (!mobileNavOverlay) return;
+    mobileNavOverlay.hidden = false;
+    // Allow display update before adding class for smooth transition
+    setTimeout(() => {
+      mobileNavOverlay.classList.add("open");
+      hamburgerBtn?.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden"; // Prevent background scroll
+    }, 10);
+  }
+
+  function closeMobileNav() {
+    if (!mobileNavOverlay) return;
+    mobileNavOverlay.classList.remove("open");
+    hamburgerBtn?.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = ""; // Restore background scroll
+    setTimeout(() => {
+      if (!mobileNavOverlay.classList.contains("open")) {
+        mobileNavOverlay.hidden = true;
+      }
+    }, 250); // Match transition duration (0.25s)
+  }
+
+  hamburgerBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openMobileNav();
+  });
+
+  mobileNavClose?.addEventListener("click", closeMobileNav);
+
+  mobileNavOverlay?.addEventListener("click", (e) => {
+    // If user clicked backdrop (outside the drawer content)
+    if (e.target === mobileNavOverlay) {
+      closeMobileNav();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mobileNavOverlay && !mobileNavOverlay.hidden) {
+      closeMobileNav();
+    }
+  });
+
+  drawerLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMobileNav();
     });
   });
 

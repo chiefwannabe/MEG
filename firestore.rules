@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if the incoming request is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to verify if the authenticated user has the 'admin' role.
+    // OPTIMIZATION: Removed redundant exists() check. get() automatically evaluates 
+    // to false/fails-secure if the document does not exist, saving evaluation cost.
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Helper function to verify if a user document is owned by the requesting authenticated user
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // ==========================================
+    // 1. RULES FOR USERS COLLECTION
+    // ==========================================
+    match /users/{uid} {
+      
+      // A user can read their own profile document. Admins can read all user profile documents.
+      allow read: if isOwner(uid) || isAdmin();
+      
+      // Creating a user document
+      allow create: if isOwner(uid) 
+        // Prevent privilege escalation: new accounts must be registered with the 'student' role
+        && request.resource.data.role == 'student'
+        // Prevent writing arbitrary fields: restrict document attributes to schema definitions
+        && request.resource.data.keys().hasOnly([
+             'uid', 'displayName', 'email', 'photoURL', 'provider', 
+             'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted'
+           ])
+        // Verify key integrity and types
+        && request.resource.data.uid == uid
+        && request.resource.data.email is string
+        && request.resource.data.displayName is string
+        && request.resource.data.photoURL is string
+        && request.resource.data.provider is string
+        && request.resource.data.emailVerified is bool
+        && request.resource.data.profileCompleted is bool;
+
+      // Updating a user document
+      allow update: if 
+        // Case A: Admin is updating user details or changing roles
+        isAdmin() 
+        && request.resource.data.keys().hasOnly([
+             'uid', 'displayName', 'email', 'photoURL', 'provider', 
+             'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
+             'bio', 'university', 'course', 'semester', 'country'
+           ])
+        ||
+        // Case B: The user is updating their own profile
+        (
+          isOwner(uid)
+          // Students can never change their own role field (prevent privilege escalation)
+          && request.resource.data.role == resource.data.role
+          // Prevent changes to crucial read-only account metadata
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.createdAt == resource.data.createdAt
+          // Restrict input updates to allowed schema fields (no arbitrary keys)
+          && request.resource.data.keys().hasOnly([
+               'uid', 'displayName', 'email', 'photoURL', 'provider', 
+               'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
+               'bio', 'university', 'course', 'semester', 'country'
+             ])
+          // Validate types of optional fields if they are supplied in the update request
+          && (!('bio' in request.resource.data) || request.resource.data.bio is string)
+          && (!('university' in request.resource.data) || request.resource.data.university is string)
+          && (!('course' in request.resource.data) || request.resource.data.course is string)
+          && (!('semester' in request.resource.data) || request.resource.data.semester is string)
+          && (!('country' in request.resource.data) || request.resource.data.country is string)
+        );
+
+      // Deleting user profiles is completely forbidden
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // 2. RULES FOR RESOURCES COLLECTION
+    // ==========================================
+    match /resources/{resourceId} {
+      
+      // Read access control:
+      // - Admins can read all resources (both published and drafts)
+      // - Students/Guests can only read resource assets that are explicitly marked as published
+      allow read: if isAdmin() || (resource.data.published == true);
+
+      // Write access control:
+      // - Only verified administrators are authorized to add, edit, or delete content resources
+      allow create: if isAdmin()
+        // Enforce document structure integrity: prevent writing arbitrary fields
+        && request.resource.data.keys().hasOnly([
+             'title', 'description', 'course', 'subject', 'type', 
+             'semester', 'tags', 'fileUrl', 'thumbnail', 'createdBy', 
+             'createdAt', 'updatedAt', 'published'
+           ])
+        // Validate required field type attributes
+        && request.resource.data.title is string
+        && request.resource.data.course is string
+        && request.resource.data.subject is string
+        && request.resource.data.type is string
+        && request.resource.data.fileUrl is string
+        && request.resource.data.published is bool
+        // Validate optional field type attributes if supplied
+        && (!('description' in request.resource.data) || request.resource.data.description is string)
+        && (!('semester' in request.resource.data) || request.resource.data.semester is string)
+        && (!('thumbnail' in request.resource.data) || request.resource.data.thumbnail is string)
+        && (!('tags' in request.resource.data) || request.resource.data.tags is list);
+
+      allow update: if isAdmin()
+        // Prevent updates from introducing arbitrary fields
+        && request.resource.data.keys().hasOnly([
+             'title', 'description', 'course', 'subject', 'type', 
+             'semester', 'tags', 'fileUrl', 'thumbnail', 'createdBy', 
+             'createdAt', 'updatedAt', 'published'
+           ])
+        // Validate required field type attributes
+        && request.resource.data.title is string
+        && request.resource.data.course is string
+        && request.resource.data.subject is string
+        && request.resource.data.type is string
+        && request.resource.data.fileUrl is string
+        && request.resource.data.published is bool
+        // Validate optional field type attributes if supplied
+        && (!('description' in request.resource.data) || request.resource.data.description is string)
+        && (!('semester' in request.resource.data) || request.resource.data.semester is string)
+        && (!('thumbnail' in request.resource.data) || request.resource.data.thumbnail is string)
+        && (!('tags' in request.resource.data) || request.resource.data.tags is list);
+
+      allow delete: if isAdmin();
+    }
+  }
+}

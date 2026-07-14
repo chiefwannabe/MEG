@@ -1,0 +1,380 @@
+/* =========================================================
+   MEGOL — IGNOU Study Hub — Admin Dashboard Styles
+   Inherits design system tokens from dashboard.css
+   ========================================================= */
+
+@import url("../dashboard/dashboard.css");
+
+/* ---------- Admin-Specific Layout / Spacing ---------- */
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.panel-header-actions h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* ---------- Tables ---------- */
+.table-card {
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-dark);
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-notes { background: #eaf1ff; color: var(--color-accent); }
+.badge-pyqs { background: #e8f7ee; color: var(--color-green); }
+.badge-assignments { background: #fef3e2; color: var(--color-amber); }
+.badge-books { background: #f2ebfe; color: var(--color-violet); }
+.badge-videos { background: #ffeef2; color: var(--color-rose); }
+.badge-links { background: #e0f7fa; color: var(--color-cyan); }
+
+.badge-published { background: #e8f7ee; color: var(--color-green); }
+.badge-draft { background: #f1f3f8; color: var(--color-text-faint); }
+
+.badge-admin { background: #ffeef2; color: var(--color-rose); }
+.badge-student { background: #eaf1ff; color: var(--color-accent); }
+
+/* Table Actions */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-action-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-soft);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  transition: all var(--transition-fast);
+}
+
+.icon-action-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-text-faint);
+}
+
+.icon-action-btn.edit:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent-light);
+}
+
+.icon-action-btn.delete:hover {
+  background: #ffeef2;
+  color: var(--color-rose);
+  border-color: var(--color-rose);
+}
+
+.table-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text-faint);
+}
+
+.table-empty i {
+  font-size: 38px;
+  margin-bottom: 12px;
+  color: var(--color-border);
+}
+
+/* ---------- Filters & Search ---------- */
+.filters-card {
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group input, .filter-group select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 13.5px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.filter-group input:focus, .filter-group select:focus {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-focus);
+}
+
+/* User Role Select Dropdown in Table */
+.role-select {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.role-select:focus {
+  border-color: var(--color-accent);
+}
+
+/* ---------- Modals ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  animation: fade-in var(--transition-fast) both;
+}
+
+.modal-container {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: scale-up var(--transition-fast) both;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: all var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Modal Form styling */
+.modal-container form {
+  padding: 24px;
+}
+
+/* Placeholder card inside panels */
+.placeholder-card {
+  padding: 64px 24px;
+  text-align: center;
+  max-width: 500px;
+  margin: 48px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.placeholder-card h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.placeholder-card p {
+  color: var(--color-text-soft);
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-up {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Responsive Mobile Styles ---------- */
+@media (max-width: 768px) {
+  .panel-header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .panel-header-actions .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  .filters-card {
+    padding: 16px;
+  }
+  .filters-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  /* Transform tables to stackable card blocks */
+  .admin-table, 
+  .admin-table thead, 
+  .admin-table tbody, 
+  .admin-table th, 
+  .admin-table td, 
+  .admin-table tr {
+    display: block;
+  }
+  .admin-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  .admin-table tr {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .admin-table td {
+    border: none;
+    border-bottom: 1px solid #f1f3f8;
+    position: relative;
+    padding-left: 45% !important;
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 !important;
+    min-height: 44px;
+  }
+  .admin-table td:last-child {
+    border-bottom: none;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    text-align: left;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    font-size: 11px;
+    position: absolute;
+    left: 0;
+    width: 40%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .action-buttons {
+    justify-content: flex-end;
+    width: 100%;
+  }
+  .icon-action-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

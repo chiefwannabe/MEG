@@ -470,11 +470,128 @@
   }
 
   /* ===================== RESPONSIVE ===================== */
+  .hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    padding: 8px;
+    touch-action: manipulation;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  .hamburger-btn:active {
+    background: var(--blue-light);
+  }
+
+  .mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(27, 36, 48, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .mobile-nav-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .mobile-nav-drawer {
+    width: min(280px, 80vw);
+    height: 100%;
+    background: var(--white);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .mobile-nav-overlay.open .mobile-nav-drawer {
+    transform: translateX(0);
+  }
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #f1f3f8;
+    padding-bottom: 16px;
+  }
+  .mobile-nav-close {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: var(--text-light);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mobile-nav-links li a {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 10px 14px;
+    display: block;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-nav-links li a:hover {
+    background: var(--blue-light);
+    color: var(--blue);
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none !important;
+    }
+    .hamburger-btn {
+      display: inline-flex;
+    }
+    .navbar {
+      padding: 10px 16px;
+    }
+    .hero {
+      padding: 60px 16px 50px;
+    }
+    .hero h1 {
+      font-size: 2rem;
+    }
+    .btn-group {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn {
+      width: 100%;
+      text-align: center;
+      min-height: 44px;
+    }
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
   @media (max-width: 640px) {
-    .hero h1 { font-size: 2rem; }
-    .navbar { flex-direction: column; gap: 12px; }
-    .nav-links { justify-content: center; gap: 14px; }
-    section { padding: 50px 16px; }
+    .hero h1 { font-size: 1.8rem; }
+    section { padding: 40px 16px; }
   }
 </style>
 </head>
@@ -483,6 +600,9 @@
 <!-- ===================== HEADER / NAVIGATION ===================== -->
 <header>
   <nav class="navbar" aria-label="Main navigation">
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-overlay">
+      &#9776;
+    </button>
     <div class="logo">IGNOU <span>Study Hub</span></div>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
@@ -516,7 +636,8 @@
             <div class="ud-email"></div>
           </div>
           <ul>
-            <li><a href="#" class="ud-nav-link" data-page="dashboard" role="menuitem">&#128202; Dashboard</a></li>
+            <li><a href="dashboard/dashboard.html" class="ud-nav-link" role="menuitem">&#128202; Dashboard</a></li>
+            <li class="ud-admin-link" style="display: none;"><a href="admin/admin.html" role="menuitem">👑 Admin Panel</a></li>
             <li><a href="#" class="ud-nav-link" data-page="bookmarks" role="menuitem">&#128278; My Bookmarks</a></li>
             <li><a href="#" class="ud-nav-link" data-page="progress"  role="menuitem">&#128218; Reading Progress</a></li>
             <li><a href="#" class="ud-nav-link" data-page="settings"  role="menuitem">&#9881;&#65039; Settings</a></li>
@@ -529,6 +650,28 @@
     </div><!-- /auth-nav-area -->
   </nav>
 </header>
+
+<!-- Mobile Slide-out Menu Overlay -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" hidden>
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+    <div class="mobile-nav-header">
+      <div class="logo">IGNOU <span>Study Hub</span></div>
+      <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">&times;</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#resources">Resources</a></li>
+      <li><a href="#courses">Courses</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li class="mobile-nav-item-dashboard" style="display: none;"><a href="dashboard/dashboard.html">Dashboard</a></li>
+      <li class="mobile-nav-item-admin" style="display: none;"><a href="admin/admin.html">Admin Panel</a></li>
+      <li class="mobile-nav-item-logout" style="display: none;"><a href="#" id="mobile-logout-btn">Logout</a></li>
+    </ul>
+  </div>
+</div>
 
 <main>
 

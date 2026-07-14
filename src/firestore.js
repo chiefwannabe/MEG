@@ -11,7 +11,14 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  addDoc,
+  deleteDoc,
+  getDocs,
+  query,
+  where,
+  getCountFromServer
 } from "firebase/firestore";
 
 /**
@@ -99,5 +106,242 @@ export async function getUserProfile(uid) {
   } catch (error) {
     console.error("[Firestore] Error retrieving user profile:", error);
     throw error;
+  }
+}
+
+/**
+ * Updates user profile fields in Firestore.
+ *
+ * @param {string} uid - The user's UID
+ * @param {object} data - The profile fields to update
+ */
+export async function updateUserProfile(uid, data) {
+  if (!uid || !data) return;
+  const userDocRef = doc(db, "users", uid);
+
+  try {
+    await updateDoc(userDocRef, data);
+    console.log(`[Firestore] Profile updated for user: ${uid}`);
+  } catch (error) {
+    console.error("[Firestore] Error updating user profile:", error);
+    throw error;
+  }
+}
+
+/**
+ * Adds a new resource to Firestore.
+ * TODO: Enforce admin-only writes in Firestore Security Rules
+ */
+export async function addResource(data, uid) {
+  try {
+    const resourcesCol = collection(db, "resources");
+    const resourceDoc = {
+      ...data,
+      createdBy: uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    const docRef = await addDoc(resourcesCol, resourceDoc);
+    console.log(`[Firestore] Resource added with ID: ${docRef.id}`);
+    return docRef.id;
+  } catch (error) {
+    console.error("[Firestore] Error adding resource:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates a resource in Firestore.
+ * TODO: Enforce admin-only writes in Firestore Security Rules
+ */
+export async function updateResource(resourceId, data) {
+  if (!resourceId || !data) return;
+  const docRef = doc(db, "resources", resourceId);
+  try {
+    const updateData = {
+      ...data,
+      updatedAt: serverTimestamp()
+    };
+    await updateDoc(docRef, updateData);
+    console.log(`[Firestore] Resource updated: ${resourceId}`);
+  } catch (error) {
+    console.error("[Firestore] Error updating resource:", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletes a resource from Firestore.
+ * TODO: Enforce admin-only writes in Firestore Security Rules
+ */
+export async function deleteResource(resourceId) {
+  if (!resourceId) return;
+  const docRef = doc(db, "resources", resourceId);
+  try {
+    await deleteDoc(docRef);
+    console.log(`[Firestore] Resource deleted: ${resourceId}`);
+  } catch (error) {
+    console.error("[Firestore] Error deleting resource:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches all resources from Firestore.
+ */
+export async function getAllResources() {
+  try {
+    const resourcesCol = collection(db, "resources");
+    const querySnapshot = await getDocs(resourcesCol);
+    const resources = [];
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() });
+    });
+    return resources;
+  } catch (error) {
+    console.error("[Firestore] Error fetching resources:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches all users from Firestore.
+ */
+export async function getAllUsers() {
+  try {
+    const usersCol = collection(db, "users");
+    const querySnapshot = await getDocs(usersCol);
+    const users = [];
+    querySnapshot.forEach((doc) => {
+      users.push(doc.data());
+    });
+    return users;
+  } catch (error) {
+    console.error("[Firestore] Error fetching users:", error);
+    throw error;
+  }
+}
+
+/**
+ * Updates a user's role in Firestore.
+ * TODO: Enforce admin-only writes in Firestore Security Rules
+ */
+export async function updateUserRole(uid, role) {
+  if (!uid || !role) return;
+  const docRef = doc(db, "users", uid);
+  try {
+    await updateDoc(docRef, { role });
+    console.log(`[Firestore] User role updated for ${uid} to ${role}`);
+  } catch (error) {
+    console.error("[Firestore] Error updating user role:", error);
+    throw error;
+  }
+}
+
+/**
+ * Gets analytics counts using Firestore count aggregates.
+ */
+export async function getAnalyticsCounts() {
+  try {
+    const usersCol = collection(db, "users");
+    const resourcesCol = collection(db, "resources");
+
+    const usersCountSnap = await getCountFromServer(usersCol);
+    const resourcesCountSnap = await getCountFromServer(resourcesCol);
+
+    const notesQuery = query(resourcesCol, where("type", "==", "Notes"));
+    const pyqsQuery = query(resourcesCol, where("type", "==", "PYQs"));
+    const booksQuery = query(resourcesCol, where("type", "==", "Books"));
+
+    const notesCountSnap = await getCountFromServer(notesQuery);
+    const pyqsCountSnap = await getCountFromServer(pyqsQuery);
+    const booksCountSnap = await getCountFromServer(booksQuery);
+
+    return {
+      totalUsers: usersCountSnap.data().count,
+      totalResources: resourcesCountSnap.data().count,
+      totalNotes: notesCountSnap.data().count,
+      totalPYQs: pyqsCountSnap.data().count,
+      totalBooks: booksCountSnap.data().count
+    };
+  } catch (error) {
+    console.error("[Firestore] Error getting analytics counts:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches all published resources.
+ */
+export async function getPublishedResources() {
+  try {
+    const resourcesCol = collection(db, "resources");
+    const q = query(resourcesCol, where("published", "==", true));
+    const querySnapshot = await getDocs(q);
+    const resources = [];
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() });
+    });
+    return resources;
+  } catch (error) {
+    console.error("[Firestore] Error fetching published resources:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches latest published resources limited by count.
+ */
+export async function getLatestResources(limitCount) {
+  try {
+    // Standard modular implementation: we fetch all and slice, or query.
+    // Querying with order requires index, so a simple filter/sort on published resources is safer.
+    const all = await getPublishedResources();
+    return all
+      .sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return dateB - dateA;
+      })
+      .slice(0, limitCount);
+  } catch (error) {
+    console.error("[Firestore] Error fetching latest resources:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches published resources by type.
+ */
+export async function getResourcesByType(type) {
+  try {
+    const resourcesCol = collection(db, "resources");
+    const q = query(resourcesCol, where("published", "==", true), where("type", "==", type));
+    const querySnapshot = await getDocs(q);
+    const resources = [];
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() });
+    });
+    return resources;
+  } catch (error) {
+    console.error("[Firestore] Error fetching resources by type:", error);
+    throw error;
+  }
+}
+
+/**
+ * Gets related published resources (same course or subject, excluding current)
+ */
+export async function getRelatedResources(res) {
+  if (!res) return [];
+  try {
+    const all = await getPublishedResources();
+    return all.filter((r) => 
+      r.id !== res.id && 
+      (r.course === res.course || (res.subject && r.subject === res.subject))
+    ).slice(0, 3);
+  } catch (error) {
+    console.error("[Firestore] Error finding related resources:", error);
+    return [];
   }
 }
