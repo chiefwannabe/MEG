@@ -163,16 +163,7 @@
             Continue Learning <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="welcome-visual" aria-hidden="true">
-          <div class="orb orb-1"></div>
-          <div class="orb orb-2"></div>
-          <svg viewBox="0 0 200 200" class="welcome-svg">
-            <circle cx="100" cy="100" r="72" class="ring ring-track"></circle>
-            <circle cx="100" cy="100" r="72" class="ring ring-progress"></circle>
-            <text x="100" y="95" text-anchor="middle" class="ring-num">68%</text>
-            <text x="100" y="116" text-anchor="middle" class="ring-label">Overall</text>
-          </svg>
-        </div>
+        <!-- welcome-visual (Overall Progress) removed completely -->
       </section>
 
       <!-- 2. QUICK STATISTICS -->
@@ -197,27 +188,6 @@
           <div class="stat-body">
             <span class="stat-value" data-dynamic="bookmarkCount">28</span>
             <span class="stat-label">Bookmarks</span>
-          </div>
-        </article>
-        <article class="card stat-card">
-          <div class="stat-icon icon-green"><i class="fa-solid fa-square-poll-vertical" aria-hidden="true"></i></div>
-          <div class="stat-body">
-            <span class="stat-value" data-dynamic="quizAverage">81%</span>
-            <span class="stat-label">Quiz Average</span>
-          </div>
-        </article>
-        <article class="card stat-card">
-          <div class="stat-icon icon-rose"><i class="fa-solid fa-fire" aria-hidden="true"></i></div>
-          <div class="stat-body">
-            <span class="stat-value" data-dynamic="studyStreakStat">12</span>
-            <span class="stat-label">Study Streak (days)</span>
-          </div>
-        </article>
-        <article class="card stat-card">
-          <div class="stat-icon icon-cyan"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
-          <div class="stat-body">
-            <span class="stat-value" data-dynamic="readingProgress">68%</span>
-            <span class="stat-label">Reading Progress</span>
           </div>
         </article>
       </section>
@@ -280,24 +250,35 @@
             </div>
           </section>
 
-          <!-- 4. RECENTLY ADDED RESOURCES -->
-          <section class="card section-card" aria-labelledby="recentlyAddedHeading">
-            <div class="section-head">
-              <h2 id="recentlyAddedHeading">Recently Added Resources</h2>
-              <a href="#" class="text-link" data-action-nav="resources">View all</a>
-            </div>
-            <ul class="mini-list" id="recently-added-resources-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </section>
-
-          <!-- 8. RECOMMENDED RESOURCES -->
-          <section class="card section-card" aria-labelledby="recommendedHeading">
+          <!-- 8. RECOMMENDED RESOURCES (Hidden until a recommendation system exists; kept in DOM to preserve JS execution) -->
+          <section class="card section-card" aria-labelledby="recommendedHeading" hidden>
             <div class="section-head">
               <h2 id="recommendedHeading">Recommended Resources</h2>
               <a href="#" class="text-link" data-action-nav="resources">View all</a>
             </div>
             <ul class="mini-list" id="recommended-resources-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </section>
+
+          <!-- 6. LATEST PYQS (Moved here to balance columns) -->
+          <section class="card section-card" aria-labelledby="pyqsHeading">
+            <div class="section-head">
+              <h2 id="pyqsHeading">Latest PYQs</h2>
+              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="PYQs">View all</a>
+            </div>
+            <ul class="mini-list" id="latest-pyqs-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </section>
+
+          <!-- 7. LATEST NOTES (Moved here to balance columns) -->
+          <section class="card section-card" aria-labelledby="notesHeading">
+            <div class="section-head">
+              <h2 id="notesHeading">Latest Notes</h2>
+              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="Notes">View all</a>
+            </div>
+            <ul class="mini-list" id="latest-notes-list">
               <!-- Dynamically populated -->
             </ul>
           </section>
@@ -357,28 +338,6 @@
             <div class="mini-cal" id="miniCal"></div>
           </section>
 
-          <!-- 6. LATEST PYQS -->
-          <section class="card section-card" aria-labelledby="pyqsHeading">
-            <div class="section-head">
-              <h2 id="pyqsHeading">Latest PYQs</h2>
-              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="PYQs">View all</a>
-            </div>
-            <ul class="mini-list" id="latest-pyqs-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </section>
-
-          <!-- 7. LATEST NOTES -->
-          <section class="card section-card" aria-labelledby="notesHeading">
-            <div class="section-head">
-              <h2 id="notesHeading">Latest Notes</h2>
-              <a href="#" class="text-link" data-action-nav="resources" data-filter-type="Notes">View all</a>
-            </div>
-            <ul class="mini-list" id="latest-notes-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </section>
-
         </aside>
       </div>
 
@@ -417,6 +376,17 @@
         <div class="panel-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Study Resources Catalog</h2>
         </div>
+
+        <!-- 4. RECENTLY ADDED RESOURCES (Moved from Dashboard) -->
+        <section class="card section-card" aria-labelledby="recentlyAddedHeading" style="margin-bottom: 24px;">
+          <div class="section-head">
+            <h2 id="recentlyAddedHeading">Recently Added Resources</h2>
+          </div>
+          <ul class="mini-list" id="recently-added-resources-list">
+            <!-- Dynamically populated -->
+          </ul>
+        </section>
+
         <!-- Filters & Sorting Grid -->
         <div class="card filters-card" style="padding: 20px; margin-bottom: 24px; border: 1px solid var(--color-border);">
           <div class="filters-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
@@ -494,10 +464,6 @@
             </div>
             <div class="profile-meta-details">
               <div class="meta-item">
-                <label>User ID</label>
-                <span id="profile-meta-uid" class="read-only-text"></span>
-              </div>
-              <div class="meta-item">
                 <label>Email Address</label>
                 <span id="profile-meta-email" class="read-only-text"></span>
               </div>
@@ -523,10 +489,8 @@
                   <label for="profile-name">Full Name</label>
                   <input type="text" id="profile-name" placeholder="Your name">
                 </div>
-                <div class="form-group full-width">
-                  <label for="profile-photo">Avatar URL</label>
-                  <input type="url" id="profile-photo" placeholder="https://example.com/avatar.jpg">
-                </div>
+                <!-- Hidden input tag to preserve JS/Firestore bindings without UI presence -->
+                <input type="hidden" id="profile-photo">
                 <div class="form-group full-width">
                   <label for="profile-bio">Bio</label>
                   <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..."></textarea>
