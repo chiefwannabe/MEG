@@ -558,6 +558,223 @@
         </div>
       </div> <!-- /#view-profile -->
 
+      <!-- ============ BOOKMARKS VIEW ============ -->
+      <div id="view-bookmarks" hidden>
+        <div class="panel-header-actions" style="margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">My Bookmarks</h2>
+        </div>
+        <div id="bookmarks-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          <!-- Loaded dynamically -->
+        </div>
+        <div id="bookmarks-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-regular fa-bookmark" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">You haven't bookmarked any resources yet.</p>
+        </div>
+      </div>
+
+      <!-- ============ READING PROGRESS VIEW ============ -->
+      <div id="view-progress" hidden>
+        <div class="panel-header-actions" style="margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Reading Progress</h2>
+        </div>
+        <div class="card" style="padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Overall Progress</h3>
+          <div style="background: var(--color-accent-soft); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 8px;">
+            <div id="progress-bar-fill" style="background: var(--color-accent); height: 100%; width: 0%; transition: width 0.3s;"></div>
+          </div>
+          <span style="font-size: 14px; font-weight: 600;" id="progress-text-label">0% Completed</span>
+        </div>
+        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Opened Resources</h4>
+        <div id="progress-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          <!-- Loaded dynamically -->
+        </div>
+        <div id="progress-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-solid fa-chart-line" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">No reading history logged yet.</p>
+        </div>
+      </div>
+
+      <!-- ============ MY NOTES VIEW ============ -->
+      <div id="view-notes" hidden>
+        <div class="panel-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">My Notes</h2>
+          <button class="btn btn-primary" id="openAddNoteModalBtn">Create Note</button>
+        </div>
+        <div id="notes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+          <!-- Notes cards -->
+        </div>
+        <div id="notes-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-regular fa-note-sticky" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">You haven't written any study notes yet.</p>
+        </div>
+      </div>
+
+      <!-- ============ QUIZ SCORES VIEW ============ -->
+      <div id="view-quiz" hidden>
+        <div class="panel-header-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Quiz Scores</h2>
+          <button class="btn btn-primary" id="openAddQuizModalBtn">Log Quiz Score</button>
+        </div>
+        <div class="card table-card" id="quizzes-table-card" style="margin-bottom: 24px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;">
+          <div class="table-responsive">
+            <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: var(--color-accent-soft); border-bottom: 1px solid var(--color-border);">
+                  <th style="padding: 14px 18px; text-align: left; font-weight: 700; color: var(--color-accent-dark);">Assessment</th>
+                  <th style="padding: 14px 18px; text-align: left; font-weight: 700; color: var(--color-accent-dark);">Course</th>
+                  <th style="padding: 14px 18px; text-align: right; font-weight: 700; color: var(--color-accent-dark);">Score</th>
+                  <th style="padding: 14px 18px; text-align: right; font-weight: 700; color: var(--color-accent-dark);">Date Logged</th>
+                </tr>
+              </thead>
+              <tbody id="quizzes-tbody">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="quizzes-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-solid fa-circle-check" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">No quiz performance records logged yet.</p>
+        </div>
+      </div>
+
+      <!-- ============ DOWNLOADS VIEW ============ -->
+      <div id="view-downloads" hidden>
+        <div class="panel-header-actions" style="margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">My Downloads</h2>
+        </div>
+        <div id="downloads-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+          <!-- Loaded dynamically -->
+        </div>
+        <div id="downloads-empty" class="card" style="text-align: center; padding: 48px; display: none;">
+          <i class="fa-solid fa-download" style="font-size: 40px; color: var(--color-border); margin-bottom: 12px;"></i>
+          <p style="color: var(--color-text-soft);">You haven't downloaded any files yet.</p>
+        </div>
+      </div>
+
+      <!-- ============ SETTINGS VIEW ============ -->
+      <div id="view-settings" hidden>
+        <div class="panel-header-actions" style="margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Settings</h2>
+        </div>
+        <div class="card" style="padding: 24px; max-width: 600px;">
+          <form id="settingsForm">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 14px;">
+                <div>
+                  <label style="font-weight: 700; display: block; margin-bottom: 4px;">Notifications</label>
+                  <span style="font-size: 13.5px; color: var(--color-text-soft);">Receive alerts for newly added PYQs and Notes</span>
+                </div>
+                <input type="checkbox" id="settings-notifications" style="width: 20px; height: 20px; cursor: pointer;">
+              </div>
+              <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 14px;">
+                <div>
+                  <label style="font-weight: 700; display: block; margin-bottom: 4px;">Preferred Course Program</label>
+                  <span style="font-size: 13.5px; color: var(--color-text-soft);">Customize recommendations feed target</span>
+                </div>
+                <select id="settings-preferred-course" style="width: 180px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+                  <option value="MEG-01">MEG-01</option>
+                  <option value="MEG-02">MEG-02</option>
+                  <option value="MEG-03">MEG-03</option>
+                  <option value="MEG-04">MEG-04</option>
+                  <option value="MEG-05">MEG-05</option>
+                  <option value="BEGC-132">BEGC-132</option>
+                </select>
+              </div>
+              <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px;">
+                <div>
+                  <label style="font-weight: 700; display: block; margin-bottom: 4px;">Dark Theme Preference</label>
+                  <span style="font-size: 13.5px; color: var(--color-text-soft);">Toggle UI appearance theme selection</span>
+                </div>
+                <input type="checkbox" id="settings-darkmode" style="width: 20px; height: 20px; cursor: pointer;">
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: 12px; width: fit-content;">Save Settings</button>
+              <div id="settings-message" class="form-message"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============ HELP VIEW ============ -->
+      <div id="view-help" hidden>
+        <div class="panel-header-actions" style="margin-bottom: 24px;">
+          <h2 style="font-size: 22px; font-weight: 800; color: var(--color-text);">Help & Support</h2>
+        </div>
+        <div class="card" style="padding: 24px; margin-bottom: 24px; max-width: 650px;">
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Frequently Asked Questions</h3>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">How do I download Study Notes?</strong>
+              <p style="font-size: 14px; color: var(--color-text-soft); line-height: 1.5;">Search for the desired subject in the "Resources" catalog, click on the card to open detail options, and click "Download" to fetch the attachment directly.</p>
+            </div>
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">Can I submit notes?</strong>
+              <p style="font-size: 14px; color: var(--color-text-soft); line-height: 1.5;">Yes! You can contact the admin team via the contact form on the homepage or write to <a href="mailto:support@megol.example">support@megol.example</a> to share your materials.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding: 24px; max-width: 650px;">
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Contact Support</h3>
+          <p style="font-size: 14px; color: var(--color-text-soft); margin-bottom: 16px;">Need assistance? Our support team is online to assist you.</p>
+          <a href="mailto:support@megol.example" class="btn btn-primary" style="width: fit-content;">Email Support Team</a>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ADD NOTE MODAL -->
+    <div class="modal-backdrop" id="addNoteModal" hidden>
+      <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="addNoteTitle" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2 id="addNoteTitle">Create Study Note</h2>
+          <button class="modal-close-btn" id="closeAddNoteModalBtn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="addNoteForm" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="note-title" style="font-weight: 700;">Title</label>
+            <input type="text" id="note-title" placeholder="e.g. Summary of MEG-01 Block 1" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+          </div>
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="note-content" style="font-weight: 700;">Content</label>
+            <textarea id="note-content" placeholder="Type notes details..." required rows="6" style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-family: inherit; resize: vertical;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="addNoteSubmitBtn">Save Note</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- LOG QUIZ SCORE MODAL -->
+    <div class="modal-backdrop" id="addQuizModal" hidden>
+      <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="addQuizTitle" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2 id="addQuizTitle">Log Quiz Score</h2>
+          <button class="modal-close-btn" id="closeAddQuizModalBtn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="addQuizForm" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="quiz-assessment" style="font-weight: 700;">Assessment / Quiz Name</label>
+            <input type="text" id="quiz-assessment" placeholder="e.g. Assessment 1" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+          </div>
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="quiz-course" style="font-weight: 700;">Course</label>
+            <select id="quiz-course" style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+              <option value="MEG-01">MEG-01</option>
+              <option value="MEG-02">MEG-02</option>
+              <option value="MEG-03">MEG-03</option>
+              <option value="MEG-04">MEG-04</option>
+              <option value="MEG-05">MEG-05</option>
+              <option value="BEGC-132">BEGC-132</option>
+            </select>
+          </div>
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="quiz-score" style="font-weight: 700;">Score Percentage (%)</label>
+            <input type="number" id="quiz-score" min="0" max="100" placeholder="e.g. 85" required style="padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+          </div>
+          <button type="submit" class="btn btn-primary" id="addQuizSubmitBtn">Save Record</button>
+        </form>
+      </div>
+    </div>
+
     </main>
 
     <footer class="site-footer">

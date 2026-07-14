@@ -5,7 +5,7 @@
 
 import { app } from "../src/firebase.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
-import { createUserDocument, getUserProfile, updateUserProfile, getPublishedResources, getRelatedResources } from "../src/firestore.js";
+import { createUserDocument, getUserProfile, updateUserProfile, getPublishedResources, getRelatedResources, toggleBookmark, logReadingProgress, logDownload, updateUserSettings, getUserNotes, addUserNote, deleteUserNote, getUserQuizzes, addUserQuizScore } from "../src/firestore.js";
 
 (async function () {
   "use strict";
@@ -28,6 +28,7 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
       const profile = await getUserProfile(user.uid);
       if (profile) {
         updateProfileUI(profile);
+        updateDashboardStats(profile);
       } else {
         // Fallback to auth details if profile fetch returns null
         updateProfileUI({
@@ -284,28 +285,32 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
       }
     });
 
-    const dashboardView = document.getElementById("view-dashboard");
-    const profileView = document.getElementById("view-profile");
-    const resourcesView = document.getElementById("view-resources");
+    const views = [
+      "dashboard", "profile", "resources", "bookmarks",
+      "progress", "notes", "quiz", "downloads", "settings", "help"
+    ];
+
+    views.forEach((v) => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.hidden = (v !== viewName);
+    });
 
     if (viewName === "dashboard") {
-      if (dashboardView) dashboardView.hidden = false;
-      if (profileView) profileView.hidden = true;
-      if (resourcesView) resourcesView.hidden = true;
       loadDashboardResources();
-    } else if (viewName === "profile") {
-      if (dashboardView) dashboardView.hidden = true;
-      if (profileView) profileView.hidden = false;
-      if (resourcesView) resourcesView.hidden = true;
     } else if (viewName === "resources") {
-      if (dashboardView) dashboardView.hidden = true;
-      if (profileView) profileView.hidden = true;
-      if (resourcesView) resourcesView.hidden = false;
       renderResourcesCatalog();
-    } else {
-      // Requirements: Do not implement bookmarks, progress, quizzes, downloads, or notes yet.
-      // So keep dashboard or simply do nothing, but print warning.
-      console.info(`[Navigation] View ${viewName} not implemented yet.`);
+    } else if (viewName === "bookmarks") {
+      renderBookmarksView();
+    } else if (viewName === "progress") {
+      renderProgressView();
+    } else if (viewName === "notes") {
+      renderNotesView();
+    } else if (viewName === "quiz") {
+      renderQuizView();
+    } else if (viewName === "downloads") {
+      renderDownloadsView();
+    } else if (viewName === "settings") {
+      renderSettingsView();
     }
   }
 
@@ -670,12 +675,61 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
     if (openBtn) {
       openBtn.href = res.fileUrl || "#";
       openBtn.style.display = res.fileUrl ? "inline-flex" : "none";
+      openBtn.onclick = () => {
+        const user = auth.currentUser;
+        if (user) {
+          logReadingProgress(user.uid, res.id).then(() => {
+            getUserProfile(user.uid).then(updateDashboardStats);
+          });
+        }
+      };
     }
 
     const downloadBtn = document.getElementById("details-download-btn");
     if (downloadBtn) {
       downloadBtn.href = res.fileUrl || "#";
       downloadBtn.style.display = res.fileUrl ? "inline-flex" : "none";
+      downloadBtn.onclick = () => {
+        const user = auth.currentUser;
+        if (user) {
+          logDownload(user.uid, res.id).then(() => {
+            getUserProfile(user.uid).then(updateDashboardStats);
+          });
+        }
+      };
+    }
+
+    const bookmarkBtn = document.getElementById("details-bookmark-btn");
+    if (bookmarkBtn) {
+      const user = auth.currentUser;
+      if (user) {
+        getUserProfile(user.uid).then((profile) => {
+          const isBookmarked = profile && profile.bookmarks && profile.bookmarks.includes(res.id);
+          bookmarkBtn.innerHTML = isBookmarked 
+            ? `<i class="fa-solid fa-bookmark"></i> Bookmarked` 
+            : `<i class="fa-regular fa-bookmark"></i> Bookmark`;
+        });
+      }
+
+      bookmarkBtn.onclick = async (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (!user) return;
+        try {
+          bookmarkBtn.disabled = true;
+          const bookmarked = await toggleBookmark(user.uid, res.id);
+          bookmarkBtn.innerHTML = bookmarked 
+            ? `<i class="fa-solid fa-bookmark"></i> Bookmarked` 
+            : `<i class="fa-regular fa-bookmark"></i> Bookmark`;
+          
+          const updatedProfile = await getUserProfile(user.uid);
+          updateDashboardStats(updatedProfile);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          bookmarkBtn.disabled = false;
+        }
+      };
     }
 
     // Load Tags
@@ -739,6 +793,328 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
       .replace(/'/g, "&#039;");
   }
 
+  // Statistics nodes updating
+  function updateDashboardStats(profile) {
+    if (!profile) return;
+    
+    userData.bookmarkCount = profile.bookmarks ? profile.bookmarks.length : 0;
+    userData.notesRead = profile.progress ? profile.progress.length : 0;
+    userData.downloadsCount = profile.downloads ? profile.downloads.length : 0;
+    
+    applyDynamicText("bookmarkCount", userData.bookmarkCount);
+    applyDynamicText("notesRead", userData.notesRead);
+    
+    if (profile.downloads) {
+      applyDynamicText("downloadsCount", profile.downloads.length);
+    }
+  }
+
+  // Subviews renderers
+  async function renderBookmarksView() {
+    const grid = document.getElementById("bookmarks-grid");
+    const empty = document.getElementById("bookmarks-empty");
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const profile = await getUserProfile(user.uid);
+      const bookmarks = profile.bookmarks || [];
+      const bookmarkedItems = cachedResources.filter((r) => bookmarks.includes(r.id));
+      
+      if (bookmarkedItems.length === 0) {
+        if (empty) empty.style.display = "block";
+        return;
+      }
+      if (empty) empty.style.display = "none";
+      
+      renderCardGrid(grid, bookmarkedItems);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renderProgressView() {
+    const grid = document.getElementById("progress-grid");
+    const empty = document.getElementById("progress-empty");
+    const barFill = document.getElementById("progress-bar-fill");
+    const textLabel = document.getElementById("progress-text-label");
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const profile = await getUserProfile(user.uid);
+      const progress = profile.progress || [];
+      const openedItems = cachedResources.filter((r) => progress.includes(r.id));
+      
+      const totalCount = cachedResources.length || 1;
+      const pct = Math.round((openedItems.length / totalCount) * 100);
+      if (barFill) barFill.style.width = `${pct}%`;
+      if (textLabel) textLabel.textContent = `${pct}% Completed`;
+      
+      if (openedItems.length === 0) {
+        if (empty) empty.style.display = "block";
+        return;
+      }
+      if (empty) empty.style.display = "none";
+      
+      renderCardGrid(grid, openedItems);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renderNotesView() {
+    const grid = document.getElementById("notes-grid");
+    const empty = document.getElementById("notes-empty");
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const notes = await getUserNotes(user.uid);
+      if (notes.length === 0) {
+        if (empty) empty.style.display = "block";
+        return;
+      }
+      if (empty) empty.style.display = "none";
+      
+      notes.forEach((note) => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.style.textAlign = "left";
+        card.style.padding = "20px";
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+            <h4 style="font-size: 16px; font-weight: 700; color: var(--color-text);">${escapeHtml(note.title)}</h4>
+            <button class="delete-note-btn" data-id="${note.id}" style="background: none; border: none; color: var(--color-text-faint); cursor: pointer; padding: 4px;"><i class="fa-solid fa-trash-can"></i></button>
+          </div>
+          <p style="font-size: 13.5px; color: var(--color-text-soft); line-height: 1.5; white-space: pre-wrap; margin-bottom: 12px;">${escapeHtml(note.content)}</p>
+          <span style="font-size: 11px; color: var(--color-text-faint);">${new Date(note.createdAt).toLocaleDateString("en-IN")}</span>
+        `;
+        
+        card.querySelector(".delete-note-btn").onclick = async (e) => {
+          e.stopPropagation();
+          if (confirm("Are you sure you want to delete this note?")) {
+            await deleteUserNote(user.uid, note.id);
+            renderNotesView();
+          }
+        };
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renderQuizView() {
+    const tbody = document.getElementById("quizzes-tbody");
+    const empty = document.getElementById("quizzes-empty");
+    const tableCard = document.getElementById("quizzes-table-card");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const quizzes = await getUserQuizzes(user.uid);
+      if (quizzes.length === 0) {
+        if (empty) empty.style.display = "block";
+        if (tableCard) tableCard.style.display = "none";
+        return;
+      }
+      if (empty) empty.style.display = "none";
+      if (tableCard) tableCard.style.display = "block";
+      
+      let scoreSum = 0;
+      quizzes.forEach((q) => {
+        const tr = document.createElement("tr");
+        tr.style.borderBottom = "1px solid var(--color-border)";
+        
+        const score = parseInt(q.score) || 0;
+        scoreSum += score;
+        const scoreClass = score >= 80 ? "score-good" : (score >= 60 ? "score-mid" : "score-low");
+        
+        tr.innerHTML = `
+          <td style="padding: 14px 18px; color: var(--color-text); font-weight: 600;">${escapeHtml(q.assessment)}</td>
+          <td style="padding: 14px 18px; color: var(--color-text-soft);"><strong>${escapeHtml(q.course)}</strong></td>
+          <td style="padding: 14px 18px; text-align: right;"><strong class="${scoreClass}">${score}%</strong></td>
+          <td style="padding: 14px 18px; text-align: right; color: var(--color-text-faint);">${new Date(q.createdAt).toLocaleDateString("en-IN")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      const avg = Math.round(scoreSum / quizzes.length);
+      applyDynamicText("quizAverage", `${avg}%`);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renderDownloadsView() {
+    const grid = document.getElementById("downloads-grid");
+    const empty = document.getElementById("downloads-empty");
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const profile = await getUserProfile(user.uid);
+      const downloads = profile.downloads || [];
+      const downloadedItems = cachedResources.filter((r) => downloads.includes(r.id));
+      
+      if (downloadedItems.length === 0) {
+        if (empty) empty.style.display = "block";
+        return;
+      }
+      if (empty) empty.style.display = "none";
+      
+      renderCardGrid(grid, downloadedItems);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function renderSettingsView() {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      const profile = await getUserProfile(user.uid);
+      const settings = profile.settings || { notifications: true, preferredCourse: "MEG-01", darkmode: false };
+      
+      const notifCheck = document.getElementById("settings-notifications");
+      const courseSel = document.getElementById("settings-preferred-course");
+      const darkmodeCheck = document.getElementById("settings-darkmode");
+      
+      if (notifCheck) notifCheck.checked = settings.notifications !== false;
+      if (courseSel) courseSel.value = settings.preferredCourse || "MEG-01";
+      if (darkmodeCheck) darkmodeCheck.checked = !!settings.darkmode;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function renderCardGrid(container, items) {
+    container.innerHTML = "";
+    items.forEach((res) => {
+      const card = document.createElement("article");
+      card.className = "card student-resource-card";
+      card.style.cursor = "pointer";
+
+      const typeClass = `badge-${res.type?.toLowerCase().replace(/\s+/g, "") || "notes"}`;
+      const fallbackThumb = `https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&q=80&w=400`;
+
+      card.innerHTML = `
+        <div class="card-thumbnail-wrapper">
+          <img src="${res.thumbnail || fallbackThumb}" alt="${escapeHtml(res.title)}" loading="lazy">
+          <span class="badge ${typeClass} card-badge">${escapeHtml(res.type)}</span>
+        </div>
+        <div class="card-body" style="padding: 16px; flex: 1; display: flex; flex-direction: column;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--color-accent); text-transform: uppercase;">${escapeHtml(res.course)}</span>
+          <h3 style="font-size: 15px; font-weight: 700; margin: 6px 0 8px; color: var(--color-text); line-height: 1.4;">${escapeHtml(res.title)}</h3>
+        </div>
+      `;
+
+      card.addEventListener("click", () => openResourceDetails(res));
+      container.appendChild(card);
+    });
+  }
+
+  // Settings submit
+  document.getElementById("settingsForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const notifCheck = document.getElementById("settings-notifications");
+    const courseSel = document.getElementById("settings-preferred-course");
+    const darkmodeCheck = document.getElementById("settings-darkmode");
+    const message = document.getElementById("settings-message");
+    
+    const settings = {
+      notifications: !!notifCheck?.checked,
+      preferredCourse: courseSel?.value || "MEG-01",
+      darkmode: !!darkmodeCheck?.checked
+    };
+    
+    try {
+      await updateUserSettings(user.uid, settings);
+      if (message) {
+        message.textContent = "Settings saved successfully!";
+        message.className = "form-message success";
+        setTimeout(() => message.textContent = "", 3000);
+      }
+    } catch (err) {
+      console.error(err);
+      if (message) {
+        message.textContent = "Failed to save settings.";
+        message.className = "form-message error";
+      }
+    }
+  });
+
+  // Notes Modal controllers
+  document.getElementById("openAddNoteModalBtn")?.addEventListener("click", () => {
+    document.getElementById("addNoteModal").hidden = false;
+  });
+  document.getElementById("closeAddNoteModalBtn")?.addEventListener("click", () => {
+    document.getElementById("addNoteModal").hidden = true;
+  });
+  document.getElementById("addNoteForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const title = document.getElementById("note-title").value.trim();
+    const content = document.getElementById("note-content").value.trim();
+    
+    try {
+      await addUserNote(user.uid, { title, content });
+      document.getElementById("addNoteModal").hidden = true;
+      document.getElementById("addNoteForm").reset();
+      renderNotesView();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  // Quiz Modal controllers
+  document.getElementById("openAddQuizModalBtn")?.addEventListener("click", () => {
+    document.getElementById("addQuizModal").hidden = false;
+  });
+  document.getElementById("closeAddQuizModalBtn")?.addEventListener("click", () => {
+    document.getElementById("addQuizModal").hidden = true;
+  });
+  document.getElementById("addQuizForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const assessment = document.getElementById("quiz-assessment").value.trim();
+    const course = document.getElementById("quiz-course").value;
+    const score = parseInt(document.getElementById("quiz-score").value) || 0;
+    
+    try {
+      await addUserQuizScore(user.uid, { assessment, course, score });
+      document.getElementById("addQuizModal").hidden = true;
+      document.getElementById("addQuizForm").reset();
+      renderQuizView();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
   /* ---------------------------------------------------------
      Generic dropdown/panel toggler
      Handles: notifications panel, user account dropdown
@@ -791,8 +1167,21 @@ import { createUserDocument, getUserProfile, updateUserProfile, getPublishedReso
   /* ---------------------------------------------------------
      Continue Learning button (placeholder action)
   --------------------------------------------------------- */
-  document.getElementById("continueLearningBtn")?.addEventListener("click", () => {
-    // TODO: route to the learner's most recently opened course/block
+  document.getElementById("continueLearningBtn")?.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const profile = await getUserProfile(user.uid);
+      if (profile && profile.lastVisitedResource) {
+        const target = cachedResources.find((r) => r.id === profile.lastVisitedResource);
+        if (target) {
+          openResourceDetails(target);
+          return;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
     document.querySelector(".course-list .course-item")?.scrollIntoView({
       behavior: "smooth",
       block: "center",

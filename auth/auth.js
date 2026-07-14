@@ -537,6 +537,11 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Dropdown nav links ─────────────────────────────────────── */
   document.querySelectorAll(".ud-nav-link").forEach((link) => {
     link.addEventListener("click", (e) => {
+      const href = link.getAttribute("href");
+      if (href && href !== "#") {
+        closeUserMenu();
+        return;
+      }
       e.preventDefault();
       closeUserMenu();
       console.info("[Auth] Navigate to:", link.dataset.page);

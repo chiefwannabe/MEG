@@ -345,3 +345,163 @@ export async function getRelatedResources(res) {
     return [];
   }
 }
+
+/**
+ * Toggles a bookmark for a user.
+ */
+export async function toggleBookmark(uid, resourceId) {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists()) return false;
+
+    const data = docSnap.data();
+    const bookmarks = data.bookmarks || [];
+    let updated;
+    if (bookmarks.includes(resourceId)) {
+      updated = bookmarks.filter((id) => id !== resourceId);
+    } else {
+      updated = [...bookmarks, resourceId];
+    }
+    await updateDoc(userDocRef, { bookmarks: updated });
+    return updated.includes(resourceId);
+  } catch (error) {
+    console.error("[Firestore] Error toggling bookmark:", error);
+    throw error;
+  }
+}
+
+/**
+ * Appends a resource to the user's reading progress list.
+ */
+export async function logReadingProgress(uid, resourceId) {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists()) return;
+
+    const data = docSnap.data();
+    const progress = data.progress || [];
+    const updateData = { lastVisitedResource: resourceId };
+    if (!progress.includes(resourceId)) {
+      updateData.progress = [...progress, resourceId];
+    }
+    await updateDoc(userDocRef, updateData);
+  } catch (error) {
+    console.error("[Firestore] Error logging reading progress:", error);
+  }
+}
+
+/**
+ * Appends a resource to the user's downloaded items list.
+ */
+export async function logDownload(uid, resourceId) {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    const docSnap = await getDoc(userDocRef);
+    if (!docSnap.exists()) return;
+
+    const data = docSnap.data();
+    const downloads = data.downloads || [];
+    if (!downloads.includes(resourceId)) {
+      await updateDoc(userDocRef, { downloads: [...downloads, resourceId] });
+    }
+  } catch (error) {
+    console.error("[Firestore] Error logging download:", error);
+  }
+}
+
+/**
+ * Updates user settings inside their profile document.
+ */
+export async function updateUserSettings(uid, settings) {
+  try {
+    const userDocRef = doc(db, "users", uid);
+    await updateDoc(userDocRef, { settings });
+  } catch (error) {
+    console.error("[Firestore] Error updating user settings:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches notes written by the student.
+ */
+export async function getUserNotes(uid) {
+  try {
+    const notesCol = collection(db, "users", uid, "notes");
+    const snapshot = await getDocs(notesCol);
+    const notes = [];
+    snapshot.forEach((docSnap) => {
+      notes.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    return notes;
+  } catch (error) {
+    console.error("[Firestore] Error fetching user notes:", error);
+    return [];
+  }
+}
+
+/**
+ * Adds a new note for the student.
+ */
+export async function addUserNote(uid, note) {
+  try {
+    const notesCol = collection(db, "users", uid, "notes");
+    const docRef = await addDoc(notesCol, {
+      ...note,
+      createdAt: new Date().toISOString()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("[Firestore] Error adding user note:", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletes a note.
+ */
+export async function deleteUserNote(uid, noteId) {
+  try {
+    const noteDocRef = doc(db, "users", uid, "notes", noteId);
+    await deleteDoc(noteDocRef);
+  } catch (error) {
+    console.error("[Firestore] Error deleting user note:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches user quiz records.
+ */
+export async function getUserQuizzes(uid) {
+  try {
+    const quizzesCol = collection(db, "users", uid, "quizzes");
+    const snapshot = await getDocs(quizzesCol);
+    const scores = [];
+    snapshot.forEach((docSnap) => {
+      scores.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    return scores;
+  } catch (error) {
+    console.error("[Firestore] Error fetching user quizzes:", error);
+    return [];
+  }
+}
+
+/**
+ * Adds a new quiz score record.
+ */
+export async function addUserQuizScore(uid, quizScore) {
+  try {
+    const quizzesCol = collection(db, "users", uid, "quizzes");
+    await addDoc(quizzesCol, {
+      ...quizScore,
+      createdAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("[Firestore] Error adding user quiz score:", error);
+    throw error;
+  }
+}

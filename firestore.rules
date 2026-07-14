@@ -54,7 +54,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
              'uid', 'displayName', 'email', 'photoURL', 'provider', 
              'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
-             'bio', 'university', 'course', 'semester', 'country'
+             'bio', 'university', 'course', 'semester', 'country',
+             'bookmarks', 'progress', 'downloads', 'settings'
            ])
         ||
         // Case B: The user is updating their own profile
@@ -68,20 +69,35 @@ service cloud.firestore {
           && request.resource.data.createdAt == resource.data.createdAt
           // Restrict input updates to allowed schema fields (no arbitrary keys)
           && request.resource.data.keys().hasOnly([
-               'uid', 'displayName', 'email', 'photoURL', 'provider', 
-               'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
-               'bio', 'university', 'course', 'semester', 'country'
-             ])
+              'uid', 'displayName', 'email', 'photoURL', 'provider', 
+              'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
+              'bio', 'university', 'course', 'semester', 'country',
+              'bookmarks', 'progress', 'downloads', 'settings'
+            ])
           // Validate types of optional fields if they are supplied in the update request
           && (!('bio' in request.resource.data) || request.resource.data.bio is string)
           && (!('university' in request.resource.data) || request.resource.data.university is string)
           && (!('course' in request.resource.data) || request.resource.data.course is string)
           && (!('semester' in request.resource.data) || request.resource.data.semester is string)
           && (!('country' in request.resource.data) || request.resource.data.country is string)
+          && (!('bookmarks' in request.resource.data) || request.resource.data.bookmarks is list)
+          && (!('progress' in request.resource.data) || request.resource.data.progress is list)
+          && (!('downloads' in request.resource.data) || request.resource.data.downloads is list)
+          && (!('settings' in request.resource.data) || request.resource.data.settings is map)
         );
 
       // Deleting user profiles is completely forbidden
       allow delete: if false;
+
+      // Notes subcollection
+      match /notes/{noteId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
+
+      // Quizzes subcollection
+      match /quizzes/{quizId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
     }
 
     // ==========================================
