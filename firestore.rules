@@ -13,6 +13,7 @@ service cloud.firestore {
     // to false/fails-secure if the document does not exist, saving evaluation cost.
     function isAdmin() {
       return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
@@ -55,7 +56,7 @@ service cloud.firestore {
              'uid', 'displayName', 'email', 'photoURL', 'provider', 
              'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
              'bio', 'university', 'course', 'semester', 'country',
-             'bookmarks', 'progress', 'downloads', 'settings'
+             'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource'
            ])
         ||
         // Case B: The user is updating their own profile
@@ -72,7 +73,7 @@ service cloud.firestore {
               'uid', 'displayName', 'email', 'photoURL', 'provider', 
               'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
               'bio', 'university', 'course', 'semester', 'country',
-              'bookmarks', 'progress', 'downloads', 'settings'
+              'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource'
             ])
           // Validate types of optional fields if they are supplied in the update request
           && (!('bio' in request.resource.data) || request.resource.data.bio is string)
@@ -84,6 +85,7 @@ service cloud.firestore {
           && (!('progress' in request.resource.data) || request.resource.data.progress is list)
           && (!('downloads' in request.resource.data) || request.resource.data.downloads is list)
           && (!('settings' in request.resource.data) || request.resource.data.settings is map)
+          && (!('lastVisitedResource' in request.resource.data) || request.resource.data.lastVisitedResource is string)
         );
 
       // Deleting user profiles is completely forbidden
