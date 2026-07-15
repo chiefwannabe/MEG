@@ -1,8 +1,8 @@
 {
   "meta": {
-    "totalGames": 92,
+    "totalGames": 93,
     "categories": [],
-    "generatedAt": "2026-07-14T11:31:03.374Z"
+    "generatedAt": "2026-07-15T09:09:34.918Z"
   },
   "games": [
     {
@@ -647,6 +647,13 @@
       "title": "Indev",
       "slug": "indev",
       "file": "Indev.html",
+      "category": null
+    },
+    {
+      "id": 93,
+      "title": "Slime Td",
+      "slug": "slime td",
+      "file": "slime td.html",
       "category": null
     }
   ]

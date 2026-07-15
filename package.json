@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "build": "node offline/generate-games.js && node generate-uploads.js",
-    "generate": "node offline/generate-games.js"
+    "generate": "node offline/generate-games.js",
+    "dev": "node server.js"
   },
   "engines": {
     "node": ">=18"
