@@ -37,7 +37,8 @@ service cloud.firestore {
         // Prevent writing arbitrary fields: restrict document attributes to schema definitions
         && request.resource.data.keys().hasOnly([
              'uid', 'displayName', 'email', 'photoURL', 'provider', 
-             'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted'
+             'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
+             'enrolment', 'programme'
            ])
         // Verify key integrity and types
         && request.resource.data.uid == uid
@@ -56,7 +57,8 @@ service cloud.firestore {
              'uid', 'displayName', 'email', 'photoURL', 'provider', 
              'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
              'bio', 'university', 'course', 'semester', 'country',
-             'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource'
+             'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource',
+             'enrolment', 'programme'
            ])
         ||
         // Case B: The user is updating their own profile
@@ -73,7 +75,8 @@ service cloud.firestore {
               'uid', 'displayName', 'email', 'photoURL', 'provider', 
               'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
               'bio', 'university', 'course', 'semester', 'country',
-              'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource'
+              'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource',
+              'enrolment', 'programme'
             ])
           // Validate types of optional fields if they are supplied in the update request
           && (!('bio' in request.resource.data) || request.resource.data.bio is string)
@@ -86,6 +89,8 @@ service cloud.firestore {
           && (!('downloads' in request.resource.data) || request.resource.data.downloads is list)
           && (!('settings' in request.resource.data) || request.resource.data.settings is map)
           && (!('lastVisitedResource' in request.resource.data) || request.resource.data.lastVisitedResource is string)
+          && (!('enrolment' in request.resource.data) || request.resource.data.enrolment is string)
+          && (!('programme' in request.resource.data) || request.resource.data.programme is string)
         );
 
       // Deleting user profiles is completely forbidden

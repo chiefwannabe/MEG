@@ -51,7 +51,9 @@ export async function createUserDocument(user) {
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
         role: "student",
-        profileCompleted: false
+        profileCompleted: false,
+        enrolment: "",
+        programme: ""
       };
 
       // Set the document. Since it doesn't exist, we just write it.

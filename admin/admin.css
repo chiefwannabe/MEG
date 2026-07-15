@@ -1,9 +1,9 @@
 /* =========================================================
    MEGOL — IGNOU Study Hub — Admin Dashboard Styles
-   Inherits design system tokens from dashboard.css
+   Inherits design system tokens from index.css
    ========================================================= */
 
-@import url("../dashboard/dashboard.css");
+@import url("../dashboard/index.css");
 
 /* ---------- Admin-Specific Layout / Spacing ---------- */
 .panel-header-actions {

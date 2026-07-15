@@ -36,7 +36,7 @@ import {
       const profile = await getUserProfile(user.uid);
       if (!profile || profile.role !== "admin") {
         console.error("[Admin Auth] Unauthorized access. User is not an admin. Redirecting to dashboard...");
-        window.location.replace("../dashboard/dashboard.html");
+        window.location.replace("../dashboard/index.html");
         return;
       }
 
@@ -46,7 +46,7 @@ import {
       initAdminPanel();
     } catch (error) {
       console.error("[Admin Panel] Error checking authorization:", error);
-      window.location.replace("../dashboard/dashboard.html");
+      window.location.replace("../dashboard/index.html");
     }
   });
 
