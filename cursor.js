@@ -42,14 +42,12 @@
 
   /* ── 1. Touch / Pointer Detection ──────────────────────────────
      We use two checks:
-     a) matchMedia('(hover: hover)') — true only if the primary
-        pointing device can hover (mouse / trackpad).
-     b) matchMedia('(pointer: fine)') — true for precise pointers
-        (mouse), false for touch / stylus-only.
-     If either check fails, we leave the native cursor untouched.
+     a) matchMedia('(any-hover: hover)') — true if any pointing device supports hover.
+     b) matchMedia('(any-pointer: fine)') — true if any precise pointing device is available.
+     This ensures hybrid/touchscreen laptops still get the custom cursor while mobile/tablets do not.
   ─────────────────────────────────────────────────────────────── */
-  const canHover      = window.matchMedia('(hover: hover)').matches;
-  const hasFinePtr    = window.matchMedia('(pointer: fine)').matches;
+  const canHover      = window.matchMedia('(any-hover: hover)').matches;
+  const hasFinePtr    = window.matchMedia('(any-pointer: fine)').matches;
   const isDesktop     = canHover && hasFinePtr;
 
   if (!isDesktop) {
@@ -161,24 +159,9 @@
     themeEl:    null,                    // <style> injected for theme vars
   };
 
-  /* ── 4. DOM Injection ───────────────────────────────────────────
-     Create the two cursor elements and append to <body>.
-     Using specific IDs so the JS can always retrieve them even if
-     the page is a SPA that re-renders the body.
-  ─────────────────────────────────────────────────────────────── */
-  const dot  = document.createElement('div');
-  const ring = document.createElement('div');
-  dot.className  = 'meg-cursor-dot';
-  ring.className = 'meg-cursor-ring';
-  dot.id   = 'megCursorDot';
-  ring.id  = 'megCursorRing';
-  dot.setAttribute('aria-hidden', 'true');
-  ring.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(dot);
-  document.body.appendChild(ring);
-
-  /* Signal CSS to hide the native cursor */
-  document.documentElement.setAttribute('data-cursor-ready', '');
+  /* ── 4. DOM Injection variables ── */
+  let dot = null;
+  let ring = null;
 
   /* ── 5. Utility Helpers ─────────────────────────────────────────*/
 
@@ -395,6 +378,23 @@
   /* ── 11. Initialisation ─────────────────────────────────────────*/
 
   const init = () => {
+    // Inject the cursor DOM elements safely now that body is ready
+    if (!dot) {
+      dot  = document.createElement('div');
+      ring = document.createElement('div');
+      dot.className  = 'meg-cursor-dot';
+      ring.className = 'meg-cursor-ring';
+      dot.id   = 'megCursorDot';
+      ring.id  = 'megCursorRing';
+      dot.setAttribute('aria-hidden', 'true');
+      ring.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(dot);
+      document.body.appendChild(ring);
+    }
+
+    /* Signal CSS to hide the native cursor */
+    document.documentElement.setAttribute('data-cursor-ready', '');
+
     /* Hide cursor elements until first mouse movement */
     addClass('is-hidden');
 
