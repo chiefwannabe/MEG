@@ -1,656 +1,117 @@
 {
   "meta": {
-    "totalGames": 93,
+    "totalGames": 16,
     "categories": [],
-    "generatedAt": "2026-07-16T23:00:24.288Z"
+    "generatedAt": "2026-07-16T23:36:42.282Z"
   },
   "games": [
     {
       "id": 1,
-      "title": "1.12",
-      "slug": "1.12",
-      "file": "1.12.html",
-      "category": null
-    },
-    {
-      "id": 2,
-      "title": "1.5",
-      "slug": "1.5",
-      "file": "1.5.html",
-      "category": null
-    },
-    {
-      "id": 3,
-      "title": "1.8",
-      "slug": "1.8",
-      "file": "1.8.html",
-      "category": null
-    },
-    {
-      "id": 4,
-      "title": "10minutestilldawn",
-      "slug": "10minutestilldawn",
-      "file": "10minutestilldawn.html",
-      "category": null
-    },
-    {
-      "id": 5,
-      "title": "12minibattles",
-      "slug": "12minibattles",
-      "file": "12minibattles.html",
-      "category": null
-    },
-    {
-      "id": 6,
-      "title": "1on1soccer",
-      "slug": "1on1soccer",
-      "file": "1on1soccer.html",
-      "category": null
-    },
-    {
-      "id": 7,
-      "title": "1on1tennis",
-      "slug": "1on1tennis",
-      "file": "1on1tennis.html",
-      "category": null
-    },
-    {
-      "id": 8,
-      "title": "1v1.Lol",
-      "slug": "1v1.lol",
-      "file": "1v1.lol.html",
-      "category": null
-    },
-    {
-      "id": 9,
       "title": "2048",
       "slug": "2048",
       "file": "2048.html",
       "category": null
     },
     {
-      "id": 10,
+      "id": 2,
       "title": "2048cupcakes",
       "slug": "2048cupcakes",
       "file": "2048cupcakes.html",
       "category": null
     },
     {
-      "id": 11,
-      "title": "3Dflightsimulator",
-      "slug": "3dflightsimulator",
-      "file": "3Dflightsimulator.html",
-      "category": null
-    },
-    {
-      "id": 12,
-      "title": "8ballclassic",
-      "slug": "8ballclassic",
-      "file": "8ballclassic.html",
-      "category": null
-    },
-    {
-      "id": 13,
+      "id": 3,
       "title": "Agariolite",
       "slug": "agariolite",
       "file": "agariolite.html",
       "category": null
     },
     {
-      "id": 14,
-      "title": "Ageofwar2",
-      "slug": "ageofwar2",
-      "file": "ageofwar2.html",
-      "category": null
-    },
-    {
-      "id": 15,
-      "title": "Agesofconflict",
-      "slug": "agesofconflict",
-      "file": "agesofconflict.html",
-      "category": null
-    },
-    {
-      "id": 16,
-      "title": "Alpha 1.2.6",
-      "slug": "alpha_1.2.6",
-      "file": "Alpha_1.2.6.html",
-      "category": null
-    },
-    {
-      "id": 17,
-      "title": "Amongus",
-      "slug": "amongus",
-      "file": "amongus.html",
-      "category": null
-    },
-    {
-      "id": 18,
-      "title": "Angrybirds",
-      "slug": "angrybirds",
-      "file": "angrybirds.html",
-      "category": null
-    },
-    {
-      "id": 19,
-      "title": "Angry Birds Showdown",
-      "slug": "angrybirdsshowdown",
-      "file": "angrybirdsshowdown.html",
-      "category": null
-    },
-    {
-      "id": 20,
-      "title": "Angrybirdsspace",
-      "slug": "angrybirdsspace",
-      "file": "angrybirdsspace.html",
-      "category": null
-    },
-    {
-      "id": 21,
-      "title": "Awesometanks",
-      "slug": "awesometanks",
-      "file": "awesometanks.html",
-      "category": null
-    },
-    {
-      "id": 22,
-      "title": "Awesometanks2",
-      "slug": "awesometanks2",
-      "file": "awesometanks2.html",
-      "category": null
-    },
-    {
-      "id": 23,
-      "title": "Backrooms",
-      "slug": "backrooms",
-      "file": "backrooms.html",
-      "category": null
-    },
-    {
-      "id": 24,
-      "title": "Baconmaydie",
-      "slug": "baconmaydie",
-      "file": "baconmaydie.html",
-      "category": null
-    },
-    {
-      "id": 25,
-      "title": "Badicecream",
-      "slug": "badicecream",
-      "file": "badicecream.html",
-      "category": null
-    },
-    {
-      "id": 26,
+      "id": 4,
       "title": "Badicecream2",
       "slug": "badicecream2",
       "file": "badicecream2.html",
       "category": null
     },
     {
-      "id": 27,
-      "title": "Badicecream3",
-      "slug": "badicecream3",
-      "file": "badicecream3.html",
-      "category": null
-    },
-    {
-      "id": 28,
-      "title": "Badparenting",
-      "slug": "badparenting",
-      "file": "badparenting.html",
-      "category": null
-    },
-    {
-      "id": 29,
-      "title": "Badpiggies",
-      "slug": "badpiggies",
-      "file": "badpiggies.html",
-      "category": null
-    },
-    {
-      "id": 30,
-      "title": "Baldisbasics",
-      "slug": "baldisbasics",
-      "file": "baldisbasics.html",
-      "category": null
-    },
-    {
-      "id": 31,
-      "title": "Baseballbros",
-      "slug": "baseballbros",
-      "file": "baseballbros.html",
-      "category": null
-    },
-    {
-      "id": 32,
-      "title": "Basketballlegends",
-      "slug": "basketballlegends",
-      "file": "basketballlegends.html",
-      "category": null
-    },
-    {
-      "id": 33,
-      "title": "Basketballstars",
-      "slug": "basketballstars",
-      "file": "basketballstars.html",
-      "category": null
-    },
-    {
-      "id": 34,
-      "title": "Basketbros",
-      "slug": "basketbros",
-      "file": "basketbros.html",
-      "category": null
-    },
-    {
-      "id": 35,
+      "id": 5,
       "title": "Basketrandom",
       "slug": "basketrandom",
       "file": "basketrandom.html",
       "category": null
     },
     {
-      "id": 36,
+      "id": 6,
       "title": "Beta 1.3",
       "slug": "beta_1.3",
       "file": "Beta_1.3.html",
       "category": null
     },
     {
-      "id": 37,
-      "title": "Bitlife",
-      "slug": "bitlife",
-      "file": "bitlife.html",
-      "category": null
-    },
-    {
-      "id": 38,
-      "title": "Blockysnakes",
-      "slug": "blockysnakes",
-      "file": "blockysnakes.html",
-      "category": null
-    },
-    {
-      "id": 39,
-      "title": "BloonsTD",
-      "slug": "bloonstd",
-      "file": "bloonsTD.html",
-      "category": null
-    },
-    {
-      "id": 40,
-      "title": "BloonsTD2",
-      "slug": "bloonstd2",
-      "file": "bloonsTD2.html",
-      "category": null
-    },
-    {
-      "id": 41,
-      "title": "BloonsTD3",
-      "slug": "bloonstd3",
-      "file": "bloonsTD3.html",
-      "category": null
-    },
-    {
-      "id": 42,
-      "title": "BloonsTD4",
-      "slug": "bloonstd4",
-      "file": "bloonsTD4.html",
-      "category": null
-    },
-    {
-      "id": 43,
-      "title": "BloonsTD5",
-      "slug": "bloonstd5",
-      "file": "bloonsTD5.html",
-      "category": null
-    },
-    {
-      "id": 44,
-      "title": "Bloxorz",
-      "slug": "bloxorz",
-      "file": "bloxorz.html",
-      "category": null
-    },
-    {
-      "id": 45,
-      "title": "Blumgiracers",
-      "slug": "blumgiracers",
-      "file": "blumgiracers.html",
-      "category": null
-    },
-    {
-      "id": 46,
+      "id": 7,
       "title": "Blumgirocket",
       "slug": "blumgirocket",
       "file": "blumgirocket.html",
       "category": null
     },
     {
-      "id": 47,
-      "title": "Bobtherobber",
-      "slug": "bobtherobber",
-      "file": "bobtherobber.html",
-      "category": null
-    },
-    {
-      "id": 48,
-      "title": "Bobtherobber2",
-      "slug": "bobtherobber2",
-      "file": "bobtherobber2.html",
-      "category": null
-    },
-    {
-      "id": 49,
-      "title": "Bobtherobber5",
-      "slug": "bobtherobber5",
-      "file": "bobtherobber5.html",
-      "category": null
-    },
-    {
-      "id": 50,
-      "title": "Bouncymotors",
-      "slug": "bouncymotors",
-      "file": "bouncymotors.html",
-      "category": null
-    },
-    {
-      "id": 51,
-      "title": "Bowmasters",
-      "slug": "bowmasters",
-      "file": "bowmasters.html",
-      "category": null
-    },
-    {
-      "id": 52,
-      "title": "Breakingthebank",
-      "slug": "breakingthebank",
-      "file": "breakingthebank.html",
-      "category": null
-    },
-    {
-      "id": 53,
-      "title": "Bubbleshooter",
-      "slug": "bubbleshooter",
-      "file": "bubbleshooter.html",
-      "category": null
-    },
-    {
-      "id": 54,
+      "id": 8,
       "title": "Candycrush",
       "slug": "candycrush",
       "file": "candycrush.html",
       "category": null
     },
     {
-      "id": 55,
-      "title": "Capybaraclicker",
-      "slug": "capybaraclicker",
-      "file": "capybaraclicker.html",
-      "category": null
-    },
-    {
-      "id": 56,
-      "title": "Cardrawing",
-      "slug": "cardrawing",
-      "file": "cardrawing.html",
-      "category": null
-    },
-    {
-      "id": 57,
-      "title": "Carkingarena",
-      "slug": "carkingarena",
-      "file": "carkingarena.html",
-      "category": null
-    },
-    {
-      "id": 58,
+      "id": 9,
       "title": "Choppyorc",
       "slug": "choppyorc",
       "file": "choppyorc.html",
       "category": null
     },
     {
-      "id": 59,
+      "id": 10,
       "title": "CircloO",
       "slug": "circloo",
       "file": "circloO.html",
       "category": null
     },
     {
-      "id": 60,
-      "title": "CircloO2",
-      "slug": "circloo2",
-      "file": "circloO2.html",
-      "category": null
-    },
-    {
-      "id": 61,
+      "id": 11,
       "title": "Clashofvikings",
       "slug": "clashofvikings",
       "file": "clashofvikings.html",
       "category": null
     },
     {
-      "id": 62,
-      "title": "Cleanupio",
-      "slug": "cleanupio",
-      "file": "cleanupio.html",
-      "category": null
-    },
-    {
-      "id": 63,
-      "title": "Crazycattle3D",
-      "slug": "crazycattle3d",
-      "file": "crazycattle3D.html",
-      "category": null
-    },
-    {
-      "id": 64,
-      "title": "Crazycrashlanding",
-      "slug": "crazycrashlanding",
-      "file": "crazycrashlanding.html",
-      "category": null
-    },
-    {
-      "id": 65,
-      "title": "Crazymotorcycle",
-      "slug": "crazymotorcycle",
-      "file": "crazymotorcycle.html",
-      "category": null
-    },
-    {
-      "id": 66,
-      "title": "Cuttherope",
-      "slug": "cuttherope",
-      "file": "cuttherope.html",
-      "category": null
-    },
-    {
-      "id": 67,
-      "title": "Dadish",
-      "slug": "dadish",
-      "file": "dadish.html",
-      "category": null
-    },
-    {
-      "id": 68,
-      "title": "Dadish2",
-      "slug": "dadish2",
-      "file": "dadish2.html",
-      "category": null
-    },
-    {
-      "id": 69,
-      "title": "Deathchase",
-      "slug": "deathchase",
-      "file": "deathchase.html",
-      "category": null
-    },
-    {
-      "id": 70,
-      "title": "Deathrun3D",
-      "slug": "deathrun3d",
-      "file": "deathrun3D.html",
-      "category": null
-    },
-    {
-      "id": 71,
-      "title": "Demolitionderbycrashracing",
-      "slug": "demolitionderbycrashracing",
-      "file": "demolitionderbycrashracing.html",
-      "category": null
-    },
-    {
-      "id": 72,
+      "id": 12,
       "title": "Doodlejump",
       "slug": "doodlejump",
       "file": "doodlejump.html",
       "category": null
     },
     {
-      "id": 73,
+      "id": 13,
       "title": "Drawclimber",
       "slug": "drawclimber",
       "file": "drawclimber.html",
       "category": null
     },
     {
-      "id": 74,
-      "title": "Ducklife",
-      "slug": "ducklife",
-      "file": "ducklife.html",
-      "category": null
-    },
-    {
-      "id": 75,
-      "title": "Ducklife2",
-      "slug": "ducklife2",
-      "file": "ducklife2.html",
-      "category": null
-    },
-    {
-      "id": 76,
-      "title": "Ducklife3",
-      "slug": "ducklife3",
-      "file": "ducklife3.html",
-      "category": null
-    },
-    {
-      "id": 77,
-      "title": "Ducklife4",
-      "slug": "ducklife4",
-      "file": "ducklife4.html",
-      "category": null
-    },
-    {
-      "id": 78,
-      "title": "Ducklife5",
-      "slug": "ducklife5",
-      "file": "ducklife5.html",
-      "category": null
-    },
-    {
-      "id": 79,
-      "title": "Ducklingsio",
-      "slug": "ducklingsio",
-      "file": "ducklingsio.html",
-      "category": null
-    },
-    {
-      "id": 80,
-      "title": "Eagleride",
-      "slug": "eagleride",
-      "file": "eagleride.html",
-      "category": null
-    },
-    {
-      "id": 81,
-      "title": "Earntodie",
-      "slug": "earntodie",
-      "file": "earntodie.html",
-      "category": null
-    },
-    {
-      "id": 82,
-      "title": "Earntodie2",
-      "slug": "earntodie2",
-      "file": "earntodie2.html",
-      "category": null
-    },
-    {
-      "id": 83,
-      "title": "Eggycar",
-      "slug": "eggycar",
-      "file": "eggycar.html",
-      "category": null
-    },
-    {
-      "id": 84,
-      "title": "Escaperoad",
-      "slug": "escaperoad",
-      "file": "escaperoad.html",
-      "category": null
-    },
-    {
-      "id": 85,
-      "title": "Escaperoad2",
-      "slug": "escaperoad2",
-      "file": "escaperoad2.html",
-      "category": null
-    },
-    {
-      "id": 86,
-      "title": "Escapingtheprison",
-      "slug": "escapingtheprison",
-      "file": "escapingtheprison.html",
-      "category": null
-    },
-    {
-      "id": 87,
+      "id": 14,
       "title": "Evilglitch",
       "slug": "evilglitch",
       "file": "evilglitch.html",
       "category": null
     },
     {
-      "id": 88,
-      "title": "Fancypantsadventure",
-      "slug": "fancypantsadventure",
-      "file": "fancypantsadventure.html",
-      "category": null
-    },
-    {
-      "id": 89,
-      "title": "Fancypantsadventure2",
-      "slug": "fancypantsadventure2",
-      "file": "fancypantsadventure2.html",
-      "category": null
-    },
-    {
-      "id": 90,
-      "title": "Fireboyandwatergirl",
-      "slug": "fireboyandwatergirl",
-      "file": "fireboyandwatergirl.html",
-      "category": null
-    },
-    {
-      "id": 91,
-      "title": "Fireboyandwatergirl2",
-      "slug": "fireboyandwatergirl2",
-      "file": "fireboyandwatergirl2.html",
-      "category": null
-    },
-    {
-      "id": 92,
+      "id": 15,
       "title": "Indev",
       "slug": "indev",
       "file": "Indev.html",
       "category": null
     },
     {
-      "id": 93,
+      "id": 16,
       "title": "Slime Td",
       "slug": "slime td",
       "file": "slime td.html",
