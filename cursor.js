@@ -34,9 +34,11 @@
 
 (function MegCursorModule() {
   'use strict';
+  console.log("cursor.js loaded");
 
   /* Guard against duplicate initialization if the script is loaded multiple times */
   if (window.__MEG_CURSOR__) {
+    console.log("cursor.js already loaded (duplicate guard matched)");
     return;
   }
 
@@ -48,12 +50,15 @@
   ─────────────────────────────────────────────────────────────── */
   const canHover      = window.matchMedia('(any-hover: hover)').matches;
   const hasFinePtr    = window.matchMedia('(any-pointer: fine)').matches;
+  console.log("matchMedia('(any-hover: hover)').matches:", canHover);
+  console.log("matchMedia('(any-pointer: fine)').matches:", hasFinePtr);
   const isDesktop     = canHover && hasFinePtr;
 
   if (!isDesktop) {
     // Touch device — do nothing.  Native cursor stays.
     return;
   }
+  console.log("Passed device check");
 
   /* ── 2. Configuration ───────────────────────────────────────────
      Single source of truth for all behavioural values.
@@ -378,41 +383,52 @@
   /* ── 11. Initialisation ─────────────────────────────────────────*/
 
   const init = () => {
-    // Inject the cursor DOM elements safely now that body is ready
-    if (!dot) {
-      dot  = document.createElement('div');
-      ring = document.createElement('div');
-      dot.className  = 'meg-cursor-dot';
-      ring.className = 'meg-cursor-ring';
-      dot.id   = 'megCursorDot';
-      ring.id  = 'megCursorRing';
-      dot.setAttribute('aria-hidden', 'true');
-      ring.setAttribute('aria-hidden', 'true');
-      document.body.appendChild(dot);
-      document.body.appendChild(ring);
-    }
+    try {
+      console.log("init() started");
+      // Inject the cursor DOM elements safely now that body is ready
+      if (!dot) {
+        dot  = document.createElement('div');
+        ring = document.createElement('div');
+        dot.className  = 'meg-cursor-dot';
+        ring.className = 'meg-cursor-ring';
+        dot.id   = 'megCursorDot';
+        ring.id  = 'megCursorRing';
+        dot.setAttribute('aria-hidden', 'true');
+        ring.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(dot);
+        document.body.appendChild(ring);
+        console.log("Created cursor elements");
+      }
 
-    /* Signal CSS to hide the native cursor */
-    document.documentElement.setAttribute('data-cursor-ready', '');
+      /* Signal CSS to hide the native cursor */
+      document.documentElement.setAttribute('data-cursor-ready', '');
+      console.log("Added data-cursor-ready");
 
-    /* Hide cursor elements until first mouse movement */
-    addClass('is-hidden');
+      /* Hide cursor elements until first mouse movement */
+      addClass('is-hidden');
 
-    /* Restore saved theme preference */
-    loadSavedTheme();
+      /* Restore saved theme preference */
+      loadSavedTheme();
 
-    /* Attach event listeners (all passive-safe except mousedown/up) */
-    document.addEventListener('mousemove',  onMouseMove, { passive: true });
-    document.addEventListener('mousedown',  onMouseDown);
-    document.addEventListener('mouseup',    onMouseUp);
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('mouseenter', onMouseEnter);
-    window.addEventListener('scroll',       onScroll,       { passive: true });
-    window.addEventListener('blur',         onWindowBlur,   { passive: true });
+      /* Attach event listeners (all passive-safe except mousedown/up) */
+      document.addEventListener('mousemove',  onMouseMove, { passive: true });
+      document.addEventListener('mousedown',  onMouseDown);
+      document.addEventListener('mouseup',    onMouseUp);
+      document.addEventListener('mouseleave', onMouseLeave);
+      document.addEventListener('mouseenter', onMouseEnter);
+      window.addEventListener('scroll',       onScroll,       { passive: true });
+      window.addEventListener('blur',         onWindowBlur,   { passive: true });
 
-    /* Start the animation loop */
-    if (!state.rafId) {
-      state.rafId = requestAnimationFrame(tick);
+      /* Start the animation loop */
+      if (!state.rafId) {
+        state.rafId = requestAnimationFrame(tick);
+        console.log("Started requestAnimationFrame");
+      }
+    } catch (err) {
+      console.error("Error during cursor.js init():", err);
+      if (err && err.stack) {
+        console.error(err.stack);
+      }
     }
   };
 
@@ -469,11 +485,16 @@
      */
     getThemes: () => Object.keys(CONFIG.themes),
   };
+  console.log("Assigned window.__MEG_CURSOR__");
 
   /* ── Run ────────────────────────────────────────────────────────*/
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("DOMContentLoaded fired");
+      init();
+    }, { once: true });
   } else {
+    console.log("DOMContentLoaded already fired or not loading (readyState: " + document.readyState + ")");
     init();
   }
 
