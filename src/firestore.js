@@ -18,6 +18,7 @@ import {
   getDocs,
   query,
   where,
+  limit,
   getCountFromServer
 } from "firebase/firestore";
 
@@ -35,7 +36,7 @@ export async function isUsernameUnique(username) {
   const normalized = username.trim().toLowerCase();
   try {
     const usersCol = collection(db, "users");
-    const q = query(usersCol, where("username", "==", normalized));
+    const q = query(usersCol, where("username", "==", normalized), limit(1));
     const querySnapshot = await getDocs(q);
     return querySnapshot.empty;
   } catch (error) {

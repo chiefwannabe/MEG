@@ -46,8 +46,11 @@ service cloud.firestore {
     // ==========================================
     match /users/{uid} {
       
-      // A user can read their own profile document. Admins can read all user profile documents.
-      allow read: if isOwner(uid) || isAdmin();
+      // Allow reading a single profile document if owner or admin
+      allow get: if isOwner(uid) || isAdmin();
+
+      // Allow querying the users collection to check username uniqueness (e.g. limit 1)
+      allow list: if request.query.limit == 1;
       
       // Creating a user document
       allow create: if isOwner(uid)

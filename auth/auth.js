@@ -395,7 +395,10 @@ async function handleRegister(e) {
   const username = usernameEl.value.trim().toLowerCase();
   usernameEl.value = username; // reflect normalised value in field
 
+  console.log(`[handleRegister] Step 1: Starting validateUsername for "${username}"`);
   const usernameError = validateUsername(username);
+  console.log(`[handleRegister] Step 1: validateUsername completed. Result:`, usernameError);
+
   if (usernameError) {
     fieldError(usernameEl, usernameError);
     valid = false;
@@ -415,7 +418,10 @@ async function handleRegister(e) {
 
   try {
     // Check uniqueness against Firestore (username stored in lowercase)
+    console.log(`[handleRegister] Step 2: Starting isUsernameUnique check for "${username}"`);
     const isUnique = await isUsernameUnique(username);
+    console.log(`[handleRegister] Step 2: isUsernameUnique check completed. Result: isUnique = ${isUnique}`);
+
     if (!isUnique) {
       fieldError(usernameEl, "This username is already taken. Please choose a different one.");
       AuthState.isLoading = false;
@@ -426,17 +432,21 @@ async function handleRegister(e) {
     // Firebase Auth stores: username@meg.local + hashed password (handled by Firebase)
     // Firestore stores: uid, username, createdAt, role — NO password ever
     const email = `${username}@meg.local`;
+    console.log(`[handleRegister] Step 3: Starting createUserWithEmailAndPassword for synthetic email "${email}"`);
     const { user } = await createUserWithEmailAndPassword(
       auth,
       email,
       passEl.value
     );
+    console.log(`[handleRegister] Step 3: createUserWithEmailAndPassword completed successfully. user.uid = ${user?.uid}`);
+
     // Set the display name on the Firebase Auth profile
     await updateProfile(user, { displayName: nameEl.value.trim() });
     // onAuthStateChanged won't re-fire for profile updates — call manually
     handleAuthStateChanged(auth.currentUser);
     closeModal();
   } catch (err) {
+    console.error(`[handleRegister] Error occurred during signup process!`, err);
     showMessage("panel-register", "error", friendlyError(err));
   } finally {
     AuthState.isLoading = false;
@@ -496,8 +506,11 @@ document.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, (user) => {
     handleAuthStateChanged(user);
     if (user) {
-      createUserDocument(user).catch((err) => {
-        console.error("[Auth] Failed to handle user document setup:", err);
+      console.log(`[onAuthStateChanged] Step 4: Starting createUserDocument for user.uid = ${user.uid}`);
+      createUserDocument(user).then(() => {
+        console.log(`[onAuthStateChanged] Step 4: createUserDocument completed successfully for user.uid = ${user.uid}`);
+      }).catch((err) => {
+        console.error(`[onAuthStateChanged] Step 4: createUserDocument failed! Error:`, err);
       });
     }
   });
