@@ -563,7 +563,7 @@ import {
 
       tr.innerHTML = `
         <td data-label="Name" style="font-weight: 600; color: var(--color-text);">${escapeHtml(user.displayName || "User")}</td>
-        <td data-label="Email">${escapeHtml(user.email)}</td>
+        <td data-label="Username">${escapeHtml(user.username || "")}</td>
         <td data-label="Provider"><span class="badge badge-draft">${escapeHtml(user.provider || "password")}</span></td>
         <td data-label="Registered">${regString}</td>
         <td data-label="Last Active">${activeString}</td>

@@ -31,7 +31,7 @@ let cachedResources = [];
   const adminDropdownLink = document.getElementById("adminDropdownLink");
   const editProfileBtn = document.getElementById("editProfileBtn");
   const fieldName = document.getElementById("fieldName");
-  const fieldEmail = document.getElementById("fieldEmail");
+  const fieldUsername = document.getElementById("fieldUsername");
   const fieldEnrolment = document.getElementById("fieldEnrolment");
   const fieldProgramme = document.getElementById("fieldProgramme");
   const settingsNotif = document.getElementById("settingsNotif");
@@ -77,7 +77,7 @@ let cachedResources = [];
     const profile = await getUserProfile(currentUser.uid);
     currentProfile = profile || {
       displayName: currentUser.displayName || "User",
-      email: currentUser.email || "",
+      username: currentUser.email ? currentUser.email.split("@")[0] : "",
       photoURL: currentUser.photoURL || "",
       enrolment: "",
       programme: "",
@@ -93,11 +93,11 @@ let cachedResources = [];
   // Populate UI elements with profile data
   function updateUIWithProfile() {
     const displayName = currentProfile.displayName || currentUser.displayName || "User";
-    const email = currentProfile.email || currentUser.email || "";
+    const username = currentProfile.username || (currentUser.email ? currentUser.email.split("@")[0] : "");
     
     // Apply dynamic text mappings
     applyDynamicText("displayName", displayName);
-    applyDynamicText("userEmail", email);
+    applyDynamicText("userUsername", username ? `@${username}` : "");
     applyDynamicText("unreadCount", currentProfile.unreadCount || 0);
 
     const greetingWord = getGreetingWord();
@@ -117,7 +117,7 @@ let cachedResources = [];
 
     // Populate My Profile fields
     if (fieldName) fieldName.value = displayName;
-    if (fieldEmail) fieldEmail.value = email;
+    if (fieldUsername) fieldUsername.value = username;
     if (fieldEnrolment) fieldEnrolment.value = currentProfile.enrolment || "";
     if (fieldProgramme) fieldProgramme.value = currentProfile.programme || "";
 

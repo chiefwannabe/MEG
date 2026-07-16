@@ -9,11 +9,9 @@ service cloud.firestore {
     }
 
     // Helper function to verify if the authenticated user has the 'admin' role.
-    // OPTIMIZATION: Removed redundant exists() check. get() automatically evaluates 
-    // to false/fails-secure if the document does not exist, saving evaluation cost.
     function isAdmin() {
-      return isAuthenticated() && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
@@ -21,6 +19,27 @@ service cloud.firestore {
     function isOwner(uid) {
       return isAuthenticated() && request.auth.uid == uid;
     }
+
+    // Helper: ensure the role field is not being changed (used in self-update guard)
+    // A normal user can NEVER change their own role — only an admin can do that.
+    function roleIsUnchanged() {
+      return request.resource.data.role == resource.data.role;
+    }
+
+    // ==========================================
+    // DATA FLOW DOCUMENTATION
+    // ==========================================
+    // Firebase Authentication stores:
+    //   - email: <username>@meg.local  (synthetic, never shown to user)
+    //   - password: hashed by Firebase Auth (NEVER written to Firestore)
+    //
+    // Firestore /users/{uid} document stores ONLY:
+    //   - uid        : string  (Firebase Auth UID)
+    //   - username   : string  (lowercase, 3-20 chars, a-z 0-9 _ -)
+    //   - createdAt  : timestamp
+    //   - role       : 'student' | 'admin'  (admin-only writes)
+    //   + optional profile fields added on update (displayName, enrolment, etc.)
+    // ==========================================
 
     // ==========================================
     // 1. RULES FOR USERS COLLECTION
@@ -31,54 +50,60 @@ service cloud.firestore {
       allow read: if isOwner(uid) || isAdmin();
       
       // Creating a user document
-      allow create: if isOwner(uid) 
-        // Prevent privilege escalation: new accounts must be registered with the 'student' role
+      allow create: if isOwner(uid)
+        // Prevent privilege escalation: new accounts must always start with the 'student' role.
+        // The 'admin' role can only be granted by an existing admin after account creation.
         && request.resource.data.role == 'student'
-        // Prevent writing arbitrary fields: restrict document attributes to schema definitions
+        // Restrict initial document to exactly these 4 fields — no extra keys allowed
         && request.resource.data.keys().hasOnly([
-             'uid', 'displayName', 'email', 'photoURL', 'provider', 
-             'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
-             'enrolment', 'programme'
+             'uid', 'username', 'createdAt', 'role'
            ])
         // Verify key integrity and types
         && request.resource.data.uid == uid
-        && request.resource.data.email is string
-        && request.resource.data.displayName is string
-        && request.resource.data.photoURL is string
-        && request.resource.data.provider is string
-        && request.resource.data.emailVerified is bool
-        && request.resource.data.profileCompleted is bool;
+        && request.resource.data.username is string
+        // Ensure username is not an empty string
+        && request.resource.data.username.size() > 0;
 
       // Updating a user document
-      allow update: if 
-        // Case A: Admin is updating user details or changing roles
-        isAdmin() 
+      allow update: if
+        // ── Case A: Admin update (can change role, add/remove fields, etc.) ──────────────────
+        // IMPORTANT: Only admins can change the 'role' field. This is the sole
+        // mechanism for granting or revoking admin privileges.
+        isAdmin()
         && request.resource.data.keys().hasOnly([
-             'uid', 'displayName', 'email', 'photoURL', 'provider', 
+             'uid', 'username', 'displayName', 'photoURL', 'provider',
              'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
              'bio', 'university', 'course', 'semester', 'country',
              'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource',
              'enrolment', 'programme'
            ])
         ||
-        // Case B: The user is updating their own profile
+        // ── Case B: Owner self-update (CANNOT change role, uid, username, or createdAt) ─────
+        // A normal user can update their own profile fields but is strictly
+        // prohibited from changing their role, uid, username, or createdAt.
         (
           isOwner(uid)
-          // Students can never change their own role field (prevent privilege escalation)
-          && request.resource.data.role == resource.data.role
-          // Prevent changes to crucial read-only account metadata
+          // ROLE PROTECTION: A user can NEVER change their own role.
+          // Only an admin (Case A above) may modify the role field.
+          && roleIsUnchanged()
+          // Protect other immutable account metadata
           && request.resource.data.uid == resource.data.uid
-          && request.resource.data.email == resource.data.email
+          && request.resource.data.username == resource.data.username
           && request.resource.data.createdAt == resource.data.createdAt
-          // Restrict input updates to allowed schema fields (no arbitrary keys)
+          // Only allow known profile fields — block any arbitrary new keys
           && request.resource.data.keys().hasOnly([
-              'uid', 'displayName', 'email', 'photoURL', 'provider', 
+              'uid', 'username', 'displayName', 'photoURL', 'provider',
               'emailVerified', 'createdAt', 'lastLogin', 'role', 'profileCompleted',
               'bio', 'university', 'course', 'semester', 'country',
               'bookmarks', 'progress', 'downloads', 'settings', 'lastVisitedResource',
               'enrolment', 'programme'
             ])
-          // Validate types of optional fields if they are supplied in the update request
+          // Validate types for optional fields if included in the update
+          && (!('displayName' in request.resource.data) || request.resource.data.displayName is string)
+          && (!('photoURL' in request.resource.data) || request.resource.data.photoURL is string)
+          && (!('provider' in request.resource.data) || request.resource.data.provider is string)
+          && (!('emailVerified' in request.resource.data) || request.resource.data.emailVerified is bool)
+          && (!('profileCompleted' in request.resource.data) || request.resource.data.profileCompleted is bool)
           && (!('bio' in request.resource.data) || request.resource.data.bio is string)
           && (!('university' in request.resource.data) || request.resource.data.university is string)
           && (!('course' in request.resource.data) || request.resource.data.course is string)

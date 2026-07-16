@@ -22,8 +22,40 @@ import {
 } from "firebase/firestore";
 
 /**
+ * Checks if a username already exists in Firestore.
+ * Always compares against the lowercase version of the username
+ * to enforce case-insensitive uniqueness.
+ *
+ * @param {string} username - The username to check (will be lowercased)
+ * @returns {Promise<boolean>} True if the username is unique, false otherwise
+ */
+export async function isUsernameUnique(username) {
+  if (!username) return false;
+  // Always compare lowercase — usernames are stored in lowercase only
+  const normalized = username.trim().toLowerCase();
+  try {
+    const usersCol = collection(db, "users");
+    const q = query(usersCol, where("username", "==", normalized));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty;
+  } catch (error) {
+    console.error("[Firestore] Error checking username uniqueness:", error);
+    throw error;
+  }
+}
+
+/**
  * Creates a user profile document in Firestore if it doesn't already exist.
  * Never overwrites existing user data.
+ *
+ * IMPORTANT: Passwords are NEVER written to Firestore.
+ * Firebase Authentication handles all credential storage internally.
+ *
+ * Firestore document schema on creation:
+ *   - uid       : string  (Firebase Auth UID)
+ *   - username  : string  (lowercase, derived from username@meg.local email)
+ *   - createdAt : timestamp
+ *   - role      : 'student' (can only be changed by an admin via Firestore rules)
  *
  * @param {import("firebase/auth").User} user - The Firebase Auth User object
  */
@@ -36,31 +68,22 @@ export async function createUserDocument(user) {
     const docSnap = await getDoc(userDocRef);
 
     if (!docSnap.exists()) {
-      // Extract provider ID (e.g. google.com, password)
-      const provider = user.providerData && user.providerData.length > 0
-        ? user.providerData[0].providerId
-        : "password";
+      // Extract username from the synthetic email (username@meg.local)
+      // and enforce lowercase storage
+      const username = user.email ? user.email.split("@")[0].toLowerCase() : "";
 
+      // Only store uid, username, createdAt, role — NO password, NO email
       const profileData = {
         uid: user.uid,
-        displayName: user.displayName || "",
-        email: user.email || "",
-        photoURL: user.photoURL || "",
-        provider: provider,
-        emailVerified: user.emailVerified,
+        username: username,
         createdAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-        role: "student",
-        profileCompleted: false,
-        enrolment: "",
-        programme: ""
+        role: "student"        // role can only be elevated by an admin (enforced by Firestore rules)
       };
 
-      // Set the document. Since it doesn't exist, we just write it.
       await setDoc(userDocRef, profileData);
-      console.log(`[Firestore] Profile created for user: ${user.uid}`);
+      console.log(`[Firestore] Profile created for user: ${user.uid} (username: ${username})`);
     } else {
-      // Document already exists. We update the lastLogin timestamp without overwriting user data.
+      // Document already exists — update lastLogin without overwriting any data
       await updateLastLogin(user.uid);
     }
   } catch (error) {

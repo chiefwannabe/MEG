@@ -23,14 +23,11 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-  GoogleAuthProvider,
-  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
 
-import { createUserDocument, getUserProfile } from "../src/firestore.js";
+import { createUserDocument, getUserProfile, isUsernameUnique } from "../src/firestore.js";
 
 /* ================================================================
    AUTH INSTANCE
@@ -107,12 +104,12 @@ function friendlyError(err) {
   if (!err) return "An unexpected error occurred.";
   const code = err.code || "";
   const map = {
-    "auth/user-not-found":          "No account found with this email.",
+    "auth/user-not-found":          "No account found with this username.",
     "auth/wrong-password":          "Incorrect password. Please try again.",
-    "auth/invalid-credential":      "Incorrect email or password. Please try again.",
-    "auth/email-already-in-use":    "This email is already registered. Try signing in.",
+    "auth/invalid-credential":      "Incorrect username or password. Please try again.",
+    "auth/email-already-in-use":    "This username is already registered. Try signing in.",
     "auth/weak-password":           "Password is too weak. Use at least 6 characters.",
-    "auth/invalid-email":           "Please enter a valid email address.",
+    "auth/invalid-email":           "Invalid username format.",
     "auth/too-many-requests":       "Too many attempts. Please wait a moment and try again.",
     "auth/network-request-failed":  "Network error. Check your connection.",
     "auth/popup-closed-by-user":    "Sign-in cancelled.",
@@ -216,8 +213,8 @@ async function handleAuthStateChanged(user) {
     if (userMenu) {
       userMenu.classList.add("active");
 
-      const displayName = user.displayName || user.email || "User";
-      const email       = user.email || "";
+      const username    = user.email ? user.email.split("@")[0] : "";
+      const displayName = user.displayName || username || "User";
       const initials    = getInitials(displayName);
 
       // Avatar: photo or initials
@@ -234,11 +231,11 @@ async function handleAuthStateChanged(user) {
       const nameEl = userMenu.querySelector(".user-display-name");
       if (nameEl) nameEl.textContent = displayName.split(" ")[0];
 
-      // Dropdown header (full name + email)
+      // Dropdown header (full name + username)
       const udName  = userMenu.querySelector(".ud-name");
       const udEmail = userMenu.querySelector(".ud-email");
       if (udName)  udName.textContent  = displayName;
-      if (udEmail) udEmail.textContent = email;
+      if (udEmail) udEmail.textContent = username ? `@${username}` : "";
     }
   } else {
     // --- Logged out ---
@@ -284,28 +281,76 @@ function closeUserMenu() {
 }
 
 /* ================================================================
+   USERNAME RULES
+   ================================================================ */
+
+/** Usernames that cannot be registered by ordinary users */
+const RESERVED_USERNAMES = new Set([
+  "admin", "administrator", "root", "owner", "support",
+  "system", "firebase", "api", "meg", "mod", "moderator",
+  "staff", "help", "info", "contact", "megol",
+]);
+
+/**
+ * Validates a username against all rules.
+ * Returns null if valid, or an error string if invalid.
+ *
+ * Rules:
+ *  - Lowercase letters, digits, underscores, hyphens only
+ *  - 3–20 characters
+ *  - Cannot be a reserved word
+ */
+function validateUsername(raw) {
+  if (!raw || raw.trim().length === 0) {
+    return "Username is required.";
+  }
+  const username = raw.trim().toLowerCase();
+  if (username.length < 3) {
+    return "Username must be at least 3 characters.";
+  }
+  if (username.length > 20) {
+    return "Username cannot exceed 20 characters.";
+  }
+  // Only allow: a-z, 0-9, underscore, hyphen
+  if (!/^[a-z0-9_-]+$/.test(username)) {
+    return "Username may only contain letters, numbers, underscores (_), and hyphens (-).";
+  }
+  if (RESERVED_USERNAMES.has(username)) {
+    return "This username is reserved and cannot be used. Please choose a different one.";
+  }
+  return null; // valid
+}
+
+/* ================================================================
    FORM ACTIONS
    ================================================================ */
 
-/* ── Email/Password Sign In ─────────────────────────────────────── */
+/* ── Username/Password Sign In ──────────────────────────────────── */
 async function handleSignIn(e) {
   e.preventDefault();
   if (AuthState.isLoading) return;
 
   const form    = e.target;
-  const emailEl = form.querySelector("#signin-email");
+  const usernameEl = form.querySelector("#signin-username");
   const passEl  = form.querySelector("#signin-password");
   const btn     = form.querySelector(".auth-submit-btn");
 
   clearFieldErrors(form);
   clearMessages("panel-signin");
 
+  // Normalise to lowercase immediately — usernames are case-insensitive
+  const username = usernameEl.value.trim().toLowerCase();
+  usernameEl.value = username; // reflect normalised value in field
+
   let valid = true;
-  if (!emailEl.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-    fieldError(emailEl, "Enter a valid email address."); valid = false;
+  const usernameError = validateUsername(username);
+  if (usernameError) {
+    fieldError(usernameEl, usernameError);
+    valid = false;
   }
   if (!passEl.value || passEl.value.length < 6) {
-    fieldError(passEl, "Password must be at least 6 characters."); valid = false;
+    fieldError(passEl, "Password must be at least 6 characters.");
+    valid = false;
   }
   if (!valid) return;
 
@@ -313,8 +358,9 @@ async function handleSignIn(e) {
   setLoading(btn, true, "Sign In");
 
   try {
-    await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-    // onAuthStateChanged listener fires automatically — UI updated there
+    // Firebase Auth email is derived from the lowercase username
+    const email = `${username}@meg.local`;
+    await signInWithEmailAndPassword(auth, email, passEl.value);
     closeModal();
   } catch (err) {
     showMessage("panel-signin", "error", friendlyError(err));
@@ -324,14 +370,14 @@ async function handleSignIn(e) {
   }
 }
 
-/* ── Email/Password Sign Up ─────────────────────────────────────── */
+/* ── Username/Password Sign Up ──────────────────────────────────── */
 async function handleRegister(e) {
   e.preventDefault();
   if (AuthState.isLoading) return;
 
   const form    = e.target;
   const nameEl  = form.querySelector("#reg-name");
-  const emailEl = form.querySelector("#reg-email");
+  const usernameEl = form.querySelector("#reg-username");
   const passEl  = form.querySelector("#reg-password");
   const pass2El = form.querySelector("#reg-password2");
   const btn     = form.querySelector(".auth-submit-btn");
@@ -341,16 +387,26 @@ async function handleRegister(e) {
 
   let valid = true;
   if (!nameEl.value.trim()) {
-    fieldError(nameEl, "Please enter your name."); valid = false;
+    fieldError(nameEl, "Please enter your name.");
+    valid = false;
   }
-  if (!emailEl.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-    fieldError(emailEl, "Enter a valid email address."); valid = false;
+
+  // Normalise to lowercase immediately — usernames are stored in lowercase only
+  const username = usernameEl.value.trim().toLowerCase();
+  usernameEl.value = username; // reflect normalised value in field
+
+  const usernameError = validateUsername(username);
+  if (usernameError) {
+    fieldError(usernameEl, usernameError);
+    valid = false;
   }
   if (!passEl.value || passEl.value.length < 6) {
-    fieldError(passEl, "Password must be at least 6 characters."); valid = false;
+    fieldError(passEl, "Password must be at least 6 characters.");
+    valid = false;
   }
   if (passEl.value !== pass2El.value) {
-    fieldError(pass2El, "Passwords do not match."); valid = false;
+    fieldError(pass2El, "Passwords do not match.");
+    valid = false;
   }
   if (!valid) return;
 
@@ -358,12 +414,24 @@ async function handleRegister(e) {
   setLoading(btn, true, "Create Account");
 
   try {
+    // Check uniqueness against Firestore (username stored in lowercase)
+    const isUnique = await isUsernameUnique(username);
+    if (!isUnique) {
+      fieldError(usernameEl, "This username is already taken. Please choose a different one.");
+      AuthState.isLoading = false;
+      setLoading(btn, false, "Create Account");
+      return;
+    }
+
+    // Firebase Auth stores: username@meg.local + hashed password (handled by Firebase)
+    // Firestore stores: uid, username, createdAt, role — NO password ever
+    const email = `${username}@meg.local`;
     const { user } = await createUserWithEmailAndPassword(
       auth,
-      emailEl.value.trim(),
+      email,
       passEl.value
     );
-    // Set the display name on the Firebase profile
+    // Set the display name on the Firebase Auth profile
     await updateProfile(user, { displayName: nameEl.value.trim() });
     // onAuthStateChanged won't re-fire for profile updates — call manually
     handleAuthStateChanged(auth.currentUser);
@@ -376,36 +444,10 @@ async function handleRegister(e) {
   }
 }
 
-/* ── Password Reset ─────────────────────────────────────────────── */
+/* ── Password Reset (Stubbed for username-only login UI) ────────── */
 async function handleForgotPassword(e) {
   e.preventDefault();
-  if (AuthState.isLoading) return;
-
-  const form    = e.target;
-  const emailEl = form.querySelector("#forgot-email");
-  const btn     = form.querySelector(".auth-submit-btn");
-
-  clearFieldErrors(form);
-  clearMessages("panel-forgot");
-
-  if (!emailEl.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-    fieldError(emailEl, "Enter a valid email address.");
-    return;
-  }
-
-  AuthState.isLoading = true;
-  setLoading(btn, true, "Send Reset Link");
-
-  try {
-    await sendPasswordResetEmail(auth, emailEl.value.trim());
-    showMessage("panel-forgot", "success", "Reset link sent! Check your email inbox.");
-    form.reset();
-  } catch (err) {
-    showMessage("panel-forgot", "error", friendlyError(err));
-  } finally {
-    AuthState.isLoading = false;
-    setLoading(btn, false, "Send Reset Link");
-  }
+  showMessage("panel-forgot", "error", "Password reset is not supported in a username-only system. Please contact the administrator.");
 }
 
 /* ── Google Sign-In ─────────────────────────────────────────────── */
