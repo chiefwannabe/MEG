@@ -1,38 +1,38 @@
-/* Custom Cursor Styles - Kenney Cursor Pack */
+/* Custom Cursor Styles - Reset to browser defaults */
 
-/* Apply default custom cursor to all elements */
+/* Apply default cursor to all elements */
 *, *::before, *::after {
-  cursor: url('tip/PNG/Basic/Default/pointer_a.png'), auto;
+  cursor: default;
 }
 
-/* Apply custom hover cursor to all interactive elements */
-a, 
-button, 
-[role="button"], 
-input[type="submit"], 
-input[type="button"], 
-input[type="radio"], 
-input[type="checkbox"], 
-select, 
-label, 
-.btn, 
-.card, 
-a *, 
-button *, 
-[role="button"] *, 
-.btn *, 
+/* Apply pointer cursor to all interactive elements */
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+input[type="radio"],
+input[type="checkbox"],
+select,
+label,
+.btn,
+.card,
+a *,
+button *,
+[role="button"] *,
+.btn *,
 label * {
-  cursor: url('tip/PNG/Basic/Default/hand_point.png'), pointer !important;
+  cursor: pointer;
 }
 
 /* Ensure text areas and input fields keep their default text cursor */
-textarea, 
-input[type="text"], 
-input[type="email"], 
-input[type="password"], 
-input[type="search"], 
-input[type="number"], 
-input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]), 
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 [contenteditable] {
-  cursor: text !important;
+  cursor: text;
 }
