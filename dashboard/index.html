@@ -119,18 +119,15 @@
         </div>
 
         <div class="user-menu">
-          <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false">
+          <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="User profile menu">
             <!-- USER AVATAR: replace src with dynamic profile image (Firebase user photoURL) -->
             <img class="avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Ravi%20Kumar&backgroundColor=2563eb&textColor=ffffff" alt="" width="36" height="36">
-            <span class="user-name" data-dynamic="displayName">Ravi Kumar</span>
-            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
           </button>
 
           <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
-            <li role="none"><a role="menuitem" href="#" data-nav="profile"><i class="fa-regular fa-user" aria-hidden="true"></i>My Profile</a></li>
-            <li role="none" id="adminDropdownLink" style="display: none;"><a role="menuitem" href="../admin/admin.html"><i class="fa-solid fa-user-shield" aria-hidden="true"></i>Admin Panel</a></li>
+            <li role="none"><a role="menuitem" href="#" data-nav="home"><i class="fa-solid fa-house" aria-hidden="true"></i>Dashboard</a></li>
+            <li role="none"><a role="menuitem" href="#" data-nav="bookmarks"><i class="fa-regular fa-star" aria-hidden="true"></i>Bookmarks</a></li>
             <li role="none"><a role="menuitem" href="#" data-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i>Settings</a></li>
-            <li role="none"><a role="menuitem" href="#" data-nav="help"><i class="fa-regular fa-circle-question" aria-hidden="true"></i>Help</a></li>
             <li class="dropdown-divider" role="none"></li>
             <li role="none"><a role="menuitem" href="#" class="danger" data-nav="logout"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>Logout</a></li>
           </ul>

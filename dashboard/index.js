@@ -426,17 +426,20 @@ let cachedResources = [];
     }
   }
 
+  function handleNavigation(key) {
+    if (key === "logout") {
+      handleLogout();
+    } else {
+      navigateTo(key);
+    }
+    closeAllPanels();
+    if (window.innerWidth <= 900) closeSidebar();
+  }
+
   document.querySelectorAll("[data-nav]").forEach((el) => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
-      const key = el.dataset.nav;
-      if (key === "logout") {
-        handleLogout();
-      } else {
-        navigateTo(key);
-      }
-      closeAllPanels();
-      if (window.innerWidth <= 900) closeSidebar();
+      handleNavigation(el.dataset.nav);
     });
   });
 
