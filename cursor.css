@@ -1,38 +1,197 @@
-/* Custom Cursor Styles - Reset to browser defaults */
+/* ═══════════════════════════════════════════════════════════════════
+   MEG WEBSITE · cursor.css
+   Global custom cursor styles — loaded on every page.
 
-/* Apply default cursor to all elements */
-*, *::before, *::after {
-  cursor: default;
+   Table of Contents
+   ─────────────────
+   1.  Design Tokens  (easy to extend per-theme later)
+   2.  Native Cursor Suppression
+   3.  Cursor Elements  (dot + outline ring)
+   4.  Cursor States    (hover / text / click / hidden)
+   5.  Click Ripple     (JS-spawned, self-removing)
+
+   How it integrates
+   ─────────────────
+   cursor.js adds [data-cursor-ready] to <html> before injecting the
+   cursor DOM elements.  Every rule that hides the native cursor is
+   scoped to [data-cursor-ready] so touch devices (which never get
+   the attribute) keep their default OS cursor untouched.
+═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────
+   1. Design Tokens
+   Override these in a page-specific stylesheet or via JS to enable
+   future cursor theme switching.
+───────────────────────────────────────────────────────────────── */
+:root {
+  /* — Geometry — */
+  --cur-dot-size:         8px;
+  --cur-ring-size:        36px;
+  --cur-ring-width:       1.5px;
+
+  /* — Default colors — */
+  --cur-dot-color:        #ffffff;
+  --cur-ring-color:       rgba(255, 255, 255, 0.42);
+
+  /* — Hover state — */
+  --cur-hover-dot-size:   6px;
+  --cur-hover-ring-size:  52px;
+  --cur-hover-color:      #7c6df5;
+  --cur-hover-fill:       rgba(124, 109, 245, 0.08);
+
+  /* — Click state — */
+  --cur-click-dot-size:   5px;
+  --cur-click-ring-size:  28px;
+  --cur-click-color:      #f06292;
+  --cur-click-fill:       rgba(240, 98, 146, 0.10);
+
+  /* — Transition speed for size/color morphs — */
+  --cur-speed:            0.14s;
 }
 
-/* Apply pointer cursor to all interactive elements */
-a,
-button,
-[role="button"],
-input[type="submit"],
-input[type="button"],
-input[type="radio"],
-input[type="checkbox"],
-select,
-label,
-.btn,
-.card,
-a *,
-button *,
-[role="button"] *,
-.btn *,
-label * {
-  cursor: pointer;
+
+/* ─────────────────────────────────────────────────────────────────
+   2. Native Cursor Suppression
+   Scoped to [data-cursor-ready] so it ONLY fires when cursor.js has
+   confirmed a non-touch, pointer-capable device.
+───────────────────────────────────────────────────────────────── */
+[data-cursor-ready] *,
+[data-cursor-ready] *::before,
+[data-cursor-ready] *::after,
+[data-cursor-ready] a,
+[data-cursor-ready] button,
+[data-cursor-ready] [role="button"],
+[data-cursor-ready] input,
+[data-cursor-ready] textarea,
+[data-cursor-ready] select,
+[data-cursor-ready] label,
+[data-cursor-ready] [style*="cursor: pointer"],
+[data-cursor-ready] [style*="cursor:pointer"] {
+  cursor: none !important;
 }
 
-/* Ensure text areas and input fields keep their default text cursor */
-textarea,
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="search"],
-input[type="number"],
-input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
-[contenteditable] {
-  cursor: text;
+
+/* ─────────────────────────────────────────────────────────────────
+   3. Cursor Elements
+───────────────────────────────────────────────────────────────── */
+
+/* ── Dot — snaps to exact mouse position every rAF frame ── */
+.meg-cursor-dot {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          var(--cur-dot-size);
+  height:         var(--cur-dot-size);
+  background:     var(--cur-dot-color);
+  border-radius:  50%;
+  pointer-events: none;
+  z-index:        2147483645; /* near max z-index */
+  transform:      translate3d(-200px, -200px, 0); /* off-screen until first move */
+
+  /* Only transition size/color — transform is driven by JS each frame */
+  transition:
+    width         var(--cur-speed) ease,
+    height        var(--cur-speed) ease,
+    border-radius var(--cur-speed) ease,
+    background    var(--cur-speed) ease,
+    opacity       var(--cur-speed) ease;
+
+  will-change: transform;
+}
+
+/* ── Ring — lerps toward mouse each rAF frame ── */
+.meg-cursor-ring {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          var(--cur-ring-size);
+  height:         var(--cur-ring-size);
+  border:         var(--cur-ring-width) solid var(--cur-ring-color);
+  border-radius:  50%;
+  background:     transparent;
+  pointer-events: none;
+  z-index:        2147483644;
+  transform:      translate3d(-200px, -200px, 0);
+
+  transition:
+    width        var(--cur-speed) ease,
+    height       var(--cur-speed) ease,
+    border-color var(--cur-speed) ease,
+    background   var(--cur-speed) ease,
+    opacity      var(--cur-speed) ease;
+
+  will-change: transform;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   4. Cursor States  (toggled by cursor.js via classList)
+───────────────────────────────────────────────────────────────── */
+
+/* — Hover (links, buttons, cards, anything cursor:pointer) — */
+.meg-cursor-dot.is-hovering {
+  width:      var(--cur-hover-dot-size);
+  height:     var(--cur-hover-dot-size);
+  background: var(--cur-hover-color);
+}
+.meg-cursor-ring.is-hovering {
+  width:        var(--cur-hover-ring-size);
+  height:       var(--cur-hover-ring-size);
+  border-color: var(--cur-hover-color);
+  background:   var(--cur-hover-fill);
+}
+
+/* — Click (mousedown) — */
+.meg-cursor-dot.is-clicking {
+  width:      var(--cur-click-dot-size);
+  height:     var(--cur-click-dot-size);
+  background: var(--cur-click-color);
+}
+.meg-cursor-ring.is-clicking {
+  width:        var(--cur-click-ring-size);
+  height:       var(--cur-click-ring-size);
+  border-color: var(--cur-click-color);
+  background:   var(--cur-click-fill);
+}
+
+/* — Text / I-beam (inputs, textareas, contenteditable) — */
+.meg-cursor-dot.is-text {
+  width:         2px;
+  height:        22px;
+  border-radius: 2px;
+  background:    var(--cur-hover-color);
+}
+.meg-cursor-ring.is-text {
+  opacity: 0;
+}
+
+/* — Hidden (cursor outside viewport or not yet moved) — */
+.meg-cursor-dot.is-hidden,
+.meg-cursor-ring.is-hidden {
+  opacity: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   5. Click Ripple  (div.meg-cursor-ripple created by cursor.js)
+   Positioned at click coords, self-removes after animation ends.
+───────────────────────────────────────────────────────────────── */
+.meg-cursor-ripple {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          0;
+  height:         0;
+  border-radius:  50%;
+  border:         1.5px solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  z-index:        2147483643;
+  transform:      translate(-50%, -50%);
+  animation:      megRippleExpand 0.62s ease-out forwards;
+}
+
+@keyframes megRippleExpand {
+  0%   { width: 0;    height: 0;    opacity: 0.75; }
+  100% { width: 80px; height: 80px; opacity: 0;    }
 }
