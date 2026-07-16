@@ -35,6 +35,11 @@
 (function MegCursorModule() {
   'use strict';
 
+  /* Guard against duplicate initialization if the script is loaded multiple times */
+  if (window.__MEG_CURSOR__) {
+    return;
+  }
+
   /* ── 1. Touch / Pointer Detection ──────────────────────────────
      We use two checks:
      a) matchMedia('(hover: hover)') — true only if the primary
@@ -315,6 +320,27 @@
     state.isVisible = true;
   };
 
+  /**
+   * Handle scrolling: re-evaluates the hover state of whatever element
+   * is currently positioned under the mouse coordinates.
+   */
+  const onScroll = () => {
+    if (!state.isVisible) return;
+    const target = document.elementFromPoint(state.mouse.x, state.mouse.y);
+    if (target) {
+      applyHoverState(target);
+    }
+  };
+
+  /**
+   * Handle tab switching/visibility/blur changes: hides custom cursor to
+   * avoid getting frozen/stuck on page when window loses focus.
+   */
+  const onWindowBlur = () => {
+    addClass('is-hidden');
+    state.isVisible = false;
+  };
+
   /* ── 10. Theme System ───────────────────────────────────────────
      MegCursor.setTheme(name) applies a predefined set of CSS
      custom property overrides to :root.
@@ -381,26 +407,48 @@
     document.addEventListener('mouseup',    onMouseUp);
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('mouseenter', onMouseEnter);
+    window.addEventListener('scroll',       onScroll,       { passive: true });
+    window.addEventListener('blur',         onWindowBlur,   { passive: true });
 
     /* Start the animation loop */
-    state.rafId = requestAnimationFrame(tick);
+    if (!state.rafId) {
+      state.rafId = requestAnimationFrame(tick);
+    }
   };
 
   /**
-   * Teardown — call this if you're removing the cursor system
-   * (e.g. in SPA route transitions before re-mounting).
+   * Teardown — cleanly destroys the cursor system and resets all DOM changes.
+   * Eliminates memory leaks and cleans up all active ripple elements.
    */
   const destroy = () => {
     cancelAnimationFrame(state.rafId);
+    state.rafId = null;
+
+    /* Remove event listeners */
     document.removeEventListener('mousemove',  onMouseMove);
     document.removeEventListener('mousedown',  onMouseDown);
     document.removeEventListener('mouseup',    onMouseUp);
     document.removeEventListener('mouseleave', onMouseLeave);
     document.removeEventListener('mouseenter', onMouseEnter);
+    window.removeEventListener('scroll',       onScroll);
+    window.removeEventListener('blur',         onWindowBlur);
+
+    /* Clean up DOM elements */
     dot.remove();
     ring.remove();
+
+    if (state.themeEl) {
+      state.themeEl.remove();
+      state.themeEl = null;
+    }
+
+    state.ripples.forEach(el => el.remove());
+    state.ripples = [];
+
+    /* Reset global attributes and references */
     document.documentElement.removeAttribute('data-cursor-ready');
     document.documentElement.removeAttribute('data-cursor-theme');
+    delete window.__MEG_CURSOR__;
   };
 
   /* ── 12. Public API ─────────────────────────────────────────────
