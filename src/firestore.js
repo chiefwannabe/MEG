@@ -59,36 +59,48 @@ export async function isUsernameUnique(username) {
  *
  * @param {import("firebase/auth").User} user - The Firebase Auth User object
  */
-export async function createUserDocument(user) {
+export async function createUserDocument(user, retries = 3, delay = 500) {
   if (!user) return;
 
   const userDocRef = doc(db, "users", user.uid);
 
-  try {
-    const docSnap = await getDoc(userDocRef);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const docSnap = await getDoc(userDocRef);
 
-    if (!docSnap.exists()) {
-      // Extract username from the synthetic email (username@meg.local)
-      // and enforce lowercase storage
-      const username = user.email ? user.email.split("@")[0].toLowerCase() : "";
+      if (!docSnap.exists()) {
+        // Extract username from the synthetic email (username@meg.local)
+        // and enforce lowercase storage
+        const username = user.email ? user.email.split("@")[0].toLowerCase() : "";
 
-      // Only store uid, username, createdAt, role — NO password, NO email
-      const profileData = {
-        uid: user.uid,
-        username: username,
-        createdAt: serverTimestamp(),
-        role: "student"        // role can only be elevated by an admin (enforced by Firestore rules)
-      };
+        // Only store uid, username, createdAt, role — NO password, NO email
+        const profileData = {
+          uid: user.uid,
+          username: username,
+          createdAt: serverTimestamp(),
+          role: "student"        // role can only be elevated by an admin (enforced by Firestore rules)
+        };
 
-      await setDoc(userDocRef, profileData);
-      console.log(`[Firestore] Profile created for user: ${user.uid} (username: ${username})`);
-    } else {
-      // Document already exists — update lastLogin without overwriting any data
-      await updateLastLogin(user.uid);
+        await setDoc(userDocRef, profileData);
+        console.log(`[Firestore] Profile created for user: ${user.uid} (username: ${username})`);
+      } else {
+        // Document already exists — update lastLogin without overwriting any data
+        await updateLastLogin(user.uid);
+      }
+      return; // Success, exit retry loop
+    } catch (error) {
+      console.warn(`[Firestore] Attempt ${attempt} failed for user document setup:`, error);
+      
+      const isPermissionError = error.code === "permission-denied" || 
+                                (error.message && error.message.toLowerCase().includes("permission"));
+      
+      if (isPermissionError && attempt < retries) {
+        console.info(`[Firestore] Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error; // Re-throw if not a permissions error or if we've exhausted all retries
+      }
     }
-  } catch (error) {
-    console.error("[Firestore] Error creating user document:", error);
-    throw error;
   }
 }
 
