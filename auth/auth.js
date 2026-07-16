@@ -223,8 +223,7 @@ async function handleAuthStateChanged(user) {
         if (user.photoURL) {
           avatarEl.innerHTML = `<img src="${user.photoURL}" alt="${displayName}" referrerpolicy="no-referrer" />`;
         } else {
-          const defaultAvatar = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%232563eb"/><path d="M16 18c-4.418 0-8 3.582-8 8h16c0-4.418-3.582-8-8-8z" fill="%23ffffff"/><circle cx="16" cy="11" r="4" fill="%23ffffff"/></svg>`;
-          avatarEl.innerHTML = `<img src="${defaultAvatar}" alt="${displayName}" referrerpolicy="no-referrer" />`;
+          avatarEl.innerHTML = `<img src="/assets/images/default-avatar.svg" alt="${displayName}" referrerpolicy="no-referrer" />`;
         }
       }
 
