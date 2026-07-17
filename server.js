@@ -23,6 +23,17 @@ const server = http.createServer((req, res) => {
   // Route /api/imagekit-auth to the local Vercel serverless function for development
   if (reqPath === '/api/imagekit-auth') {
     try {
+      // Mock Vercel response helper methods
+      res.status = (code) => {
+        res.statusCode = code;
+        return res;
+      };
+      res.json = (data) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data));
+        return res;
+      };
+
       const imagekitAuth = require('./api/imagekit-auth');
       imagekitAuth(req, res);
     } catch (e) {

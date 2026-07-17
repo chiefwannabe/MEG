@@ -1,4 +1,4 @@
-const ImageKit = require("imagekit");
+const ImageKit = require("@imagekit/nodejs");
 
 module.exports = function handler(req, res) {
   // CORS Headers
@@ -34,7 +34,7 @@ module.exports = function handler(req, res) {
       urlEndpoint
     });
 
-    const authParameters = imagekit.getAuthenticationParameters();
+    const authParameters = imagekit.helper.getAuthenticationParameters();
     
     // Send public key along with auth params so frontend does not need to hardcode it
     res.status(200).json({
