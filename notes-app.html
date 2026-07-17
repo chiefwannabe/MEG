@@ -1146,7 +1146,7 @@
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
         import { app } from "./src/firebase.js";
-        import { getUserProfile, getUserNotes, setUserNote, deleteUserNote, updateUserNote } from "./src/firestore.js";
+        import { getUserProfile, getUserNotes, setUserNote, deleteUserNote, updateUserNote, getUserScreenshots, setUserScreenshot, deleteUserScreenshot } from "./src/firestore.js";
 
         const auth = getAuth(app);
 
@@ -1229,16 +1229,19 @@
 
                 if (user) {
                     elements.editorImagesGroup.classList.remove('hidden');
-                    // Sync any local notes to Firestore
+                    // Sync any local notes and screenshots to Firestore
                     await syncLocalNotesToFirestore(user.uid);
-                    // Load notes from Firestore
+                    await syncLocalScreenshotsToFirestore(user.uid);
+                    // Load notes and screenshots from Firestore
                     await loadFirestoreNotes(user.uid);
+                    await loadFirestoreScreenshots(user.uid);
                 } else {
                     elements.editorImagesGroup.classList.add('hidden');
                     // Load notes from Local Storage
-                    loadLocalNotes();
+                    await loadLocalNotes();
                 }
                 renderNotes();
+                renderScreenshots();
             });
         }
 
@@ -1296,18 +1299,54 @@
             }
         }
 
+        async function syncLocalScreenshotsToFirestore(uid) {
+            try {
+                const localScreenshots = await screenshotsStorage.getAll();
+                if (localScreenshots && localScreenshots.length > 0) {
+                    console.log(`[Sync] Found ${localScreenshots.length} local screenshots. Syncing to Firestore...`);
+                    for (const s of localScreenshots) {
+                        await setUserScreenshot(uid, s.id, s);
+                    }
+                    // Clear local screenshots
+                    for (const s of localScreenshots) {
+                        await screenshotsStorage.delete(s.id);
+                    }
+                    console.log('[Sync] Local screenshots synced and cleared.');
+                }
+            } catch (e) {
+                console.error('[Sync] Error syncing local screenshots to Firestore:', e);
+            }
+        }
+
         async function loadFirestoreNotes(uid) {
             try {
                 const firestoreNotes = await getUserNotes(uid);
                 notes = firestoreNotes || [];
-                updateScreenshotsFromNotes();
             } catch (e) {
                 console.error('[Firestore] Error loading notes:', e);
                 notes = [];
             }
         }
 
-        function loadLocalNotes() {
+        async function loadFirestoreScreenshots(uid) {
+            try {
+                const firestoreScreenshots = await getUserScreenshots(uid);
+                screenshots = firestoreScreenshots || [];
+                screenshots.sort((a, b) => {
+                    const orderA = a.order !== undefined ? a.order : 0;
+                    const orderB = b.order !== undefined ? b.order : 0;
+                    if (orderA !== orderB) {
+                        return orderA - orderB;
+                    }
+                    return b.createdAt - a.createdAt;
+                });
+            } catch (e) {
+                console.error('[Firestore] Error loading screenshots:', e);
+                screenshots = [];
+            }
+        }
+
+        async function loadLocalNotes() {
             const stored = localStorage.getItem('notes');
             if (stored) {
                 try {
@@ -1322,7 +1361,7 @@
             } else {
                 notes = [];
             }
-            loadLocalScreenshots();
+            await loadLocalScreenshots();
         }
 
         async function loadLocalScreenshots() {
@@ -1342,33 +1381,7 @@
             }
         }
 
-        function updateScreenshotsFromNotes() {
-            if (currentUser) {
-                const imgUrls = [];
-                const aggregatedScreenshots = [];
-                let counter = 0;
-                const sortedNotes = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
-                sortedNotes.forEach(note => {
-                    if (note.images && Array.isArray(note.images)) {
-                        note.images.forEach(url => {
-                            if (!imgUrls.includes(url)) {
-                                imgUrls.push(url);
-                                aggregatedScreenshots.push({
-                                    id: `img-${counter++}-${note.id}`,
-                                    dataUrl: url,
-                                    width: 800,
-                                    height: 600,
-                                    sizeBytes: 0,
-                                    createdAt: note.updatedAt || Date.now(),
-                                    noteId: note.id
-                                });
-                            }
-                        });
-                    }
-                });
-                screenshots = aggregatedScreenshots;
-            }
-        }
+
 
         async function saveNoteState(note) {
             if (currentUser) {
@@ -1561,7 +1574,29 @@
             screenshots.forEach((s, idx) => {
                 s.order = idx;
             });
-            await screenshotsStorage.saveAll(screenshots);
+            if (currentUser) {
+                try {
+                    for (const s of screenshots) {
+                        await setUserScreenshot(currentUser.uid, s.id, s);
+                    }
+                } catch (e) {
+                    console.error('Failed to save screenshots to Firestore', e);
+                }
+            } else {
+                await screenshotsStorage.saveAll(screenshots);
+            }
+        }
+
+        async function saveScreenshotState(screenshot) {
+            if (currentUser) {
+                try {
+                    await setUserScreenshot(currentUser.uid, screenshot.id, screenshot);
+                } catch (e) {
+                    console.error('Failed to save screenshot to Firestore', e);
+                }
+            } else {
+                await saveScreenshotsState();
+            }
         }
 
         // ============================================
@@ -1607,7 +1642,6 @@
             } else {
                 localStorage.setItem('notes', JSON.stringify(notes));
             }
-            updateScreenshotsFromNotes();
             renderNotes();
         }
 
@@ -1663,7 +1697,6 @@
                 localStorage.setItem('notes', JSON.stringify(notes));
             }
 
-            updateScreenshotsFromNotes();
             renderNotes();
         }
 
@@ -1736,17 +1769,12 @@
 
         async function deleteScreenshot(id) {
             if (currentUser) {
-                const screenshotItem = screenshots.find(s => s.id === id);
-                if (screenshotItem && screenshotItem.noteId) {
-                    const note = notes.find(n => n.id === screenshotItem.noteId);
-                    if (note && note.images) {
-                        note.images = note.images.filter(url => url !== screenshotItem.dataUrl);
-                        note.updatedAt = Date.now();
-                        await saveNoteState(note);
-                        updateScreenshotsFromNotes();
-                        renderNotes();
-                        renderScreenshots();
-                    }
+                try {
+                    await deleteUserScreenshot(currentUser.uid, id);
+                    screenshots = screenshots.filter(s => s.id !== id);
+                    renderScreenshots();
+                } catch (e) {
+                    console.error('Failed to delete screenshot from Firestore', e);
                 }
             } else {
                 screenshots = screenshots.filter(s => s.id !== id);
@@ -2072,7 +2100,6 @@
                 await saveNoteState(note);
             }
             
-            updateScreenshotsFromNotes();
             closeEditor();
             renderNotes();
         }
@@ -2516,27 +2543,25 @@
                             for (const file of files) {
                                 try {
                                     const url = await uploadToImageKit(file);
-                                    const title = `Pasted Screenshot - ${new Date().toLocaleDateString()}`;
-                                    const content = `Automatically created from paste.`;
-                                    const note = {
+                                    const dataUrl = await fileToDataURL(file);
+                                    const { width, height } = await getImageDimensions(dataUrl);
+                                    const sizeBytes = file.size;
+
+                                    const newScreenshot = {
                                         id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9),
-                                        title: title,
-                                        content: content,
-                                        createdAt: Date.now(),
-                                        updatedAt: Date.now(),
-                                        pinned: false,
-                                        favorited: false,
-                                        archived: false,
-                                        images: [url]
+                                        dataUrl: url,
+                                        width: width,
+                                        height: height,
+                                        sizeBytes: sizeBytes,
+                                        createdAt: Date.now()
                                     };
-                                    notes.unshift(note);
-                                    await saveNoteState(note);
+
+                                    screenshots.unshift(newScreenshot);
+                                    await saveScreenshotState(newScreenshot);
                                 } catch (err) {
                                     console.error('Failed to upload pasted screenshot:', err);
                                 }
                             }
-                            updateScreenshotsFromNotes();
-                            renderNotes();
                             renderScreenshots();
                         } else {
                             for (const file of files) {

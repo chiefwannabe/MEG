@@ -569,3 +569,48 @@ export async function addUserQuizScore(uid, quizScore) {
     throw error;
   }
 }
+
+/**
+ * Fetches screenshots saved by the student.
+ */
+export async function getUserScreenshots(uid) {
+  try {
+    const screenshotsCol = collection(db, "users", uid, "screenshots");
+    const snapshot = await getDocs(screenshotsCol);
+    const screenshots = [];
+    snapshot.forEach((docSnap) => {
+      screenshots.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    return screenshots;
+  } catch (error) {
+    console.error("[Firestore] Error fetching user screenshots:", error);
+    return [];
+  }
+}
+
+/**
+ * Deletes a screenshot.
+ */
+export async function deleteUserScreenshot(uid, screenshotId) {
+  try {
+    const screenshotDocRef = doc(db, "users", uid, "screenshots", screenshotId);
+    await deleteDoc(screenshotDocRef);
+  } catch (error) {
+    console.error("[Firestore] Error deleting user screenshot:", error);
+    throw error;
+  }
+}
+
+/**
+ * Sets a screenshot document with a specific ID.
+ */
+export async function setUserScreenshot(uid, screenshotId, screenshot) {
+  try {
+    const screenshotDocRef = doc(db, "users", uid, "screenshots", screenshotId);
+    await setDoc(screenshotDocRef, screenshot);
+  } catch (error) {
+    console.error("[Firestore] Error setting user screenshot:", error);
+    throw error;
+  }
+}
+

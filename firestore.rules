@@ -133,6 +133,11 @@ service cloud.firestore {
       match /quizzes/{quizId} {
         allow read, write: if isOwner(uid) || isAdmin();
       }
+
+      // Screenshots subcollection
+      match /screenshots/{screenshotId} {
+        allow read, write: if isOwner(uid) || isAdmin();
+      }
     }
 
     // ==========================================
