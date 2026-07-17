@@ -2528,17 +2528,9 @@
                 }
 
                 if (files.length > 0) {
-                    const isEditorOpen = !elements.editor.classList.contains('hidden');
-                    
-                    if (isEditorOpen) {
+                    if (currentTab === 'screenshots') {
                         e.preventDefault();
-                        if (!currentUser) {
-                            alert('Please sign in to paste screenshots.');
-                            return;
-                        }
-                        await handleEditorFilesUpload(files);
-                    } else if (currentTab === 'screenshots') {
-                        e.preventDefault();
+                        closeEditor(); // Ensure editor is hidden before paste handling
                         if (currentUser) {
                             for (const file of files) {
                                 try {
@@ -2567,6 +2559,16 @@
                             for (const file of files) {
                                 await handleImageFile(file);
                             }
+                        }
+                    } else {
+                        const isEditorOpen = !elements.editor.classList.contains('hidden');
+                        if (isEditorOpen) {
+                            e.preventDefault();
+                            if (!currentUser) {
+                                alert('Please sign in to paste screenshots.');
+                                return;
+                            }
+                            await handleEditorFilesUpload(files);
                         }
                     }
                 }
