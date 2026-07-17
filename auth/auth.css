@@ -56,7 +56,7 @@
   transition: background 0.2s;
 }
 
-.user-avatar-btn:hover { background: #eaf2fd; }
+.user-avatar-btn:hover { background: var(--user-avatar-hover-bg); }
 
 .user-avatar {
   width: 36px;
@@ -103,8 +103,8 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: #fff;
-  border: 1px solid #e0e8f4;
+  background: var(--white);
+  border: 1px solid var(--user-dropdown-border);
   border-radius: 14px;
   box-shadow: 0 12px 36px rgba(20, 40, 80, 0.14);
   min-width: 210px;
@@ -124,14 +124,14 @@
 
 .user-dropdown-header {
   padding: 14px 16px 12px;
-  border-bottom: 1px solid #eef2f7;
-  background: #f7f9fd;
+  border-bottom: 1px solid var(--user-dropdown-divider);
+  background: var(--user-dropdown-header-bg);
 }
 
 .user-dropdown-header .ud-name {
   font-weight: 700;
   font-size: 0.9rem;
-  color: #1b2430;
+  color: var(--text-dark);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -139,7 +139,7 @@
 
 .user-dropdown-header .ud-email {
   font-size: 0.78rem;
-  color: #5a6472;
+  color: var(--text-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -157,7 +157,7 @@
   padding: 10px 16px;
   font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
   font-size: 0.88rem;
-  color: #1b2430;
+  color: var(--text-dark);
   background: none;
   border: none;
   text-align: left;
@@ -168,13 +168,13 @@
 
 .user-dropdown ul li a:hover,
 .user-dropdown ul li button:hover {
-  background: #eaf2fd;
-  color: #1d5fbf;
+  background: var(--blue-light);
+  color: var(--blue);
 }
 
 .user-dropdown ul li.ud-divider {
   height: 1px;
-  background: #eef2f7;
+  background: var(--user-dropdown-divider);
   margin: 4px 12px;
 }
 
@@ -213,7 +213,7 @@
 
 /* ── MODAL CARD ─────────────────────────────────────────────────── */
 .auth-card {
-  background: #fff;
+  background: var(--white);
   border-radius: 20px;
   box-shadow: 0 24px 64px rgba(10, 22, 50, 0.2);
   width: 100%;
@@ -283,8 +283,8 @@
 /* ── TABS ───────────────────────────────────────────────────────── */
 .auth-tabs {
   display: flex;
-  border-bottom: 2px solid #eef2f7;
-  background: #f7f9fd;
+  border-bottom: 2px solid var(--user-dropdown-divider);
+  background: var(--user-dropdown-header-bg);
 }
 
 .auth-tab {
@@ -303,9 +303,9 @@
 }
 
 .auth-tab.active {
-  color: #1d5fbf;
-  border-bottom-color: #1d5fbf;
-  background: #fff;
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  background: var(--white);
 }
 
 .auth-tab:hover:not(.active) { color: #1d5fbf; }
@@ -325,27 +325,27 @@
   display: block;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #1b2430;
+  color: var(--text-dark);
   margin-bottom: 6px;
 }
 
 .auth-field input {
   width: 100%;
   padding: 11px 14px;
-  border: 1.5px solid #d8e2f0;
+  border: 1.5px solid var(--input-border);
   border-radius: 10px;
   font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
   font-size: 0.9rem;
-  color: #1b2430;
-  background: #f9fbff;
+  color: var(--text-dark);
+  background: var(--input-bg);
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
 }
 
 .auth-field input:focus {
-  border-color: #1d5fbf;
+  border-color: var(--blue);
   box-shadow: 0 0 0 3px rgba(29, 95, 191, 0.1);
-  background: #fff;
+  background: var(--white);
 }
 
 .auth-field input::placeholder { color: #aab4c4; }

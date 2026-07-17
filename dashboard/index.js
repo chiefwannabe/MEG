@@ -338,12 +338,24 @@ let cachedResources = [];
       try {
         await updateUserSettings(currentUser.uid, settings);
         currentProfile.settings = settings;
-        document.body.classList.toggle("dark-theme", settings.darkMode);
+        const isDark = settings.darkMode;
+        document.body.classList.toggle("dark-theme", isDark);
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+        document.dispatchEvent(new CustomEvent("themeChanged", { detail: { theme: isDark ? "dark" : "light" } }));
       } catch (error) {
         console.error("[Dashboard] Error saving settings:", error);
       }
     });
   }
+
+  // Sync settings checkbox when theme changes globally
+  document.addEventListener("themeChanged", (e) => {
+    const isDark = e.detail.theme === "dark";
+    if (settingsDarkMode) {
+      settingsDarkMode.checked = isDark;
+    }
+  });
+
 
   // Sidebar (mobile drawer) open / close
   const sidebar = document.getElementById("sidebar");

@@ -27,7 +27,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 
-import { createUserDocument, getUserProfile, isUsernameUnique } from "../src/firestore.js";
+import { createUserDocument, getUserProfile, isUsernameUnique, updateUserSettings } from "../src/firestore.js";
 
 /* ================================================================
    AUTH INSTANCE
@@ -205,6 +205,19 @@ async function handleAuthStateChanged(user) {
       } else {
         if (mAdmin) mAdmin.style.display = "none";
         if (dAdmin) dAdmin.style.display = "none";
+      }
+
+      // Also apply theme from profile settings if available
+      if (profile && profile.settings && typeof profile.settings.darkMode !== "undefined") {
+        const isDark = profile.settings.darkMode;
+        const currentLocalDark = document.body.classList.contains("dark-theme");
+        if (isDark !== currentLocalDark) {
+          const newTheme = isDark ? "dark" : "light";
+          document.body.classList.toggle("dark-theme", isDark);
+          localStorage.setItem("theme", newTheme);
+          // Dispatch event to sync toggle icons globally
+          document.dispatchEvent(new CustomEvent("themeChanged", { detail: { theme: newTheme } }));
+        }
       }
     } catch (e) {
       console.error("[Auth] Error fetching user role:", e);
@@ -656,6 +669,25 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", () => {
       closeMobileNav();
     });
+  });
+
+  // Sync theme with Firestore when changed by user
+  document.addEventListener("themeChanged", async (e) => {
+    const isDark = e.detail.theme === "dark";
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        const profile = await getUserProfile(user.uid);
+        const currentSettings = (profile && profile.settings) || {};
+        if (currentSettings.darkMode !== isDark) {
+          currentSettings.darkMode = isDark;
+          await updateUserSettings(user.uid, currentSettings);
+          console.log("[Auth] Updated user theme settings in Firestore.");
+        }
+      } catch (err) {
+        console.error("[Auth] Error updating theme setting in Firestore:", err);
+      }
+    }
   });
 
 });

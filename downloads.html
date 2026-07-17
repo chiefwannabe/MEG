@@ -508,9 +508,187 @@
         width: 100%;
       }
     }
+
+    /* ============================================
+       DARK THEME & TOGGLE BUTTON STYLING
+       ============================================ */
+    body.dark-theme {
+      color: #e5e7eb;
+      background-color: #121316;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(255, 255, 255, 0.01) 3px,
+          rgba(255, 255, 255, 0.01) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 5px,
+          rgba(255, 255, 255, 0.005) 5px,
+          rgba(255, 255, 255, 0.005) 6px
+        ),
+        linear-gradient(
+          175deg,
+          #151619 0%,
+          #121316 25%,
+          #0f1012 50%,
+          #111215 75%,
+          #16171a 100%
+        );
+    }
+
+    body.dark-theme .page {
+      background: rgba(20, 21, 25, 0.95);
+      border-left-color: #374151;
+      border-right-color: #374151;
+    }
+
+    body.dark-theme .masthead {
+      border-bottom: 3px double #e5e7eb;
+    }
+
+    body.dark-theme .masthead h1 {
+      color: #e5e7eb;
+    }
+
+    body.dark-theme .masthead .tagline {
+      color: #9ca3af;
+    }
+
+    body.dark-theme .section-title {
+      color: #e5e7eb;
+      border-bottom: 1px solid #374151;
+    }
+
+    body.dark-theme .filter-panel {
+      background: #1e2025;
+      border-color: #374151;
+    }
+
+    body.dark-theme .filter-group label {
+      color: #d1d5db;
+    }
+
+    body.dark-theme .filter-group input,
+    body.dark-theme .filter-group select {
+      background-color: #151619;
+      border-color: #4b5563;
+      color: #e5e7eb;
+    }
+
+    body.dark-theme .pyq-card {
+      background: #1e2025;
+      border-color: #374151;
+    }
+
+    body.dark-theme .pyq-card:hover {
+      background: #252830;
+      border-color: #4b5563;
+    }
+
+    body.dark-theme .pyq-title {
+      color: #f3f4f6;
+    }
+
+    body.dark-theme .download-btn {
+      background: #e5e7eb;
+      color: #121316;
+    }
+
+    body.dark-theme .download-btn:hover {
+      background: #10b981;
+      color: #fff;
+    }
+
+    body.dark-theme .section-label {
+      color: #6b7280;
+    }
+    
+    body.dark-theme a {
+      color: #60a5fa;
+    }
+    
+    body.dark-theme a:hover {
+      color: #34d399;
+    }
+
+    /* Transition for theme change */
+    body, .page, .masthead, .masthead h1, .section-title, .filter-panel, .filter-group input, .filter-group select, .pyq-card, .download-btn, a {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* ---------- Theme Toggle Button ---------- */
+    .theme-toggle-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: #c8bfb0;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .theme-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      position: absolute;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+      stroke: currentColor;
+    }
+
+    /* Light theme state: Moon icon is hidden, Sun is shown */
+    body:not(.dark-theme) .theme-toggle-btn .sun-icon {
+      transform: rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    body:not(.dark-theme) .theme-toggle-btn .moon-icon {
+      transform: rotate(90deg) scale(0);
+      opacity: 0;
+    }
+
+    /* Dark theme state: Sun icon is hidden, Moon is shown */
+    body.dark-theme .theme-toggle-btn .sun-icon {
+      transform: rotate(-90deg) scale(0);
+      opacity: 0;
+    }
+    body.dark-theme .theme-toggle-btn .moon-icon {
+      transform: rotate(0deg) scale(1);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-theme');
+    } else if (savedTheme === 'light') {
+      document.body.classList.remove('dark-theme');
+    } else {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (systemPrefersDark) {
+        document.body.classList.add('dark-theme');
+      }
+    }
+  })();
+</script>
 
   <div class="page">
 
@@ -529,6 +707,24 @@
       <ul>
         <li><a href="index.html"><span style="color: #2ecc71;">←</span> Back to Home</a></li>
         <li style="color: #c8bfb0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: bold; padding: 0.5rem 1rem;">Document Archive</li>
+        <li>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+            <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
       </ul>
     </nav>
 
@@ -784,6 +980,8 @@
     // Initial render
     renderTable(pyqDatabase);
   </script>
+
+<script src="theme-toggle.js" defer></script>
 
 <!-- ── Custom Cursor ────────────────────────────── -->
 <script src="cursor.js" defer></script>
