@@ -511,6 +511,32 @@ export async function deleteUserNote(uid, noteId) {
 }
 
 /**
+ * Updates an existing note for the student.
+ */
+export async function updateUserNote(uid, noteId, noteData) {
+  try {
+    const noteDocRef = doc(db, "users", uid, "notes", noteId);
+    await updateDoc(noteDocRef, noteData);
+  } catch (error) {
+    console.error("[Firestore] Error updating user note:", error);
+    throw error;
+  }
+}
+
+/**
+ * Sets a note document with a specific ID.
+ */
+export async function setUserNote(uid, noteId, note) {
+  try {
+    const noteDocRef = doc(db, "users", uid, "notes", noteId);
+    await setDoc(noteDocRef, note);
+  } catch (error) {
+    console.error("[Firestore] Error setting user note:", error);
+    throw error;
+  }
+}
+
+/**
  * Fetches user quiz records.
  */
 export async function getUserQuizzes(uid) {

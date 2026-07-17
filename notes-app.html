@@ -784,6 +784,182 @@
         }
 
         /* ============================================
+           TOP NAVIGATION & AUTH STATUS
+           ============================================ */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .back-link {
+            display: flex;
+            align-items: center;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover {
+            color: #38bdf8;
+        }
+        .auth-status {
+            font-size: 14px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .auth-status-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e5e7eb;
+        }
+        .auth-status-user .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #38bdf8;
+            color: #0b0f17;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .auth-btn {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .auth-btn:hover {
+            background: #38bdf8;
+            color: #0b0f17;
+        }
+        .auth-btn.signout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        .auth-btn.signout-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        /* ============================================
+           IMAGE UPLOAD & GALLERY STYLING
+           ============================================ */
+        .note-card-images {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .note-card-img-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+        .note-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+        .note-card-img-wrapper:hover .note-card-img {
+            transform: scale(1.1);
+        }
+        .editor-images-group {
+            margin-top: 16px;
+            margin-bottom: 20px;
+        }
+        .editor-images-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .editor-img-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .editor-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .editor-img-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.85);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1;
+            transition: background 0.2s;
+        }
+        .editor-img-remove:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+        .editor-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .upload-spinner {
+            color: #38bdf8;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .upload-spinner::before {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(56, 189, 248, 0.2);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================
            ANIMATIONS
            ============================================ */
         @keyframes fadeIn {
@@ -801,12 +977,34 @@
             animation: fadeIn 0.3s ease;
         }
     </style>
+    <!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+        "firebase/auth":     "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+        "firebase/analytics":"https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- ============================================
          MAIN CONTAINER
          ============================================ -->
     <div class="container">
+        <!-- Top Navigation & Auth Status -->
+        <div class="top-nav">
+            <a href="index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Back to Home
+            </a>
+            <div class="auth-status" id="authStatus">
+                <span>Checking authentication...</span>
+            </div>
+        </div>
+
         <!-- Header -->
         <div class="header">
             <div class="header-top">
@@ -875,6 +1073,17 @@
                     id="noteContent" 
                     placeholder="Start writing..."
                 ></textarea>
+            <!-- Editor Images Section -->
+            <div class="form-group editor-images-group hidden" id="editorImagesGroup">
+                <label class="form-label">Attached Screenshots</label>
+                <div class="editor-images-grid" id="editorImagesGrid"></div>
+                <div class="editor-upload-container">
+                    <button class="btn btn-secondary" id="editorUploadBtn" type="button" style="display: flex; align-items: center; gap: 6px;">
+                        <span>📸</span> Upload Screenshot
+                    </button>
+                    <input type="file" id="editorFileInput" accept="image/*" class="hidden" multiple>
+                    <span id="uploadSpinner" class="upload-spinner hidden">Uploading to ImageKit...</span>
+                </div>
             </div>
 
             <div class="editor-actions">
@@ -934,7 +1143,13 @@
     <!-- ============================================
          JAVASCRIPT
          ============================================ -->
-    <script>
+    <script type="module">
+        import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+        import { app } from "./src/firebase.js";
+        import { getUserProfile, getUserNotes, setUserNote, deleteUserNote, updateUserNote } from "./src/firestore.js";
+
+        const auth = getAuth(app);
+
         // ============================================
         // STATE MANAGEMENT
         // ============================================
@@ -945,6 +1160,9 @@
         let searchQuery = '';
         let viewingArchives = false;
         let currentTab = 'notes';
+
+        let currentUser = null;
+        let isUserLoaded = false;
 
         // ============================================
         // DOM ELEMENTS
@@ -983,38 +1201,196 @@
             screenshotsEmptyState: document.getElementById('screenshotsEmptyState'),
             lightboxOverlay: document.getElementById('lightboxOverlay'),
             lightboxClose: document.getElementById('lightboxClose'),
-            lightboxImage: document.getElementById('lightboxImage')
+            lightboxImage: document.getElementById('lightboxImage'),
+            
+            // ImageKit & Auth elements
+            authStatus: document.getElementById('authStatus'),
+            editorImagesGroup: document.getElementById('editorImagesGroup'),
+            editorImagesGrid: document.getElementById('editorImagesGrid'),
+            editorUploadBtn: document.getElementById('editorUploadBtn'),
+            editorFileInput: document.getElementById('editorFileInput'),
+            uploadSpinner: document.getElementById('uploadSpinner')
         };
 
         // ============================================
         // INITIALIZATION
         // ============================================
         async function init() {
-            loadNotes();
-            renderNotes();
-            await loadScreenshots();
             attachEventListeners();
             setupKeyboardShortcuts();
             setupPasteHandler();
+            setupEditorUploadListeners();
+
+            // Set up Firebase Auth state listener
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                isUserLoaded = true;
+                updateAuthStatusUI();
+
+                if (user) {
+                    elements.editorImagesGroup.classList.remove('hidden');
+                    // Sync any local notes to Firestore
+                    await syncLocalNotesToFirestore(user.uid);
+                    // Load notes from Firestore
+                    await loadFirestoreNotes(user.uid);
+                } else {
+                    elements.editorImagesGroup.classList.add('hidden');
+                    // Load notes from Local Storage
+                    loadLocalNotes();
+                }
+                renderNotes();
+            });
         }
 
         // ============================================
-        // LOCAL STORAGE
+        // AUTH & FIREBASE SYNC HELPERS
         // ============================================
-        function loadNotes() {
-            const stored = localStorage.getItem('notes');
-            if (stored) {
+        function updateAuthStatusUI() {
+            if (!elements.authStatus) return;
+            if (currentUser) {
+                const username = currentUser.email ? currentUser.email.split('@')[0] : 'User';
+                elements.authStatus.innerHTML = `
+                    <div class="auth-status-user">
+                        <div class="avatar">${username[0].toUpperCase()}</div>
+                        <span>Logged in as <strong>${username}</strong></span>
+                    </div>
+                    <button class="auth-btn signout-btn" id="signOutBtn">Sign Out</button>
+                `;
+                document.getElementById('signOutBtn')?.addEventListener('click', handleSignOut);
+            } else {
+                elements.authStatus.innerHTML = `
+                    <span>Sign in to sync notes and screenshots.</span>
+                    <button class="auth-btn" id="signInBtn">Sign In</button>
+                `;
+                document.getElementById('signInBtn')?.addEventListener('click', () => {
+                    window.location.href = 'index.html?login=true';
+                });
+            }
+        }
+
+        async function handleSignOut() {
+            try {
+                await signOut(auth);
+            } catch (err) {
+                console.error('[SignOut Error]:', err);
+            }
+        }
+
+        async function syncLocalNotesToFirestore(uid) {
+            const localStored = localStorage.getItem('notes');
+            if (localStored) {
                 try {
-                    notes = JSON.parse(stored);
+                    const localNotes = JSON.parse(localStored);
+                    if (localNotes && localNotes.length > 0) {
+                        console.log(`[Sync] Found ${localNotes.length} local notes. Syncing to Firestore...`);
+                        for (const note of localNotes) {
+                            if (!note.images) note.images = [];
+                            await setUserNote(uid, note.id, note);
+                        }
+                        localStorage.removeItem('notes');
+                        console.log('[Sync] Local notes synced and cleared.');
+                    }
                 } catch (e) {
-                    console.error('Failed to load notes:', e);
-                    notes = [];
+                    console.error('[Sync] Error syncing local notes to Firestore:', e);
                 }
             }
         }
 
-        function saveNotes() {
-            localStorage.setItem('notes', JSON.stringify(notes));
+        async function loadFirestoreNotes(uid) {
+            try {
+                const firestoreNotes = await getUserNotes(uid);
+                notes = firestoreNotes || [];
+                updateScreenshotsFromNotes();
+            } catch (e) {
+                console.error('[Firestore] Error loading notes:', e);
+                notes = [];
+            }
+        }
+
+        function loadLocalNotes() {
+            const stored = localStorage.getItem('notes');
+            if (stored) {
+                try {
+                    notes = JSON.parse(stored);
+                    notes.forEach(note => {
+                        if (!note.images) note.images = [];
+                    });
+                } catch (e) {
+                    console.error('Failed to load notes from local storage:', e);
+                    notes = [];
+                }
+            } else {
+                notes = [];
+            }
+            loadLocalScreenshots();
+        }
+
+        async function loadLocalScreenshots() {
+            try {
+                const stored = await screenshotsStorage.getAll();
+                screenshots = stored.sort((a, b) => {
+                    const orderA = a.order !== undefined ? a.order : 0;
+                    const orderB = b.order !== undefined ? b.order : 0;
+                    if (orderA !== orderB) {
+                        return orderA - orderB;
+                    }
+                    return b.createdAt - a.createdAt;
+                });
+            } catch (e) {
+                console.error('Failed to load screenshots:', e);
+                screenshots = [];
+            }
+        }
+
+        function updateScreenshotsFromNotes() {
+            if (currentUser) {
+                const imgUrls = [];
+                const aggregatedScreenshots = [];
+                let counter = 0;
+                const sortedNotes = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
+                sortedNotes.forEach(note => {
+                    if (note.images && Array.isArray(note.images)) {
+                        note.images.forEach(url => {
+                            if (!imgUrls.includes(url)) {
+                                imgUrls.push(url);
+                                aggregatedScreenshots.push({
+                                    id: `img-${counter++}-${note.id}`,
+                                    dataUrl: url,
+                                    width: 800,
+                                    height: 600,
+                                    sizeBytes: 0,
+                                    createdAt: note.updatedAt || Date.now(),
+                                    noteId: note.id
+                                });
+                            }
+                        });
+                    }
+                });
+                screenshots = aggregatedScreenshots;
+            }
+        }
+
+        async function saveNoteState(note) {
+            if (currentUser) {
+                try {
+                    await setUserNote(currentUser.uid, note.id, note);
+                } catch (e) {
+                    console.error('Failed to save note to Firestore', e);
+                }
+            } else {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+        }
+
+        // Keep saveNotes for backward compatibility or direct calls
+        async function saveNotes() {
+            if (currentUser) {
+                for (const note of notes) {
+                    await saveNoteState(note);
+                }
+            } else {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
         }
 
         // ============================================
@@ -1191,7 +1567,7 @@
         // ============================================
         // NOTE OPERATIONS
         // ============================================
-        function createNote(title, content) {
+        async function createNote(title, content) {
             const note = {
                 id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9),
                 title: title || 'Untitled Note',
@@ -1200,66 +1576,94 @@
                 updatedAt: Date.now(),
                 pinned: false,
                 favorited: false,
-                archived: false
+                archived: false,
+                images: []
             };
             notes.unshift(note);
-            saveNotes();
+            await saveNoteState(note);
+            renderNotes();
             return note;
         }
 
-        function updateNote(id, title, content) {
+        async function updateNote(id, title, content) {
             const note = notes.find(n => n.id === id);
             if (note) {
                 note.title = title || 'Untitled Note';
                 note.content = content || '';
                 note.updatedAt = Date.now();
-                saveNotes();
+                await saveNoteState(note);
+                renderNotes();
             }
         }
 
-        function deleteNote(id) {
+        async function deleteNote(id) {
             notes = notes.filter(n => n.id !== id);
-            saveNotes();
+            if (currentUser) {
+                try {
+                    await deleteUserNote(currentUser.uid, id);
+                } catch (e) {
+                    console.error('Failed to delete note from Firestore', e);
+                }
+            } else {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+            updateScreenshotsFromNotes();
             renderNotes();
         }
 
-        function togglePin(id) {
+        async function togglePin(id) {
             const note = notes.find(n => n.id === id);
             if (note) {
                 note.pinned = !note.pinned;
-                saveNotes();
+                await saveNoteState(note);
                 renderNotes();
             }
         }
 
-        function toggleFavorite(id) {
+        async function toggleFavorite(id) {
             const note = notes.find(n => n.id === id);
             if (note) {
                 note.favorited = !note.favorited;
-                saveNotes();
+                await saveNoteState(note);
                 renderNotes();
             }
         }
 
-        function toggleArchive(id) {
+        async function toggleArchive(id) {
             const note = notes.find(n => n.id === id);
             if (note) {
                 note.archived = !note.archived;
                 if (currentNoteId === id) {
                     closeEditor();
                 }
-                saveNotes();
+                await saveNoteState(note);
                 renderNotes();
             }
         }
 
-        function deleteAllNotes() {
+        async function deleteAllNotes() {
+            let notesToDelete = [];
             if (viewingArchives) {
+                notesToDelete = notes.filter(n => n.archived);
                 notes = notes.filter(n => !n.archived);
             } else {
+                notesToDelete = notes.filter(n => !n.archived);
                 notes = notes.filter(n => n.archived);
             }
-            saveNotes();
+
+            if (currentUser) {
+                for (const note of notesToDelete) {
+                    try {
+                        await deleteUserNote(currentUser.uid, note.id);
+                    } catch (e) {
+                        console.error('Failed to delete note from Firestore', e);
+                    }
+                }
+            } else {
+                localStorage.setItem('notes', JSON.stringify(notes));
+            }
+
+            updateScreenshotsFromNotes();
             renderNotes();
         }
 
@@ -1331,9 +1735,24 @@
         }
 
         async function deleteScreenshot(id) {
-            screenshots = screenshots.filter(s => s.id !== id);
-            await screenshotsStorage.delete(id);
-            renderScreenshots();
+            if (currentUser) {
+                const screenshotItem = screenshots.find(s => s.id === id);
+                if (screenshotItem && screenshotItem.noteId) {
+                    const note = notes.find(n => n.id === screenshotItem.noteId);
+                    if (note && note.images) {
+                        note.images = note.images.filter(url => url !== screenshotItem.dataUrl);
+                        note.updatedAt = Date.now();
+                        await saveNoteState(note);
+                        updateScreenshotsFromNotes();
+                        renderNotes();
+                        renderScreenshots();
+                    }
+                }
+            } else {
+                screenshots = screenshots.filter(s => s.id !== id);
+                await screenshotsStorage.delete(id);
+                renderScreenshots();
+            }
         }
 
         function renderScreenshots() {
@@ -1477,8 +1896,108 @@
         }
 
         // ============================================
-        // EDITOR
+        // EDITOR & IMAGEKIT ATTACHMENTS
         // ============================================
+        let editorImages = [];
+
+        function renderEditorImages() {
+            elements.editorImagesGrid.innerHTML = '';
+            if (editorImages.length === 0) {
+                elements.editorImagesGrid.innerHTML = '<span style="font-size:13px; color:#6b7280; font-style:italic;">No screenshots attached to this note.</span>';
+            } else {
+                editorImages.forEach((url, idx) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'editor-img-wrapper';
+                    
+                    wrapper.innerHTML = `
+                        <img src="${url}" class="editor-img" alt="Screenshot" loading="lazy">
+                        <button type="button" class="editor-img-remove" data-index="${idx}">&times;</button>
+                    `;
+                    
+                    wrapper.querySelector('.editor-img').addEventListener('click', () => {
+                        openLightbox(url);
+                    });
+                    
+                    wrapper.querySelector('.editor-img-remove').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editorImages.splice(idx, 1);
+                        renderEditorImages();
+                    });
+                    
+                    elements.editorImagesGrid.appendChild(wrapper);
+                });
+            }
+        }
+
+        async function uploadToImageKit(file) {
+            elements.uploadSpinner.classList.remove('hidden');
+            elements.editorUploadBtn.disabled = true;
+
+            try {
+                const authRes = await fetch('/api/imagekit-auth');
+                if (!authRes.ok) {
+                    throw new Error('Failed to fetch ImageKit upload authentication');
+                }
+                const authParams = await authRes.json();
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('fileName', file.name || `screenshot-${Date.now()}.png`);
+                formData.append('publicKey', authParams.publicKey);
+                formData.append('signature', authParams.signature);
+                formData.append('expire', authParams.expire);
+                formData.append('token', authParams.token);
+
+                const uploadRes = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadRes.ok) {
+                    const errText = await uploadRes.text();
+                    throw new Error(`Upload failed: ${errText}`);
+                }
+
+                const result = await uploadRes.json();
+                return result.url;
+            } catch (err) {
+                console.error('[ImageKit Upload Error]:', err);
+                alert(`Failed to upload screenshot: ${err.message}`);
+                throw err;
+            } finally {
+                elements.uploadSpinner.classList.add('hidden');
+                elements.editorUploadBtn.disabled = false;
+            }
+        }
+
+        async function handleEditorFilesUpload(files) {
+            if (!currentUser) {
+                alert('Please sign in to upload screenshots.');
+                return;
+            }
+            for (const file of files) {
+                try {
+                    const url = await uploadToImageKit(file);
+                    editorImages.push(url);
+                    renderEditorImages();
+                } catch (e) {
+                    console.error('File upload failed', e);
+                }
+            }
+        }
+
+        function setupEditorUploadListeners() {
+            elements.editorUploadBtn.addEventListener('click', () => {
+                elements.editorFileInput.click();
+            });
+            elements.editorFileInput.addEventListener('change', async (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    await handleEditorFilesUpload(e.target.files);
+                    e.target.value = '';
+                }
+            });
+        }
+
         function openEditor(noteId = null) {
             currentNoteId = noteId;
             
@@ -1488,18 +2007,26 @@
                     elements.editorTitle.textContent = 'Edit Note';
                     elements.noteTitle.value = note.title;
                     elements.noteContent.value = note.content;
+                    editorImages = note.images ? [...note.images] : [];
                 }
             } else {
                 elements.editorTitle.textContent = 'New Note';
                 elements.noteTitle.value = '';
                 elements.noteContent.value = '';
+                editorImages = [];
+            }
+            
+            if (currentUser) {
+                elements.editorImagesGroup.classList.remove('hidden');
+                renderEditorImages();
+            } else {
+                elements.editorImagesGroup.classList.add('hidden');
             }
             
             elements.editor.classList.remove('hidden');
             elements.noteTitle.focus();
             updateEditorStats();
             
-            // Scroll to editor
             elements.editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1508,9 +2035,10 @@
             currentNoteId = null;
             elements.noteTitle.value = '';
             elements.noteContent.value = '';
+            editorImages = [];
         }
 
-        function saveCurrentNote() {
+        async function saveCurrentNote() {
             const title = elements.noteTitle.value.trim();
             const content = elements.noteContent.value.trim();
             
@@ -1520,11 +2048,31 @@
             }
             
             if (currentNoteId) {
-                updateNote(currentNoteId, title, content);
+                const note = notes.find(n => n.id === currentNoteId);
+                if (note) {
+                    note.title = title || 'Untitled Note';
+                    note.content = content || '';
+                    note.images = editorImages;
+                    note.updatedAt = Date.now();
+                    await saveNoteState(note);
+                }
             } else {
-                createNote(title, content);
+                const note = {
+                    id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9),
+                    title: title || 'Untitled Note',
+                    content: content || '',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    pinned: false,
+                    favorited: false,
+                    archived: false,
+                    images: editorImages
+                };
+                notes.unshift(note);
+                await saveNoteState(note);
             }
             
+            updateScreenshotsFromNotes();
             closeEditor();
             renderNotes();
         }
@@ -1582,6 +2130,20 @@
             const words = note.content.trim() ? note.content.trim().split(/\s+/).length : 0;
             const chars = note.content.length;
             
+            // Generate images HTML
+            let imagesHtml = '';
+            if (note.images && note.images.length > 0) {
+                imagesHtml = `<div class="note-card-images">`;
+                note.images.forEach(url => {
+                    imagesHtml += `
+                        <div class="note-card-img-wrapper" data-url="${url}">
+                            <img src="${url}" class="note-card-img" alt="Attached image" loading="lazy">
+                        </div>
+                    `;
+                });
+                imagesHtml += `</div>`;
+            }
+
             card.innerHTML = `
                 <button class="note-archive-btn ${note.archived ? 'archived' : ''}" data-id="${note.id}" title="${note.archived ? 'Unarchive Note' : 'Archive Note'}">
                     <svg viewBox="0 0 276.157 276.157" width="16" height="16" fill="currentColor">
@@ -1590,6 +2152,7 @@
                 </button>
                 <div class="note-title">${escapeHtml(note.title)}</div>
                 <div class="note-preview">${escapeHtml(preview)}</div>
+                ${imagesHtml}
                 <div class="note-meta">
                     <span>Last edited ${date}</span>
                 </div>
@@ -1608,6 +2171,14 @@
                     <button class="note-btn delete-btn" data-id="${note.id}">Delete</button>
                 </div>
             `;
+
+            // Event listeners
+            card.querySelectorAll('.note-card-img-wrapper').forEach(wrapper => {
+                wrapper.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openLightbox(wrapper.dataset.url);
+                });
+            });
             
             // Event listeners
             card.querySelector('.note-archive-btn').addEventListener('click', (e) => {
@@ -1903,8 +2474,6 @@
         // ============================================
         function setupPasteHandler() {
             window.addEventListener('paste', async (e) => {
-                if (currentTab !== 'screenshots') return;
-
                 const clipboardData = e.clipboardData || window.clipboardData;
                 if (!clipboardData) return;
 
@@ -1932,9 +2501,48 @@
                 }
 
                 if (files.length > 0) {
-                    e.preventDefault();
-                    for (const file of files) {
-                        await handleImageFile(file);
+                    const isEditorOpen = !elements.editor.classList.contains('hidden');
+                    
+                    if (isEditorOpen) {
+                        e.preventDefault();
+                        if (!currentUser) {
+                            alert('Please sign in to paste screenshots.');
+                            return;
+                        }
+                        await handleEditorFilesUpload(files);
+                    } else if (currentTab === 'screenshots') {
+                        e.preventDefault();
+                        if (currentUser) {
+                            for (const file of files) {
+                                try {
+                                    const url = await uploadToImageKit(file);
+                                    const title = `Pasted Screenshot - ${new Date().toLocaleDateString()}`;
+                                    const content = `Automatically created from paste.`;
+                                    const note = {
+                                        id: Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9),
+                                        title: title,
+                                        content: content,
+                                        createdAt: Date.now(),
+                                        updatedAt: Date.now(),
+                                        pinned: false,
+                                        favorited: false,
+                                        archived: false,
+                                        images: [url]
+                                    };
+                                    notes.unshift(note);
+                                    await saveNoteState(note);
+                                } catch (err) {
+                                    console.error('Failed to upload pasted screenshot:', err);
+                                }
+                            }
+                            updateScreenshotsFromNotes();
+                            renderNotes();
+                            renderScreenshots();
+                        } else {
+                            for (const file of files) {
+                                await handleImageFile(file);
+                            }
+                        }
                     }
                 }
             });

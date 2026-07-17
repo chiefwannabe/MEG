@@ -690,4 +690,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Auto-open auth modal if redirect query parameter exists
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("login") === "true" || urlParams.get("auth") === "true") {
+    openModal("signin");
+  }
+
 });

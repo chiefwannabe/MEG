@@ -20,6 +20,19 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let reqPath = req.url.split('?')[0];
 
+  // Route /api/imagekit-auth to the local Vercel serverless function for development
+  if (reqPath === '/api/imagekit-auth') {
+    try {
+      const imagekitAuth = require('./api/imagekit-auth');
+      imagekitAuth(req, res);
+    } catch (e) {
+      console.error('Local ImageKit Auth Error:', e);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+
   // Handle vercel rewrites
   if (reqPath === '/games') {
     reqPath = '/offline/index.html';
