@@ -49,6 +49,8 @@ const server = http.createServer((req, res) => {
     reqPath = '/src/pages/offline/index.html';
   } else if (reqPath.startsWith('/games/')) {
     reqPath = '/src/pages/offline/' + reqPath.substring(7);
+  } else if (reqPath === '/notes-app' || reqPath === '/notes-app.html') {
+    reqPath = '/src/pages/public/notes-app.html';
   }
 
   // Fallback to index.html for directory routes or root

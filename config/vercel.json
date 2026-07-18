@@ -30,6 +30,14 @@
     {
       "source": "/games/:path*",
       "destination": "/src/pages/offline/:path*"
+    },
+    {
+      "source": "/notes-app",
+      "destination": "/src/pages/public/notes-app.html"
+    },
+    {
+      "source": "/notes-app.html",
+      "destination": "/src/pages/public/notes-app.html"
     }
   ]
 }
