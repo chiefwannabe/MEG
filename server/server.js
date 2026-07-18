@@ -20,37 +20,11 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let reqPath = req.url.split('?')[0];
 
-  // Route /api/imagekit-auth to the local Vercel serverless function for development
-  if (reqPath === '/api/imagekit-auth') {
-    try {
-      // Mock Vercel response helper methods
-      res.status = (code) => {
-        res.statusCode = code;
-        return res;
-      };
-      res.json = (data) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(data));
-        return res;
-      };
-
-      const imagekitAuth = require('../api/imagekit-auth');
-      imagekitAuth(req, res);
-    } catch (e) {
-      console.error('Local ImageKit Auth Error:', e);
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: e.message }));
-    }
-    return;
-  }
-
   // Handle vercel rewrites
   if (reqPath === '/games') {
     reqPath = '/src/pages/offline/index.html';
   } else if (reqPath.startsWith('/games/')) {
     reqPath = '/src/pages/offline/' + reqPath.substring(7);
-  } else if (reqPath === '/notes-app' || reqPath === '/notes-app.html') {
-    reqPath = '/src/pages/public/notes-app.html';
   }
 
   // Fallback to index.html for directory routes or root
