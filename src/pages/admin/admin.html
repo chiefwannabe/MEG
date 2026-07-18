@@ -15,8 +15,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="admin.css">
-<link rel="stylesheet" href="../cursor.css">
-<link rel="stylesheet" href="../cursor-panel.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor-panel.css">
 
 <!-- Firebase v12 CDN importmap -->
 <script type="importmap">
@@ -52,7 +52,7 @@
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar" aria-label="Admin navigation">
     <div class="sidebar-top">
-      <a href="../index.html" class="brand" aria-label="MEGOL home">
+      <a href="../../../index.html" class="brand" aria-label="MEGOL home">
         <span class="brand-mark" aria-hidden="true">M</span>
         <span class="brand-text">MEGOL Admin</span>
       </a>
@@ -126,7 +126,7 @@
 
         <div class="user-menu">
           <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Admin profile menu">
-            <img class="avatar" src="/assets/images/default-avatar.svg" alt="Admin Avatar" width="36" height="36" id="topbar-admin-avatar">
+            <img class="avatar" src="/src/assets/images/default-avatar.svg" alt="Admin Avatar" width="36" height="36" id="topbar-admin-avatar">
           </button>
 
           <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
@@ -490,10 +490,10 @@
 </div>
 
 <script type="module" src="admin.js"></script>
-<script src="../theme-toggle.js" defer></script>
+<script src="../../../scripts/theme-toggle.js" defer></script>
 
 <!-- ── Custom Cursor ────────────────────────────── -->
-<script src="../cursor.js" defer></script>
-<script src="../cursor-panel.js" defer></script>
+<script src="../../ui/cursor/cursor.js" defer></script>
+<script src="../../ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

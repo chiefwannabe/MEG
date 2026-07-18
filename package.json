@@ -4,9 +4,9 @@
   "description": "IGNOU MEG website with offline game launcher",
   "private": true,
   "scripts": {
-    "build": "node offline/generate-games.js && node generate-uploads.js",
-    "generate": "bun offline/generate-games.js",
-    "dev": "bun server.js"
+    "build": "node src/pages/offline/generate-games.js && node scripts/generate-uploads.js",
+    "generate": "bun src/pages/offline/generate-games.js",
+    "dev": "bun server/server.js"
   },
   "engines": {
     "node": ">=18"

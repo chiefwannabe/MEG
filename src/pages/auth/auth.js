@@ -17,7 +17,7 @@
  *   - Fully functional for guests (no auth required to browse)
  */
 
-import { app } from "../src/firebase.js";
+import { app } from "../../firebase.js";
 import {
   getAuth,
   onAuthStateChanged,
@@ -27,7 +27,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 
-import { createUserDocument, getUserProfile, isUsernameUnique, updateUserSettings } from "../src/firestore.js";
+import { createUserDocument, getUserProfile, isUsernameUnique, updateUserSettings } from "../../firestore.js";
 
 /* ================================================================
    AUTH INSTANCE
@@ -236,7 +236,7 @@ async function handleAuthStateChanged(user) {
         if (user.photoURL) {
           avatarEl.innerHTML = `<img src="${user.photoURL}" alt="${displayName}" referrerpolicy="no-referrer" />`;
         } else {
-          avatarEl.innerHTML = `<img src="/assets/images/default-avatar.svg" alt="${displayName}" referrerpolicy="no-referrer" />`;
+          avatarEl.innerHTML = `<img src="/src/assets/images/default-avatar.svg" alt="${displayName}" referrerpolicy="no-referrer" />`;
         }
       }
 

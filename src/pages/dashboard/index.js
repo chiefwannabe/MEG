@@ -3,7 +3,7 @@
    Integrated with Firebase Authentication and Firestore.
    ========================================================= */
 
-import { app } from "../src/firebase.js";
+import { app } from "../../firebase.js";
 import { getAuth, onAuthStateChanged, signOut, updateProfile } from "firebase/auth";
 import { 
   createUserDocument, 
@@ -13,7 +13,7 @@ import {
   toggleBookmark, 
   logDownload, 
   updateUserSettings 
-} from "../src/firestore.js";
+} from "../../firestore.js";
 
 const auth = getAuth(app);
 
@@ -46,7 +46,7 @@ let cachedResources = [];
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       console.info("[Auth] No authenticated user found, redirecting to home...");
-      window.location.replace("../index.html");
+      window.location.replace("../../../index.html");
       return;
     }
 
@@ -109,7 +109,7 @@ let cachedResources = [];
     }
 
     // Set avatar images
-    const fallbackAvatar = "/assets/images/default-avatar.svg";
+    const fallbackAvatar = "/src/assets/images/default-avatar.svg";
     const avatarSrc = currentProfile.photoURL || currentUser.photoURL || fallbackAvatar;
     document.querySelectorAll(".avatar, .profile-avatar").forEach((img) => {
       img.src = avatarSrc;
@@ -432,7 +432,7 @@ let cachedResources = [];
   async function handleLogout() {
     try {
       await signOut(auth);
-      window.location.replace("../index.html");
+      window.location.replace("../../../index.html");
     } catch (error) {
       console.error("[Dashboard] Error logging out:", error);
     }

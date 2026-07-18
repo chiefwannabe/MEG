@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 8000;
-const PUBLIC_DIR = __dirname;
+const PUBLIC_DIR = path.join(__dirname, '..');
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
         return res;
       };
 
-      const imagekitAuth = require('./api/imagekit-auth');
+      const imagekitAuth = require('../api/imagekit-auth');
       imagekitAuth(req, res);
     } catch (e) {
       console.error('Local ImageKit Auth Error:', e);
@@ -46,9 +46,9 @@ const server = http.createServer((req, res) => {
 
   // Handle vercel rewrites
   if (reqPath === '/games') {
-    reqPath = '/offline/index.html';
+    reqPath = '/src/pages/offline/index.html';
   } else if (reqPath.startsWith('/games/')) {
-    reqPath = '/offline/' + reqPath.substring(7);
+    reqPath = '/src/pages/offline/' + reqPath.substring(7);
   }
 
   // Fallback to index.html for directory routes or root

@@ -25,11 +25,11 @@
   "rewrites": [
     {
       "source": "/games",
-      "destination": "/offline/index.html"
+      "destination": "/src/pages/offline/index.html"
     },
     {
       "source": "/games/:path*",
-      "destination": "/offline/:path*"
+      "destination": "/src/pages/offline/:path*"
     }
   ]
 }

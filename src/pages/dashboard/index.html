@@ -15,8 +15,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="index.css">
-<link rel="stylesheet" href="../cursor.css">
-<link rel="stylesheet" href="../cursor-panel.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor-panel.css">
 
 <!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
 <script type="importmap">
@@ -56,7 +56,7 @@
   <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
     <div class="sidebar-top">
       <div class="brand-group" style="display: flex; align-items: center; gap: 12px;">
-        <a href="../index.html" class="back-home-btn" aria-label="Back to Home">
+        <a href="../../../index.html" class="back-home-btn" aria-label="Back to Home">
           <i class="fa-solid fa-right-from-bracket fa-flip-horizontal" aria-hidden="true"></i>
         </a>
         <a href="#" class="brand" id="brandHome" data-nav="home" aria-label="MEGOL home">
@@ -154,7 +154,7 @@
         <div class="user-menu">
           <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="User profile menu">
             <!-- USER AVATAR: replace src with dynamic profile image (Firebase user photoURL) -->
-            <img class="avatar" src="/assets/images/default-avatar.svg" alt="" width="36" height="36">
+            <img class="avatar" src="/src/assets/images/default-avatar.svg" alt="" width="36" height="36">
           </button>
 
           <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
@@ -230,7 +230,7 @@
           <!-- PROFILE FIELDS: replace values with the signed-in user's real
                Firestore/Firebase Auth profile document -->
           <div class="profile-head">
-            <img class="profile-avatar" src="/assets/images/default-avatar.svg" alt="" width="64" height="64">
+            <img class="profile-avatar" src="/src/assets/images/default-avatar.svg" alt="" width="64" height="64">
             <div>
               <h2 data-dynamic="displayName">Ravi Kumar</h2>
               <p class="text-faint" data-dynamic="userUsername">@ravi</p>
@@ -434,10 +434,10 @@
 </div>
 
 <script type="module" src="index.js"></script>
-<script src="../theme-toggle.js" defer></script>
+<script src="../../../scripts/theme-toggle.js" defer></script>
 
 <!-- ── Custom Cursor ────────────────────────────── -->
-<script src="../cursor.js" defer></script>
-<script src="../cursor-panel.js" defer></script>
+<script src="../../ui/cursor/cursor.js" defer></script>
+<script src="../../ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

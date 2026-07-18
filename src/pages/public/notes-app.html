@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes</title>
-    <link rel="stylesheet" href="cursor.css">
-    <link rel="stylesheet" href="cursor-panel.css">
+    <link rel="stylesheet" href="../../ui/cursor/cursor.css">
+    <link rel="stylesheet" href="../../ui/cursor/cursor-panel.css">
     <style>
         /* ============================================
            RESET & BASE STYLES
@@ -996,7 +996,7 @@
     <div class="container">
         <!-- Top Navigation & Auth Status -->
         <div class="top-nav">
-            <a href="index.html" class="back-link">
+            <a href="../../../index.html" class="back-link">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 Back to Home
             </a>
@@ -1145,8 +1145,8 @@
          ============================================ -->
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-        import { app } from "./src/firebase.js";
-        import { getUserProfile, getUserNotes, setUserNote, deleteUserNote, updateUserNote, getUserScreenshots, setUserScreenshot, deleteUserScreenshot } from "./src/firestore.js";
+        import { app } from "../../firebase.js";
+        import { getUserProfile, getUserNotes, setUserNote, deleteUserNote, updateUserNote, getUserScreenshots, setUserScreenshot, deleteUserScreenshot } from "../../firestore.js";
 
         const auth = getAuth(app);
 
@@ -1266,7 +1266,7 @@
                     <button class="auth-btn" id="signInBtn">Sign In</button>
                 `;
                 document.getElementById('signInBtn')?.addEventListener('click', () => {
-                    window.location.href = 'index.html?login=true';
+                    window.location.href = '../../../index.html?login=true';
                 });
             }
         }
@@ -2632,7 +2632,7 @@
     </script>
 
 <!-- ── Custom Cursor ────────────────────────────── -->
-<script src="cursor.js" defer></script>
-<script src="cursor-panel.js" defer></script>
+<script src="../../ui/cursor/cursor.js" defer></script>
+<script src="../../ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

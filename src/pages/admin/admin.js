@@ -3,7 +3,7 @@
    Access control, Resource Management, User Permissions, and Analytics.
    ========================================================= */
 
-import { app } from "../src/firebase.js";
+import { app } from "../../firebase.js";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { 
   getUserProfile, 
@@ -14,7 +14,7 @@ import {
   getAllUsers, 
   updateUserRole, 
   getAnalyticsCounts 
-} from "../src/firestore.js";
+} from "../../firestore.js";
 
 (async function () {
   "use strict";
@@ -28,7 +28,7 @@ import {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       console.warn("[Admin Auth] Unauthenticated access attempt. Redirecting...");
-      window.location.replace("../index.html");
+      window.location.replace("../../../index.html");
       return;
     }
 
@@ -159,7 +159,7 @@ import {
         e.preventDefault();
         try {
           await signOut(auth);
-          window.location.replace("../index.html");
+          window.location.replace("../../../index.html");
         } catch (error) {
           console.error("[Admin Auth] Logout failed:", error);
         }

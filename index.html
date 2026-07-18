@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IGNOU Free Study Resource Hub</title>
 <meta name="description" content="Free IGNOU Previous Year Question Papers, Notes, Assignments, Syllabus and Study Resources for all courses.">
-<link rel="stylesheet" href="auth/auth.css">
-<link rel="stylesheet" href="cursor.css">
-<link rel="stylesheet" href="cursor-panel.css">
+<link rel="stylesheet" href="src/pages/auth/auth.css">
+<link rel="stylesheet" href="src/ui/cursor/cursor.css">
+<link rel="stylesheet" href="src/ui/cursor/cursor-panel.css">
 
 <!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
 <script type="importmap">
@@ -765,8 +765,8 @@
             <div class="ud-email"></div>
           </div>
           <ul>
-            <li><a href="dashboard/index.html" class="ud-nav-link" role="menuitem">&#128202; Dashboard</a></li>
-            <li class="ud-admin-link" style="display: none;"><a href="admin/admin.html" role="menuitem">👑 Admin Panel</a></li>
+            <li><a href="src/pages/dashboard/index.html" class="ud-nav-link" role="menuitem">&#128202; Dashboard</a></li>
+            <li class="ud-admin-link" style="display: none;"><a href="src/pages/admin/admin.html" role="menuitem">👑 Admin Panel</a></li>
             <li><a href="#" class="ud-nav-link" data-page="bookmarks" role="menuitem">&#128278; My Bookmarks</a></li>
             <li><a href="#" class="ud-nav-link" data-page="settings"  role="menuitem">&#9881;&#65039; Settings</a></li>
             <li class="ud-divider" role="separator"></li>
@@ -794,8 +794,8 @@
       <li><a href="#why">Why Us</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li class="mobile-nav-item-dashboard" style="display: none;"><a href="dashboard/index.html">Dashboard</a></li>
-      <li class="mobile-nav-item-admin" style="display: none;"><a href="admin/admin.html">Admin Panel</a></li>
+      <li class="mobile-nav-item-dashboard" style="display: none;"><a href="src/pages/dashboard/index.html">Dashboard</a></li>
+      <li class="mobile-nav-item-admin" style="display: none;"><a href="src/pages/admin/admin.html">Admin Panel</a></li>
       <li class="mobile-nav-item-logout" style="display: none;"><a href="#" id="mobile-logout-btn">Logout</a></li>
     </ul>
   </div>
@@ -809,10 +809,10 @@
       <h1>Free IGNOU Study Resources</h1>
       <p>Helping IGNOU students succeed with free Previous Year Question Papers, Notes, and Study Materials.</p>
       <div class="btn-group">
-        <a href="downloads.html" class="btn btn-primary">Download PYQs</a>
+        <a href="src/pages/public/downloads.html" class="btn btn-primary">Download PYQs</a>
         <a href="#resources" class="btn btn-secondary">Download Notes</a>
         <a href="/games" class="btn btn-secondary">Games</a>
-        <a href="uploads.html" class="btn btn-secondary">HTMLs</a>
+        <a href="src/pages/public/uploads.html" class="btn btn-secondary">HTMLs</a>
         <a href="/games/slime%20td.html" class="btn btn-secondary">Tower Defence</a>
       </div>
     </div>
@@ -850,14 +850,14 @@
           <div class="card-icon">📄</div>
           <h3>Previous Year Question Papers</h3>
           <p>Access PYQs from past sessions to understand exam patterns and important topics.</p>
-          <a href="downloads.html" class="card-link">Download PYQs</a>
+          <a href="src/pages/public/downloads.html" class="card-link">Download PYQs</a>
         </article>
 
         <article class="card">
           <div class="card-icon">📝</div>
           <h3>Handwritten Notes</h3>
           <p>Well-organized, easy-to-understand handwritten notes prepared by fellow students.</p>
-          <a href="notes-app.html" class="card-link">Create Notes</a>
+          <a href="src/pages/public/notes-app.html" class="card-link">Create Notes</a>
         </article>
 
         <article class="card">
@@ -892,7 +892,7 @@
           <div class="card-icon">✏️</div>
           <h3>Create Notes</h3>
           <p>Write, save, and organise your own study notes directly in the browser — no account needed.</p>
-          <a href="notes-app.html" class="card-link">Create Notes</a>
+          <a href="src/pages/public/notes-app.html" class="card-link">Create Notes</a>
         </article>
 
       </div>
@@ -1178,11 +1178,11 @@
   </div><!-- /auth-card -->
 </div><!-- /auth-overlay -->
 
-<script type="module" src="auth/auth.js"></script>
-<script src="theme-toggle.js" defer></script>
+<script type="module" src="src/pages/auth/auth.js"></script>
+<script src="scripts/theme-toggle.js" defer></script>
 
 <!-- ── Custom Cursor ────────────────────────────── -->
-<script src="cursor.js" defer></script>
-<script src="cursor-panel.js" defer></script>
+<script src="src/ui/cursor/cursor.js" defer></script>
+<script src="src/ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

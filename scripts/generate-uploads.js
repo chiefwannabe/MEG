@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dirPath = path.join(__dirname, 'Html_files');
+const dirPath = path.join(__dirname, '..', 'archive', 'Html_files');
 if (!fs.existsSync(dirPath)) {
   fs.mkdirSync(dirPath);
 }
