@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Custom Cursor · Demo</title>
+  <meta name="description" content="A premium custom cursor built with pure HTML, CSS, and vanilla JavaScript. Smooth animations, hover effects, and click interactions." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       CUSTOM CURSOR ELEMENTS
+       These two divs are all the cursor needs.
+  ═══════════════════════════════════════════ -->
+  <div class="cursor-dot"     id="cursorDot"></div>
+  <div class="cursor-outline" id="cursorOutline"></div>
+
+  <!-- ═══════════════════════════════════════════
+       DEMO PAGE
+  ═══════════════════════════════════════════ -->
+  <main>
+
+    <!-- ── Hero ───────────────────────────────────── -->
+    <section class="section section--hero" id="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container">
+        <span class="badge">✦ Premium Cursor</span>
+        <h1 class="hero-title">Move Your <span class="gradient-text">Mouse</span></h1>
+        <p class="hero-subtitle">
+          A buttery-smooth custom cursor built with pure HTML, CSS, and
+          vanilla JavaScript. No libraries. No dependencies. Just pixels.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn--primary" id="primaryBtn">Get Started</button>
+          <button class="btn btn--ghost"   id="ghostBtn">Learn More</button>
+        </div>
+        <div class="scroll-hint" aria-hidden="true">
+          <span class="scroll-hint__line"></span>
+          <span class="scroll-hint__label">Scroll to explore</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Feature Cards ──────────────────────────── -->
+    <section class="section section--cards" id="features">
+      <div class="container">
+        <h2 class="section-title">Hover the <span class="gradient-text">Cards</span></h2>
+        <div class="cards-grid">
+
+          <article class="card" id="card1">
+            <div class="card-icon" aria-hidden="true">⚡</div>
+            <h3>Lightning Fast</h3>
+            <p>Uses <code>requestAnimationFrame</code> for buttery 60 fps animation with zero jank or dropped frames.</p>
+          </article>
+
+          <article class="card" id="card2">
+            <div class="card-icon" aria-hidden="true">🎨</div>
+            <h3>Fully Customizable</h3>
+            <p>One <code>CONFIG</code> object controls every value — size, speed, color, and hover selectors.</p>
+          </article>
+
+          <article class="card" id="card3">
+            <div class="card-icon" aria-hidden="true">🔮</div>
+            <h3>Zero Dependencies</h3>
+            <p>Pure vanilla JavaScript. No React, no GSAP, no jQuery. Works by opening <code>index.html</code>.</p>
+          </article>
+
+          <article class="card" id="card4">
+            <div class="card-icon" aria-hidden="true">✨</div>
+            <h3>Premium Feel</h3>
+            <p>Smooth lerp interpolation creates an Apple / Framer-quality interaction that feels alive.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Interactive Elements ───────────────────── -->
+    <section class="section section--interactive" id="interactive">
+      <div class="container">
+        <h2 class="section-title">Try <span class="gradient-text">Interactions</span></h2>
+        <div class="interactive-grid">
+
+          <!-- Links group -->
+          <div class="interactive-group">
+            <p class="group-label">Navigation Links</p>
+            <nav class="links-list" aria-label="Demo navigation">
+              <a href="#hero"        class="demo-link">Home ↗</a>
+              <a href="#features"    class="demo-link">Features ↗</a>
+              <a href="#interactive" class="demo-link">Interactive ↗</a>
+              <a href="#footer"      class="demo-link">Contact ↗</a>
+            </nav>
+          </div>
+
+          <!-- Form group -->
+          <div class="interactive-group">
+            <p class="group-label">Form Fields</p>
+            <form class="form-group" id="demoForm" onsubmit="return false;">
+              <input
+                type="text"
+                class="demo-input"
+                placeholder="Your name…"
+                id="inputName"
+                autocomplete="off"
+              />
+              <input
+                type="email"
+                class="demo-input"
+                placeholder="Email address…"
+                id="inputEmail"
+                autocomplete="off"
+              />
+              <textarea
+                class="demo-input demo-textarea"
+                placeholder="Your message…"
+                id="inputMessage"
+              ></textarea>
+              <button class="btn btn--primary btn--full" id="submitBtn" type="submit">
+                Send Message
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Footer ─────────────────────────────────── -->
+    <footer class="footer" id="footer">
+      <div class="container footer__inner">
+        <p class="footer__copy">
+          Built with <span class="heart" aria-label="love">♥</span> using pure HTML, CSS &amp; JS.
+        </p>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="#" class="footer-link">GitHub</a>
+          <a href="#" class="footer-link">Docs</a>
+          <a href="#" class="footer-link">MIT License</a>
+        </nav>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

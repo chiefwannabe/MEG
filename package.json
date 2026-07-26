@@ -1,0 +1,14 @@
+{
+  "name": "meg-offline-launcher",
+  "version": "1.0.0",
+  "description": "IGNOU MEG website with offline game launcher",
+  "private": true,
+  "scripts": {
+    "build": "node src/pages/offline/generate-games.js && node scripts/generate-uploads.js",
+    "generate": "bun src/pages/offline/generate-games.js",
+    "dev": "bun server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

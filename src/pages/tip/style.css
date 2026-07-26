@@ -1,0 +1,633 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PREMIUM CUSTOM CURSOR · style.css
+   ═══════════════════════════════════════════════════════════════════
+
+   Table of Contents
+   ─────────────────
+   1.  Configuration Variables
+   2.  Reset & Base
+   3.  Custom Cursor Elements
+   4.  Cursor States  (hover / text / click / hidden)
+   5.  Layout Primitives
+   6.  Hero Section
+   7.  Buttons
+   8.  Section Title
+   9.  Feature Cards
+   10. Interactive Section  (links + form)
+   11. Footer
+   12. Click Ripple  (JS-spawned element)
+   13. Scrollbar & Selection
+═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────
+   1. Configuration Variables
+   Edit these to restyle the cursor and the demo page in one place.
+───────────────────────────────────────────────────────────────── */
+:root {
+  /* — Cursor geometry — */
+  --cursor-dot-size:      8px;
+  --cursor-outline-size:  36px;
+  --cursor-outline-width: 1.5px;
+
+  /* — Cursor colors — */
+  --cursor-dot-color:     #ffffff;
+  --cursor-ring-color:    rgba(255, 255, 255, 0.45);
+
+  /* — Cursor hover state — */
+  --cursor-hover-ring-size:  52px;
+  --cursor-hover-dot-size:   6px;
+  --cursor-hover-color:      #7c6df5;
+  --cursor-hover-fill:       rgba(124, 109, 245, 0.08);
+
+  /* — Cursor click state — */
+  --cursor-click-ring-size:  28px;
+  --cursor-click-dot-size:   5px;
+  --cursor-click-color:      #f06292;
+  --cursor-click-fill:       rgba(240, 98, 146, 0.10);
+
+  /* — Cursor transition speed — */
+  --cursor-speed: 0.15s;
+
+  /* — Page palette — */
+  --bg:             #080810;
+  --bg-card:        #0d0d1c;
+  --bg-card-hover:  #111128;
+  --surface:        #16162e;
+  --border:         rgba(255, 255, 255, 0.07);
+  --border-hover:   rgba(255, 255, 255, 0.14);
+  --text-primary:   #eeeeff;
+  --text-secondary: #8080aa;
+  --text-muted:     #50506a;
+  --accent:         #7c6df5;
+  --accent-glow:    rgba(124, 109, 245, 0.38);
+  --accent-2:       #f06292;
+  --gradient:       linear-gradient(135deg, #7c6df5 0%, #f06292 100%);
+
+  /* — Typography — */
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* — Spacing — */
+  --section-v: 110px;
+  --container: 1100px;
+  --radius:    16px;
+  --radius-sm: 10px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   2. Reset & Base
+───────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide the default OS cursor globally */
+*, *::before, *::after,
+a, button, input, textarea, select, label,
+[role="button"], [tabindex],
+[style*="cursor: pointer"], [style*="cursor:pointer"] {
+  cursor: none !important;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   3. Custom Cursor Elements
+───────────────────────────────────────────────────────────────── */
+
+/* ── Dot — teleports exactly to mouse position each frame ── */
+.cursor-dot {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          var(--cursor-dot-size);
+  height:         var(--cursor-dot-size);
+  background:     var(--cursor-dot-color);
+  border-radius:  50%;
+  pointer-events: none;
+  z-index:        99999;
+
+  /* JS sets transform: translate3d() — we only transition size/color */
+  transition:
+    width          var(--cursor-speed) ease,
+    height         var(--cursor-speed) ease,
+    border-radius  var(--cursor-speed) ease,
+    background     var(--cursor-speed) ease,
+    opacity        var(--cursor-speed) ease;
+
+  will-change: transform;
+}
+
+/* ── Outline ring — lerps toward mouse each frame ── */
+.cursor-outline {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          var(--cursor-outline-size);
+  height:         var(--cursor-outline-size);
+  border:         var(--cursor-outline-width) solid var(--cursor-ring-color);
+  border-radius:  50%;
+  pointer-events: none;
+  z-index:        99998;
+  background:     transparent;
+
+  transition:
+    width        var(--cursor-speed) ease,
+    height       var(--cursor-speed) ease,
+    border-color var(--cursor-speed) ease,
+    background   var(--cursor-speed) ease,
+    opacity      var(--cursor-speed) ease;
+
+  will-change: transform;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   4. Cursor States  (toggled via JS class names)
+───────────────────────────────────────────────────────────────── */
+
+/* — Hover (links, buttons, cards) — */
+.cursor-dot.is-hovering {
+  width:      var(--cursor-hover-dot-size);
+  height:     var(--cursor-hover-dot-size);
+  background: var(--cursor-hover-color);
+}
+.cursor-outline.is-hovering {
+  width:        var(--cursor-hover-ring-size);
+  height:       var(--cursor-hover-ring-size);
+  border-color: var(--cursor-hover-color);
+  background:   var(--cursor-hover-fill);
+}
+
+/* — Click (mousedown) — */
+.cursor-dot.is-clicking {
+  width:      var(--cursor-click-dot-size);
+  height:     var(--cursor-click-dot-size);
+  background: var(--cursor-click-color);
+}
+.cursor-outline.is-clicking {
+  width:        var(--cursor-click-ring-size);
+  height:       var(--cursor-click-ring-size);
+  border-color: var(--cursor-click-color);
+  background:   var(--cursor-click-fill);
+}
+
+/* — Text / input fields — */
+.cursor-dot.is-text {
+  width:         2px;
+  height:        22px;
+  border-radius: 2px;
+  background:    var(--cursor-hover-color);
+}
+.cursor-outline.is-text {
+  opacity: 0;
+}
+
+/* — Hidden (cursor left window or not yet moved) — */
+.cursor-dot.is-hidden,
+.cursor-outline.is-hidden {
+  opacity: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   5. Layout Primitives
+───────────────────────────────────────────────────────────────── */
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: var(--section-v) 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   6. Hero Section
+───────────────────────────────────────────────────────────────── */
+.section--hero {
+  min-height: 100vh;
+  display:    flex;
+  align-items: center;
+  position:   relative;
+  overflow:   hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Radial ambient glow */
+.hero-glow {
+  position:  absolute;
+  top:       -20%;
+  left:      50%;
+  transform: translateX(-50%);
+  width:     800px;
+  height:    800px;
+  background: radial-gradient(
+    circle at center,
+    rgba(124, 109, 245, 0.14) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+.badge {
+  display:       inline-block;
+  padding:       6px 18px;
+  border-radius: 100px;
+  border:        1px solid rgba(124, 109, 245, 0.35);
+  background:    rgba(124, 109, 245, 0.08);
+  color:         var(--accent);
+  font-size:     12px;
+  font-weight:   600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom:  28px;
+}
+
+.hero-title {
+  font-size:      clamp(52px, 8vw, 96px);
+  font-weight:    700;
+  line-height:    1.04;
+  letter-spacing: -0.035em;
+  margin-bottom:  24px;
+}
+
+.gradient-text {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size:     clamp(16px, 2vw, 19px);
+  color:         var(--text-secondary);
+  max-width:     500px;
+  margin-bottom: 44px;
+  line-height:   1.75;
+  font-weight:   400;
+}
+
+.hero-actions {
+  display:   flex;
+  gap:       16px;
+  flex-wrap: wrap;
+}
+
+/* Scroll hint */
+.scroll-hint {
+  position:   absolute;
+  bottom:     40px;
+  left:       50%;
+  transform:  translateX(-50%);
+  display:    flex;
+  flex-direction: column;
+  align-items: center;
+  gap:        10px;
+  opacity:    0.35;
+}
+.scroll-hint__line {
+  width:      1px;
+  height:     48px;
+  background: linear-gradient(to bottom, transparent, var(--text-secondary));
+  animation:  scrollPulse 1.8s ease-in-out infinite;
+}
+.scroll-hint__label {
+  font-size:      11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color:          var(--text-secondary);
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1);   }
+  50%       { opacity: 1;   transform: scaleY(0.7); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   7. Buttons
+───────────────────────────────────────────────────────────────── */
+.btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         14px 34px;
+  border-radius:   12px;
+  font-family:     var(--font);
+  font-size:       15px;
+  font-weight:     600;
+  border:          none;
+  outline:         none;
+  position:        relative;
+  overflow:        hidden;
+  transition:      transform 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: -0.01em;
+}
+
+/* Shimmer overlay on hover */
+.btn::after {
+  content:    '';
+  position:   absolute;
+  inset:      0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.2s ease;
+}
+.btn:hover::after { background: rgba(255, 255, 255, 0.06); }
+
+.btn--primary {
+  background:  var(--gradient);
+  color:       #fff;
+  box-shadow:  0 0 0 0 var(--accent-glow);
+}
+.btn--primary:hover {
+  transform:  translateY(-2px);
+  box-shadow: 0 10px 36px var(--accent-glow);
+}
+.btn--primary:active { transform: translateY(0px); }
+
+.btn--ghost {
+  background: transparent;
+  color:      var(--text-primary);
+  border:     1px solid var(--border);
+}
+.btn--ghost:hover {
+  border-color: var(--border-hover);
+  background:   rgba(255, 255, 255, 0.04);
+}
+
+.btn--full { width: 100%; }
+
+
+/* ─────────────────────────────────────────────────────────────────
+   8. Section Title
+───────────────────────────────────────────────────────────────── */
+.section-title {
+  font-size:      clamp(28px, 4vw, 44px);
+  font-weight:    700;
+  letter-spacing: -0.025em;
+  text-align:     center;
+  margin-bottom:  60px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   9. Feature Cards
+───────────────────────────────────────────────────────────────── */
+.section--cards {
+  border-top:    1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.cards-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background:     var(--bg-card);
+  border:         1px solid var(--border);
+  border-radius:  var(--radius);
+  padding:        34px 28px;
+  position:       relative;
+  overflow:       hidden;
+  transition:
+    background   0.3s ease,
+    border-color 0.3s ease,
+    transform    0.3s ease,
+    box-shadow   0.3s ease;
+}
+
+/* Top-edge shimmer line */
+.card::before {
+  content:    '';
+  position:   absolute;
+  top:        0; left: 0; right: 0;
+  height:     1px;
+  background: linear-gradient(90deg, transparent, rgba(124,109,245,0), transparent);
+  transition: background 0.35s ease;
+}
+
+.card:hover {
+  background:  var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform:   translateY(-5px);
+  box-shadow:  0 20px 56px rgba(0,0,0,0.45);
+}
+.card:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(124,109,245,0.55), transparent);
+}
+
+.card-icon {
+  font-size:     30px;
+  margin-bottom: 20px;
+  display:       block;
+}
+
+.card h3 {
+  font-size:     17px;
+  font-weight:   600;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-size:   14px;
+  color:       var(--text-secondary);
+  line-height: 1.75;
+}
+
+.card code {
+  font-size:   12.5px;
+  padding:     2px 6px;
+  border-radius: 4px;
+  background:  rgba(124, 109, 245, 0.12);
+  color:       var(--accent);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   10. Interactive Section
+───────────────────────────────────────────────────────────────── */
+.section--interactive { border-bottom: 1px solid var(--border); }
+
+.interactive-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   64px;
+}
+
+@media (max-width: 720px) {
+  .interactive-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+.group-label {
+  font-size:      11.5px;
+  font-weight:    600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--text-muted);
+  margin-bottom:  22px;
+}
+
+/* — Demo Links — */
+.links-list {
+  display:        flex;
+  flex-direction: column;
+}
+
+.demo-link {
+  display:         block;
+  color:           var(--text-primary);
+  text-decoration: none;
+  font-size:       20px;
+  font-weight:     500;
+  padding:         14px 0;
+  border-bottom:   1px solid var(--border);
+  position:        relative;
+  transition:      color 0.22s ease, padding-left 0.22s ease;
+}
+
+/* Animated underline */
+.demo-link::after {
+  content:    '';
+  position:   absolute;
+  bottom:     -1px; left: 0;
+  width:      0;
+  height:     1px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.demo-link:hover {
+  color:        var(--accent);
+  padding-left: 10px;
+}
+.demo-link:hover::after { width: 100%; }
+
+/* — Form — */
+.form-group {
+  display:        flex;
+  flex-direction: column;
+  gap:            14px;
+}
+
+.demo-input {
+  background:  var(--bg-card);
+  border:      1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color:       var(--text-primary);
+  font-family: var(--font);
+  font-size:   15px;
+  padding:     14px 18px;
+  outline:     none;
+  width:       100%;
+  transition:
+    border-color 0.2s ease,
+    box-shadow   0.2s ease,
+    background   0.2s ease;
+}
+
+.demo-input::placeholder { color: var(--text-muted); }
+
+.demo-input:focus {
+  border-color: var(--accent);
+  box-shadow:   0 0 0 3px rgba(124, 109, 245, 0.14);
+  background:   var(--surface);
+}
+
+.demo-textarea {
+  min-height: 116px;
+  resize:     vertical;
+  line-height: 1.6;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   11. Footer
+───────────────────────────────────────────────────────────────── */
+.footer { padding: 44px 0; }
+
+.footer__inner {
+  display:        flex;
+  align-items:    center;
+  justify-content: space-between;
+  flex-wrap:      wrap;
+  gap:            16px;
+}
+
+.footer__copy {
+  color:     var(--text-muted);
+  font-size: 14px;
+}
+
+.heart { color: var(--accent-2); }
+
+.footer-nav {
+  display: flex;
+  gap:     28px;
+}
+
+.footer-link {
+  color:           var(--text-muted);
+  text-decoration: none;
+  font-size:       14px;
+  transition:      color 0.2s ease;
+}
+.footer-link:hover { color: var(--text-primary); }
+
+
+/* ─────────────────────────────────────────────────────────────────
+   12. Click Ripple  (spawned by JS on mousedown)
+───────────────────────────────────────────────────────────────── */
+.cursor-ripple {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  width:          0;
+  height:         0;
+  border-radius:  50%;
+  border:         1.5px solid rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  z-index:        99997;
+  transform:      translate(-50%, -50%);
+  animation:      rippleExpand 0.62s ease-out forwards;
+}
+
+@keyframes rippleExpand {
+  0%   { width: 0;    height: 0;    opacity: 0.8; }
+  100% { width: 80px; height: 80px; opacity: 0;   }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   13. Scrollbar & Selection
+───────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+::selection {
+  background: rgba(124, 109, 245, 0.28);
+  color: var(--text-primary);
+}
