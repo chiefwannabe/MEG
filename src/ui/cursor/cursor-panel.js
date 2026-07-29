@@ -191,7 +191,8 @@
         return val !== null ? val : fallback;
       };
 
-      settings.disabled = getBool(KEYS.disabled, true);
+      // Custom cursor always defaults to OFF (disabled) on initial page load
+      settings.disabled = true;
       settings.theme = getString(KEYS.theme, 'default');
       settings.size = getNum(KEYS.size, 100);
       settings.speed = getNum(KEYS.speed, 100);

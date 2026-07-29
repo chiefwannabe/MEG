@@ -400,14 +400,9 @@
         console.log("Created cursor elements");
       }
 
-      /* Signal CSS to hide native cursor only if custom cursor is explicitly enabled */
-      let isExplicitlyEnabled = false;
-      try { isExplicitlyEnabled = localStorage.getItem('meg-cursor-disabled') === 'false'; } catch (_) {}
-      if (isExplicitlyEnabled) {
-        document.documentElement.setAttribute('data-cursor-ready', '');
-      } else {
-        document.documentElement.setAttribute('data-cursor-disabled', 'true');
-      }
+      /* Native cursor is active by default on page load. Custom cursor is disabled until activated. */
+      document.documentElement.setAttribute('data-cursor-disabled', 'true');
+      document.documentElement.removeAttribute('data-cursor-ready');
 
       /* Hide cursor elements until first mouse movement */
       addClass('is-hidden');
