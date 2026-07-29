@@ -3,13 +3,13 @@
  * Pure Vanilla JavaScript Application with Firebase Cloud Sync
  */
 
-import { auth } from "../../firebase.js";
+import { auth } from "/src/firebase.js";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   getUserNotes,
   setUserNote,
   deleteUserNote
-} from "../../firestore.js";
+} from "/src/firestore.js";
 
 // --------------------------------------------------------------------------
 // Constants & Initial State
