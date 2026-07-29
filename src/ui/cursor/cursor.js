@@ -400,9 +400,16 @@
         console.log("Created cursor elements");
       }
 
-      /* Native cursor is active by default on page load. Custom cursor is disabled until activated. */
-      document.documentElement.setAttribute('data-cursor-disabled', 'true');
-      document.documentElement.removeAttribute('data-cursor-ready');
+      /* Set cursor state based on saved preference (default OFF / native PC cursor) */
+      let isEnabled = false;
+      try { isEnabled = localStorage.getItem('meg-cursor-disabled') === 'false'; } catch (_) {}
+      if (isEnabled) {
+        document.documentElement.setAttribute('data-cursor-ready', '');
+        document.documentElement.removeAttribute('data-cursor-disabled');
+      } else {
+        document.documentElement.setAttribute('data-cursor-disabled', 'true');
+        document.documentElement.removeAttribute('data-cursor-ready');
+      }
 
       /* Hide cursor elements until first mouse movement */
       addClass('is-hidden');

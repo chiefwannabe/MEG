@@ -191,8 +191,8 @@
         return val !== null ? val : fallback;
       };
 
-      // Custom cursor always defaults to OFF (disabled) on initial page load
-      settings.disabled = true;
+      // Load disabled state from localStorage; default to true (OFF / native PC cursor) if no saved preference
+      settings.disabled = getBool(KEYS.disabled, true);
       settings.theme = getString(KEYS.theme, 'default');
       settings.size = getNum(KEYS.size, 100);
       settings.speed = getNum(KEYS.speed, 100);
@@ -587,10 +587,6 @@
       }
 
       e.preventDefault();
-      // Toggle custom cursor system when user presses ESC
-      settings.disabled = !settings.disabled;
-      saveSetting(KEYS.disabled, settings.disabled);
-      applySettingsToDOM();
       togglePanel();
     }
   };
