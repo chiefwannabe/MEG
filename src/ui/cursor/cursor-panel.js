@@ -62,10 +62,14 @@
     if (settings.disabled) {
       doc.setAttribute('data-cursor-disabled', 'true');
       doc.removeAttribute('data-cursor-ready');
+      if (engine && typeof engine.disable === 'function') {
+        engine.disable();
+      }
     } else {
       doc.removeAttribute('data-cursor-disabled');
-      // Only set ready if the engine itself says it's visible / initialized
-      if (engine && engine.state) {
+      if (engine && typeof engine.enable === 'function') {
+        engine.enable();
+      } else if (engine && engine.state) {
         doc.setAttribute('data-cursor-ready', '');
       }
     }

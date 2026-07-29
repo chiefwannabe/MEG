@@ -1,9 +1,9 @@
 /**
- * firebase.js — Firebase App + Analytics + Firestore Initialization
+ * firebase.js — Firebase App + Auth + Firestore Initialization
  * IGNOU Study Hub
  *
  * Import this module wherever Firebase services are needed.
- * Analytics and Firestore are initialized using the modular SDK.
+ * Auth and Firestore are initialized using the modular SDK.
  */
 
 import { initializeApp } from "firebase/app";
@@ -17,7 +17,6 @@ const firebaseConfig = {
   storageBucket:     "megol-d2cf1.firebasestorage.app",
   messagingSenderId: "790671544534",
   appId:             "1:790671544534:web:4262f1edc47932d5957977",
-  measurementId:     "G-JJW5DNP212",
 };
 
 const app = initializeApp(firebaseConfig);

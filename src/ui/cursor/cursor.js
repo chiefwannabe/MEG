@@ -159,10 +159,14 @@
     isClicking: false,
     isText:     false,
     isVisible:  false,
+    enabled:    false,
     ripples:    [],
     rafId:      null,
     themeEl:    null,                    // <style> injected for theme vars
   };
+
+  let listenersAttached = false;
+  let isPanelLoading = false;
 
   /* ── 4. DOM Injection variables ── */
   let dot = null;
@@ -178,19 +182,21 @@
    * We subtract 50% to keep the element centred on the coordinate.
    */
   const setPos = (el, x, y) => {
+    if (!el) return;
     el.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0)`;
   };
 
   /** Toggle a class on both cursor elements atomically. */
   const setState = (cls, active) => {
+    if (!dot || !ring) return;
     dot[active  ? 'classList' : 'classList'][active ? 'add' : 'remove'](cls);
     ring[active ? 'classList' : 'classList'][active ? 'add' : 'remove'](cls);
   };
 
-  const addClass    = (cls) => { dot.classList.add(cls);    ring.classList.add(cls);    };
-  const removeClass = (cls) => { dot.classList.remove(cls); ring.classList.remove(cls); };
+  const addClass    = (cls) => { if (dot && ring) { dot.classList.add(cls);    ring.classList.add(cls); }   };
+  const removeClass = (cls) => { if (dot && ring) { dot.classList.remove(cls); ring.classList.remove(cls); } };
 
-  /* ── 6. Animation Loop ──────────────────────────────────────────*/
+  /* ── 6. Animation Loop & Lifecycle Controls ───────────────────────*/
 
   /**
    * Core rAF tick.
@@ -199,6 +205,10 @@
    * Both writes are GPU-composited (transform only), layout-safe.
    */
   const tick = () => {
+    if (!state.enabled) {
+      stopLoop();
+      return;
+    }
     setPos(dot, state.mouse.x, state.mouse.y);
 
     state.ring.x = lerp(state.ring.x, state.mouse.x, CONFIG.lerpFactor);
@@ -206,6 +216,67 @@
     setPos(ring, state.ring.x, state.ring.y);
 
     state.rafId = requestAnimationFrame(tick);
+  };
+
+  const startLoop = () => {
+    if (!state.rafId && state.enabled) {
+      state.rafId = requestAnimationFrame(tick);
+    }
+  };
+
+  const stopLoop = () => {
+    if (state.rafId) {
+      cancelAnimationFrame(state.rafId);
+      state.rafId = null;
+    }
+  };
+
+  const attachListeners = () => {
+    if (listenersAttached) return;
+    document.addEventListener('mousemove',  onMouseMove, { passive: true });
+    document.addEventListener('mousedown',  onMouseDown);
+    document.addEventListener('mouseup',    onMouseUp);
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mouseenter', onMouseEnter);
+    window.addEventListener('scroll',       onScroll,       { passive: true });
+    window.addEventListener('blur',         onWindowBlur,   { passive: true });
+    listenersAttached = true;
+  };
+
+  const detachListeners = () => {
+    if (!listenersAttached) return;
+    document.removeEventListener('mousemove',  onMouseMove);
+    document.removeEventListener('mousedown',  onMouseDown);
+    document.removeEventListener('mouseup',    onMouseUp);
+    document.removeEventListener('mouseleave', onMouseLeave);
+    document.removeEventListener('mouseenter', onMouseEnter);
+    window.removeEventListener('scroll',       onScroll);
+    window.removeEventListener('blur',         onWindowBlur);
+    listenersAttached = false;
+  };
+
+  const enable = () => {
+    state.enabled = true;
+    document.documentElement.setAttribute('data-cursor-ready', '');
+    document.documentElement.removeAttribute('data-cursor-disabled');
+    attachListeners();
+    startLoop();
+  };
+
+  const disable = () => {
+    state.enabled = false;
+    document.documentElement.setAttribute('data-cursor-disabled', 'true');
+    document.documentElement.removeAttribute('data-cursor-ready');
+    detachListeners();
+    stopLoop();
+  };
+
+  const setEnabled = (flag) => {
+    if (flag) {
+      enable();
+    } else {
+      disable();
+    }
   };
 
   /* ── 7. Hover Detection ─────────────────────────────────────────*/
@@ -276,6 +347,7 @@
   /* ── 9. Event Handlers ──────────────────────────────────────────*/
 
   const onMouseMove = (e) => {
+    if (!state.enabled) return;
     state.mouse.x = e.clientX;
     state.mouse.y = e.clientY;
 
@@ -288,22 +360,26 @@
   };
 
   const onMouseDown = (e) => {
+    if (!state.enabled) return;
     state.isClicking = true;
     addClass('is-clicking');
     spawnRipple(e.clientX, e.clientY);
   };
 
   const onMouseUp = () => {
+    if (!state.enabled) return;
     state.isClicking = false;
     removeClass('is-clicking');
   };
 
   const onMouseLeave = () => {
+    if (!state.enabled) return;
     addClass('is-hidden');
     state.isVisible = false;
   };
 
   const onMouseEnter = () => {
+    if (!state.enabled) return;
     removeClass('is-hidden');
     state.isVisible = true;
   };
@@ -313,7 +389,7 @@
    * is currently positioned under the mouse coordinates.
    */
   const onScroll = () => {
-    if (!state.isVisible) return;
+    if (!state.enabled || !state.isVisible) return;
     const target = document.elementFromPoint(state.mouse.x, state.mouse.y);
     if (target) {
       applyHoverState(target);
@@ -325,11 +401,64 @@
    * avoid getting frozen/stuck on page when window loses focus.
    */
   const onWindowBlur = () => {
+    if (!state.enabled) return;
     addClass('is-hidden');
     state.isVisible = false;
   };
 
-  /* ── 10. Theme System ───────────────────────────────────────────
+  /* ── 10. Lazy Loading Cursor Settings Panel on ESC ─────────────*/
+
+  const loadAndTogglePanel = () => {
+    if (window.__MEG_CURSOR_PANEL__) {
+      window.__MEG_CURSOR_PANEL__.toggle();
+      return;
+    }
+    if (isPanelLoading) return;
+    isPanelLoading = true;
+
+    // Resolve relative path to cursor-panel.js based on cursor.js location
+    let panelScriptUrl = 'src/ui/cursor/cursor-panel.js';
+    const scripts = Array.from(document.querySelectorAll('script'));
+    const cursorScript = scripts.find(s => s.src && s.src.includes('cursor.js'));
+    if (cursorScript) {
+      panelScriptUrl = cursorScript.src.replace(/cursor\.js(\?.*)?$/, 'cursor-panel.js$1');
+    }
+
+    const panelScript = document.createElement('script');
+    panelScript.src = panelScriptUrl;
+    panelScript.onload = () => {
+      isPanelLoading = false;
+      if (window.__MEG_CURSOR_PANEL__) {
+        window.__MEG_CURSOR_PANEL__.toggle();
+      }
+    };
+    panelScript.onerror = () => {
+      isPanelLoading = false;
+      console.error('[MegCursor] Failed to lazy-load cursor-panel.js from:', panelScriptUrl);
+    };
+    document.body.appendChild(panelScript);
+  };
+
+  const onGlobalKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      // If panel module is already initialized, cursor-panel.js manages keydown
+      if (window.__MEG_CURSOR_PANEL__) return;
+
+      const active = document.activeElement;
+      if (active && (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.isContentEditable ||
+        active.getAttribute('contenteditable') !== null
+      )) {
+        return;
+      }
+      e.preventDefault();
+      loadAndTogglePanel();
+    }
+  };
+
+  /* ── 11. Theme System ───────────────────────────────────────────
      MegCursor.setTheme(name) applies a predefined set of CSS
      custom property overrides to :root.
      Theme name is persisted to localStorage so the user's
@@ -380,11 +509,10 @@
     } catch (_) {}
   };
 
-  /* ── 11. Initialisation ─────────────────────────────────────────*/
+  /* ── 12. Initialisation ─────────────────────────────────────────*/
 
   const init = () => {
     try {
-      console.log("init() started");
       // Inject the cursor DOM elements safely now that body is ready
       if (!dot) {
         dot  = document.createElement('div');
@@ -397,18 +525,6 @@
         ring.setAttribute('aria-hidden', 'true');
         document.body.appendChild(dot);
         document.body.appendChild(ring);
-        console.log("Created cursor elements");
-      }
-
-      /* Set cursor state based on saved preference (default OFF / native PC cursor) */
-      let isEnabled = false;
-      try { isEnabled = localStorage.getItem('meg-cursor-disabled') === 'false'; } catch (_) {}
-      if (isEnabled) {
-        document.documentElement.setAttribute('data-cursor-ready', '');
-        document.documentElement.removeAttribute('data-cursor-disabled');
-      } else {
-        document.documentElement.setAttribute('data-cursor-disabled', 'true');
-        document.documentElement.removeAttribute('data-cursor-ready');
       }
 
       /* Hide cursor elements until first mouse movement */
@@ -417,25 +533,20 @@
       /* Restore saved theme preference */
       loadSavedTheme();
 
-      /* Attach event listeners (all passive-safe except mousedown/up) */
-      document.addEventListener('mousemove',  onMouseMove, { passive: true });
-      document.addEventListener('mousedown',  onMouseDown);
-      document.addEventListener('mouseup',    onMouseUp);
-      document.addEventListener('mouseleave', onMouseLeave);
-      document.addEventListener('mouseenter', onMouseEnter);
-      window.addEventListener('scroll',       onScroll,       { passive: true });
-      window.addEventListener('blur',         onWindowBlur,   { passive: true });
+      /* Always listen for ESC key to lazy-load settings panel */
+      window.addEventListener('keydown', onGlobalKeyDown);
 
-      /* Start the animation loop */
-      if (!state.rafId) {
-        state.rafId = requestAnimationFrame(tick);
-        console.log("Started requestAnimationFrame");
+      /* Set cursor state based on saved preference (default OFF / native PC cursor) */
+      let isEnabled = false;
+      try { isEnabled = localStorage.getItem('meg-cursor-disabled') === 'false'; } catch (_) {}
+      
+      if (isEnabled) {
+        enable();
+      } else {
+        disable();
       }
     } catch (err) {
       console.error("Error during cursor.js init():", err);
-      if (err && err.stack) {
-        console.error(err.stack);
-      }
     }
   };
 
@@ -444,21 +555,12 @@
    * Eliminates memory leaks and cleans up all active ripple elements.
    */
   const destroy = () => {
-    cancelAnimationFrame(state.rafId);
-    state.rafId = null;
-
-    /* Remove event listeners */
-    document.removeEventListener('mousemove',  onMouseMove);
-    document.removeEventListener('mousedown',  onMouseDown);
-    document.removeEventListener('mouseup',    onMouseUp);
-    document.removeEventListener('mouseleave', onMouseLeave);
-    document.removeEventListener('mouseenter', onMouseEnter);
-    window.removeEventListener('scroll',       onScroll);
-    window.removeEventListener('blur',         onWindowBlur);
+    disable();
+    window.removeEventListener('keydown', onGlobalKeyDown);
 
     /* Clean up DOM elements */
-    dot.remove();
-    ring.remove();
+    if (dot) dot.remove();
+    if (ring) ring.remove();
 
     if (state.themeEl) {
       state.themeEl.remove();
@@ -474,9 +576,9 @@
     delete window.__MEG_CURSOR__;
   };
 
-  /* ── 12. Public API ─────────────────────────────────────────────
+  /* ── 13. Public API ─────────────────────────────────────────────
      Exposed on window.__MEG_CURSOR__ for:
-     - Future theme picker UI
+     - Settings panel integration
      - ESC cursor selector
      - Saved preferences integration
      - DevTools inspection
@@ -484,6 +586,9 @@
   window.__MEG_CURSOR__ = {
     CONFIG,
     state,
+    enable,
+    disable,
+    setEnabled,
     setTheme,
     destroy,
     /**
@@ -492,16 +597,13 @@
      */
     getThemes: () => Object.keys(CONFIG.themes),
   };
-  console.log("Assigned window.__MEG_CURSOR__");
 
   /* ── Run ────────────────────────────────────────────────────────*/
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log("DOMContentLoaded fired");
       init();
     }, { once: true });
   } else {
-    console.log("DOMContentLoaded already fired or not loading (readyState: " + document.readyState + ")");
     init();
   }
 

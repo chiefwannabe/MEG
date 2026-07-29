@@ -6,9 +6,14 @@
 <title>Admin Panel – MEGOL | IGNOU Study Hub</title>
 <meta name="description" content="Secure administrative panel for MEGOL IGNOU Study Hub. Manage resources, users, and track platform analytics.">
 
+<link rel="stylesheet" href="../../ui/tokens.css">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="../../ui/cursor/cursor.css">
-<link rel="stylesheet" href="../../ui/cursor/cursor-panel.css">
+
+<!-- Critical Theme Initializer — prevents Flash of Unstyled Theme (FOUT) -->
+<script>
+  (function(){try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark-theme");document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("dark-theme");});}}catch(_){}})();
+</script>
 
 <!-- Firebase v12 CDN importmap -->
 <script type="importmap">
@@ -145,7 +150,7 @@
 
         <div class="user-menu">
           <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Admin profile menu">
-            <img class="avatar" src="/src/assets/images/default-avatar.svg" alt="Admin Avatar" width="36" height="36" id="topbar-admin-avatar">
+            <img class="avatar" src="/src/assets/images/default-avatar.svg" alt="Admin Avatar" width="36" height="36" id="topbar-admin-avatar" loading="lazy">
           </button>
 
           <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
@@ -513,6 +518,5 @@
 
 <!-- ── Custom Cursor ────────────────────────────── -->
 <script src="../../ui/cursor/cursor.js" defer></script>
-<script src="../../ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

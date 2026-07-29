@@ -18,6 +18,7 @@ import {
   getDocs,
   query,
   where,
+  orderBy,
   limit,
   getCountFromServer
 } from "firebase/firestore";
@@ -107,21 +108,29 @@ export async function createUserDocument(user, retries = 3, delay = 500) {
 
 /**
  * Updates the lastLogin timestamp for a user.
+ * Throttles writes to once per browser session to prevent redundant database writes.
  *
  * @param {string} uid - The user's UID
  */
 export async function updateLastLogin(uid) {
   if (!uid) return;
+  const sessionKey = `meg_last_login_${uid}`;
+  try {
+    if (sessionStorage.getItem(sessionKey)) {
+      return; // Already updated lastLogin during this browser session
+    }
+  } catch (_) {}
+
   const userDocRef = doc(db, "users", uid);
 
   try {
     await updateDoc(userDocRef, {
       lastLogin: serverTimestamp()
     });
+    try { sessionStorage.setItem(sessionKey, "true"); } catch (_) {}
     console.log(`[Firestore] lastLogin updated for user: ${uid}`);
   } catch (error) {
     console.error("[Firestore] Error updating lastLogin timestamp:", error);
-    throw error;
   }
 }
 
@@ -329,11 +338,26 @@ export async function getPublishedResources() {
 
 /**
  * Fetches latest published resources limited by count.
+ * Uses indexed Firestore query (published == true ORDER BY createdAt DESC LIMIT limitCount)
+ * with graceful in-memory fallback.
  */
-export async function getLatestResources(limitCount) {
+export async function getLatestResources(limitCount = 6) {
   try {
-    // Standard modular implementation: we fetch all and slice, or query.
-    // Querying with order requires index, so a simple filter/sort on published resources is safer.
+    const resourcesCol = collection(db, "resources");
+    const q = query(
+      resourcesCol,
+      where("published", "==", true),
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    );
+    const querySnapshot = await getDocs(q);
+    const resources = [];
+    querySnapshot.forEach((doc) => {
+      resources.push({ id: doc.id, ...doc.data() });
+    });
+    return resources;
+  } catch (error) {
+    console.warn("[Firestore] Falling back to client-side sort for getLatestResources:", error?.message || error);
     const all = await getPublishedResources();
     return all
       .sort((a, b) => {
@@ -342,9 +366,6 @@ export async function getLatestResources(limitCount) {
         return dateB - dateA;
       })
       .slice(0, limitCount);
-  } catch (error) {
-    console.error("[Firestore] Error fetching latest resources:", error);
-    throw error;
   }
 }
 
@@ -368,16 +389,27 @@ export async function getResourcesByType(type) {
 }
 
 /**
- * Gets related published resources (same course or subject, excluding current)
+ * Gets related published resources (same course, excluding current resource ID)
+ * Uses native Firestore query filtering on course and limit(4)
  */
 export async function getRelatedResources(res) {
-  if (!res) return [];
+  if (!res || !res.course) return [];
   try {
-    const all = await getPublishedResources();
-    return all.filter((r) => 
-      r.id !== res.id && 
-      (r.course === res.course || (res.subject && r.subject === res.subject))
-    ).slice(0, 3);
+    const resourcesCol = collection(db, "resources");
+    const q = query(
+      resourcesCol,
+      where("published", "==", true),
+      where("course", "==", res.course),
+      limit(4)
+    );
+    const querySnapshot = await getDocs(q);
+    const resources = [];
+    querySnapshot.forEach((doc) => {
+      if (doc.id !== res.id) {
+        resources.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    return resources.slice(0, 3);
   } catch (error) {
     console.error("[Firestore] Error finding related resources:", error);
     return [];

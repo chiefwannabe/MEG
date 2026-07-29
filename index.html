@@ -5,9 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IGNOU Free Study Resource Hub</title>
 <meta name="description" content="Free IGNOU Previous Year Question Papers, Notes, Assignments, Syllabus and Study Resources for all courses.">
+<link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/pages/auth/auth.css">
 <link rel="stylesheet" href="src/ui/cursor/cursor.css">
-<link rel="stylesheet" href="src/ui/cursor/cursor-panel.css">
+
+<!-- Critical Theme Initializer — prevents Flash of Unstyled Theme (FOUT) -->
+<script>
+  (function(){try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark-theme");document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("dark-theme");});}}catch(_){}})();
+</script>
 
 <!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
 <script type="importmap">
@@ -1175,6 +1180,5 @@
 
 <!-- ── Custom Cursor ────────────────────────────── -->
 <script src="src/ui/cursor/cursor.js" defer></script>
-<script src="src/ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>

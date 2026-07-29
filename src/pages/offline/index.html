@@ -5,8 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Game Launcher</title>
 <meta name="description" content="Offline HTML5 game launcher — fast, searchable, works without internet."/>
+<link rel="stylesheet" href="../../ui/tokens.css">
 <link rel="stylesheet" href="../../ui/cursor/cursor.css">
-<link rel="stylesheet" href="../../ui/cursor/cursor-panel.css">
+<!-- Critical Theme Initializer — prevents Flash of Unstyled Theme (FOUT) -->
+<script>
+  (function(){try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark-theme");document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("dark-theme");});}}catch(_){}})();
+</script>
 <style>
 :root{
   --bg:#0d0f18;--surface:#111420;--card:#161929;--card-h:#1c2035;
@@ -530,6 +534,5 @@ function debounce(fn, ms) {
 
 <!-- ── Custom Cursor ────────────────────────────── -->
 <script src="../../ui/cursor/cursor.js" defer></script>
-<script src="../../ui/cursor/cursor-panel.js" defer></script>
 </body>
 </html>
