@@ -2,6 +2,8 @@
  * ContextMenu Component - Custom Right-Click & Mobile Long-Press Context Menu.
  */
 
+import { VAULT_CONFIG } from '../vault.config.js';
+
 export class ContextMenu {
   /**
    * @param {Object} handlers - { onOpen, onDownload, onCopyLink, onStar, onPin, onRename, onDelete }
@@ -28,7 +30,7 @@ export class ContextMenu {
         <div class="context-item" data-action="pin">📌 Pin / Unpin</div>
         <div class="context-divider"></div>
         <div class="context-item" data-action="rename">✏️ Rename</div>
-        <div class="context-item danger" data-action="delete">🗑️ Delete</div>
+        ${VAULT_CONFIG.enableDelete ? '<div class="context-item danger" data-action="delete">🗑️ Delete</div>' : ''}
       `;
       document.body.appendChild(el);
     }
@@ -48,7 +50,7 @@ export class ContextMenu {
       if (action === 'star' && this.handlers.onStar) this.handlers.onStar(this.targetFile);
       if (action === 'pin' && this.handlers.onPin) this.handlers.onPin(this.targetFile);
       if (action === 'rename' && this.handlers.onRename) this.handlers.onRename(this.targetFile);
-      if (action === 'delete' && this.handlers.onDelete) this.handlers.onDelete(this.targetFile);
+      if (action === 'delete' && this.handlers.onDelete && VAULT_CONFIG.enableDelete) this.handlers.onDelete(this.targetFile);
     });
 
     // Hide on window click or scroll or escape

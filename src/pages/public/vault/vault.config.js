@@ -20,7 +20,7 @@ export const VAULT_CONFIG = {
   // Feature Flags & Behavior Controls
   uploadConflictMode: 'ask',     // 'ask' | 'overwrite' | 'rename' | 'skip'
   enableUpload: true,
-  enableDelete: true,
+  enableDelete: false,           // Disabled/hidden in public vault
   enableRename: true,
   enableMultiSelect: true,
   enableContextMenu: true,

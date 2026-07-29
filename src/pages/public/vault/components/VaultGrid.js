@@ -5,6 +5,7 @@
 
 import { rendererRegistry } from '../renderers/RendererRegistry.js';
 import { formatBytes, formatDate } from '../utils/fileUtils.js';
+import { VAULT_CONFIG } from '../vault.config.js';
 
 export class VaultGrid {
   /**
@@ -34,7 +35,7 @@ export class VaultGrid {
         <span id="bulkCountText">0 selected</span>
         <div class="bulk-actions">
           <button id="bulkDownloadBtn" class="btn btn-secondary btn-sm">⬇ Download Selected</button>
-          <button id="bulkDeleteBtn" class="btn btn-danger btn-sm">🗑 Delete Selected</button>
+          ${VAULT_CONFIG.enableDelete ? '<button id="bulkDeleteBtn" class="btn btn-danger btn-sm">🗑 Delete Selected</button>' : ''}
           <button id="bulkClearBtn" class="btn btn-ghost btn-sm">Cancel</button>
         </div>
       </div>
@@ -65,7 +66,7 @@ export class VaultGrid {
     }
 
     const deleteBtn = this.containerEl.querySelector('#bulkDeleteBtn');
-    if (deleteBtn) {
+    if (deleteBtn && VAULT_CONFIG.enableDelete) {
       deleteBtn.addEventListener('click', () => {
         if (this.callbacks.onBulkDelete) {
           const selected = this.items.filter(i => this.selectedIds.has(i.id));
@@ -93,7 +94,7 @@ export class VaultGrid {
         this.selectAll();
       } else if (e.key === 'Escape') {
         this.clearSelection();
-      } else if (e.key === 'Delete' && this.selectedIds.size > 0) {
+      } else if (e.key === 'Delete' && this.selectedIds.size > 0 && VAULT_CONFIG.enableDelete) {
         if (this.callbacks.onBulkDelete) {
           const selected = this.items.filter(i => this.selectedIds.has(i.id));
           this.callbacks.onBulkDelete(selected);
