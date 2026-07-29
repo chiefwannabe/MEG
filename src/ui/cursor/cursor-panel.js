@@ -31,7 +31,7 @@
 
   // State Management
   const settings = {
-    disabled: false,
+    disabled: true,
     theme: 'default',
     size: 100,      // percentage: 50% to 200%
     speed: 100,     // percentage: 20% to 300%
@@ -191,7 +191,7 @@
         return val !== null ? val : fallback;
       };
 
-      settings.disabled = getBool(KEYS.disabled, false);
+      settings.disabled = getBool(KEYS.disabled, true);
       settings.theme = getString(KEYS.theme, 'default');
       settings.size = getNum(KEYS.size, 100);
       settings.speed = getNum(KEYS.speed, 100);
@@ -543,7 +543,7 @@
 
     // Reset Defaults Action
     overlayEl.querySelector('#megBtnReset').addEventListener('click', () => {
-      settings.disabled = false;
+      settings.disabled = true;
       settings.theme = 'default';
       settings.size = 100;
       settings.speed = 100;
@@ -552,7 +552,7 @@
       settings.clickAnim = true;
 
       // Save all keys
-      saveSetting(KEYS.disabled, false);
+      saveSetting(KEYS.disabled, true);
       saveSetting(KEYS.theme, 'default');
       saveSetting(KEYS.size, 100);
       saveSetting(KEYS.speed, 100);
@@ -586,6 +586,12 @@
       }
 
       e.preventDefault();
+      
+      // Toggle custom cursor system when user presses ESC
+      settings.disabled = !settings.disabled;
+      saveSetting(KEYS.disabled, settings.disabled);
+      applySettingsToDOM();
+
       togglePanel();
     }
   };

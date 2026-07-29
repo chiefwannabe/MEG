@@ -400,9 +400,14 @@
         console.log("Created cursor elements");
       }
 
-      /* Signal CSS to hide the native cursor */
-      document.documentElement.setAttribute('data-cursor-ready', '');
-      console.log("Added data-cursor-ready");
+      /* Signal CSS to hide native cursor only if custom cursor is explicitly enabled */
+      let isExplicitlyEnabled = false;
+      try { isExplicitlyEnabled = localStorage.getItem('meg-cursor-disabled') === 'false'; } catch (_) {}
+      if (isExplicitlyEnabled) {
+        document.documentElement.setAttribute('data-cursor-ready', '');
+      } else {
+        document.documentElement.setAttribute('data-cursor-disabled', 'true');
+      }
 
       /* Hide cursor elements until first mouse movement */
       addClass('is-hidden');
