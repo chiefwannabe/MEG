@@ -305,3 +305,30 @@ This is a starting point. Add your own conventions, style, and rules as you figu
 - 交付文件（报告、代码、图片、数据等）→ 写工作区根目录或其子目录，不要放进 `.openclaw/`。
 - 临时/中间文件 → 写 `.openclaw/tmp/`，不要写 `/tmp`。
 - 委派子任务时同样遵守。
+
+---
+
+# Git & Vercel Deployment Rule
+
+This project has two Git remotes:
+
+- origin -> local workspace (/persisted/.git)
+- github -> https://github.com/chiefwannabe/MEG.git
+
+Vercel is connected ONLY to the GitHub repository.
+
+Never assume `git push` deploys to Vercel.
+
+Before telling the user a deployment is complete, ALWAYS:
+
+1. Check `git remote -v`.
+2. Verify which remote points to GitHub.
+3. Push to the GitHub remote:
+   git push github main
+   (or push to whichever remote actually points to GitHub).
+4. Verify that the GitHub remote now contains the latest commit.
+5. Only then tell the user that Vercel will deploy automatically.
+
+Never claim "deployment complete" unless the commit exists on the GitHub remote that Vercel is watching.
+
+If a new repository is cloned, detect the GitHub remote automatically before pushing.
