@@ -17,9 +17,17 @@ export class FileService {
     this.config = config;
     this.bucketName = config.bucketName || 'MEG';
 
+    console.log('[FileService] Initializing Supabase Storage client...', {
+      url: config.supabaseUrl,
+      bucket: this.bucketName,
+      keyPrefix: config.supabaseKey ? config.supabaseKey.substring(0, 14) + '...' : 'Missing'
+    });
+
     // Verify Supabase library availability from global scope
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      throw new Error('Supabase client SDK library not loaded on page.');
+      const err = new Error('Supabase client SDK library (window.supabase) not loaded on page.');
+      console.error('[FileService] Critical Error:', err);
+      throw err;
     }
 
     this.client = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
@@ -32,24 +40,55 @@ export class FileService {
 
   /**
    * Lists all files and subfolders in a bucket folder path.
-   * Automatically enriches files with MIME categories, public URLs, size, and local pin/star metadata.
+   * Logs raw Supabase response, status, and errors for debugging.
    * @param {string} [folderPath='']
-   * @returns {Promise<{ items: Array, totalSize: number, totalFiles: number, error: string|null }>}
+   * @returns {Promise<{ items: Array, totalSize: number, totalFiles: number, rawData: Array, error: string|null, status: number }>}
    */
   async listFiles(folderPath = '') {
-    try {
-      const cleanPath = folderPath ? folderPath.replace(/^\/+|\/+$/g, '') : '';
+    const cleanPath = folderPath ? folderPath.replace(/^\/+|\/+$/g, '') : '';
+    console.log(`[FileService] Querying Supabase Storage bucket "${this.bucketName}", path: "${cleanPath}"...`);
 
-      const { data, error } = await this.client.storage.from(this.bucketName).list(cleanPath, {
-        limit: 1000,
-        offset: 0,
-        sortBy: { column: 'name', order: 'asc' },
+    try {
+      const { data, error } = await this.client.storage
+        .from(this.bucketName)
+        .list(cleanPath, {
+          limit: 1000,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' },
+        });
+
+      console.log('[FileService] Supabase Storage raw list response:', {
+        bucket: this.bucketName,
+        path: cleanPath,
+        data,
+        error
       });
 
       if (error) {
-        console.warn('FileService.listFiles error:', error);
-        return { items: [], totalSize: 0, totalFiles: 0, error: error.message || 'Failed to list bucket files.' };
+        console.error('[FileService] Supabase Storage returned error:', error);
+        return {
+          items: [],
+          totalSize: 0,
+          totalFiles: 0,
+          rawData: [],
+          error: error.message || error.error || JSON.stringify(error),
+          status: error.status || 500
+        };
       }
+
+      if (!data) {
+        console.warn('[FileService] listFiles returned null data');
+        return {
+          items: [],
+          totalSize: 0,
+          totalFiles: 0,
+          rawData: [],
+          error: 'Supabase storage list() returned null response',
+          status: 500
+        };
+      }
+
+      console.info(`[FileService] Supabase storage list() succeeded with ${data.length} item(s) in "${cleanPath || 'root'}".`);
 
       const starredSet = getStarredSet();
       const pinnedSet = getPinnedSet();
@@ -57,7 +96,7 @@ export class FileService {
       let totalSize = 0;
       let totalFiles = 0;
 
-      const items = (data || []).map(file => {
+      const items = data.map(file => {
         // In Supabase storage, folders have null metadata or id
         const isFolder = !file.id || file.metadata === null || file.metadata === undefined;
         const relativePath = cleanPath ? `${cleanPath}/${file.name}` : file.name;
@@ -92,15 +131,22 @@ export class FileService {
         };
       });
 
-      return { items, totalSize, totalFiles, error: null };
+      return { items, totalSize, totalFiles, rawData: data, error: null, status: 200 };
     } catch (err) {
-      console.error('FileService.listFiles exception:', err);
-      return { items: [], totalSize: 0, totalFiles: 0, error: err.message || 'Connection to storage failed.' };
+      console.error('[FileService] Exception during listFiles execution:', err);
+      return {
+        items: [],
+        totalSize: 0,
+        totalFiles: 0,
+        rawData: [],
+        error: err.message || 'Exception connecting to Supabase Storage',
+        status: 500
+      };
     }
   }
 
   /**
-   * Gets or computes public URL for a given file path in the bucket.
+   * Gets public URL for a given file path in the bucket.
    * @param {string} filePath
    * @returns {string} Public URL
    */
@@ -139,7 +185,6 @@ export class FileService {
 
   /**
    * Uploads a file object into the target folder path in the bucket.
-   * Handles upsert, conflict mode check, and permission error degradation.
    * @param {File|Blob} fileObj
    * @param {string} targetFolderPath
    * @param {Object} [options={ upsert: false }]
@@ -150,6 +195,8 @@ export class FileService {
       const cleanFolder = targetFolderPath ? targetFolderPath.replace(/^\/+|\/+$/g, '') : '';
       const filePath = cleanFolder ? `${cleanFolder}/${fileObj.name}` : fileObj.name;
 
+      console.log(`[FileService] Uploading file "${filePath}" (${fileObj.size} bytes)...`);
+
       const { data, error } = await this.client.storage
         .from(this.bucketName)
         .upload(filePath, fileObj, {
@@ -157,8 +204,9 @@ export class FileService {
           upsert: options.upsert !== undefined ? options.upsert : false,
         });
 
+      console.log('[FileService] Upload response:', { data, error });
+
       if (error) {
-        // Detect RLS or permission error
         if (error.statusCode === '403' || error.message?.includes('policy')) {
           this.permissions.canWrite = false;
           return { success: false, path: null, error: 'Write permission denied by storage security policy.' };
@@ -168,6 +216,7 @@ export class FileService {
 
       return { success: true, path: data.path, error: null };
     } catch (err) {
+      console.error('[FileService] Exception during upload:', err);
       return { success: false, path: null, error: err.message || 'Upload process encountered an error.' };
     }
   }
@@ -194,7 +243,6 @@ export class FileService {
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       return true;
     } catch (_) {
-      // Fallback open in new tab
       window.open(this.getFilePublicUrl(filePath), '_blank');
       return true;
     }

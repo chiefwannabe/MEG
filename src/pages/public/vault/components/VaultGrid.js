@@ -9,7 +9,7 @@ import { formatBytes, formatDate } from '../utils/fileUtils.js';
 export class VaultGrid {
   /**
    * @param {HTMLElement} containerEl
-   * @param {Object} callbacks - { onItemClick, onItemDoubleClick, onItemContextMenu, onSelectionChange }
+   * @param {Object} callbacks - { onItemClick, onItemDoubleClick, onItemContextMenu, onSelectionChange, onUploadTrigger }
    */
   constructor(containerEl, callbacks) {
     this.containerEl = containerEl;
@@ -122,13 +122,16 @@ export class VaultGrid {
     this.gridContainer.innerHTML = skeletons;
   }
 
-  showEmptyState(message = 'No files found in this vault path.') {
+  showEmptyState(message = 'Supabase Storage bucket "MEG" connected successfully (0 files found).') {
     if (!this.gridContainer) return;
     this.gridContainer.innerHTML = `
       <div class="vault-empty-state">
         <div class="empty-icon">🗂️</div>
-        <h3>Vault is Empty</h3>
+        <h3>Bucket "MEG" is Currently Empty</h3>
         <p>${message}</p>
+        <p class="subtitle" style="margin-top: 8px; opacity: 0.8; font-size: 13px;">
+          Drag and drop files anywhere on this page to upload files to Supabase Storage!
+        </p>
       </div>
     `;
   }
@@ -138,8 +141,13 @@ export class VaultGrid {
     this.gridContainer.innerHTML = `
       <div class="vault-error-state">
         <div class="error-icon">⚠️</div>
-        <h3>Storage Connection Issue</h3>
-        <p>${errorMessage}</p>
+        <h3>Supabase Storage API Error</h3>
+        <p class="error-msg-detail" style="color: var(--red); font-family: 'JetBrains Mono', monospace; font-size: 13px; background: rgba(239,68,68,0.1); padding: 12px; border-radius: 8px; margin: 12px 0;">
+          ${errorMessage}
+        </p>
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Please check the browser Developer Console for detailed logs.
+        </p>
       </div>
     `;
   }
@@ -206,12 +214,10 @@ export class VaultGrid {
 
     // Event listeners
     card.addEventListener('click', (e) => {
-      // Checkbox click
       if (e.target.tagName === 'INPUT' || e.target.classList.contains('card-select-checkbox')) {
         this.toggleSelection(item.id);
         return;
       }
-      // Star click
       if (e.target.classList.contains('card-star-btn')) {
         e.stopPropagation();
         if (this.callbacks.onStarToggle) this.callbacks.onStarToggle(item);
