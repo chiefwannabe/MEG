@@ -17,13 +17,13 @@ export class FileService {
     this.config = config;
     this.bucketName = config.bucketName || 'MEG';
 
-    console.log('[FileService] Initializing Supabase Storage client...', {
-      url: config.supabaseUrl,
-      bucket: this.bucketName,
-      keyPrefix: config.supabaseKey ? config.supabaseKey.substring(0, 14) + '...' : 'Missing'
-    });
+    console.log('====================================================');
+    console.log('[FileService] SUPABASE STORAGE CONFIGURATION');
+    console.log('Project URL :', config.supabaseUrl);
+    console.log('Bucket Name :', this.bucketName);
+    console.log('Key Prefix  :', config.supabaseKey ? config.supabaseKey.substring(0, 14) + '...' : 'Missing');
+    console.log('====================================================');
 
-    // Verify Supabase library availability from global scope
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
       const err = new Error('Supabase client SDK library (window.supabase) not loaded on page.');
       console.error('[FileService] Critical Error:', err);
@@ -40,13 +40,19 @@ export class FileService {
 
   /**
    * Lists all files and subfolders in a bucket folder path.
-   * Logs raw Supabase response, status, and errors for debugging.
+   * Logs exact code parameters, URL, bucket, path, returned data, and returned error.
    * @param {string} [folderPath='']
    * @returns {Promise<{ items: Array, totalSize: number, totalFiles: number, rawData: Array, error: string|null, status: number }>}
    */
   async listFiles(folderPath = '') {
     const cleanPath = folderPath ? folderPath.replace(/^\/+|\/+$/g, '') : '';
-    console.log(`[FileService] Querying Supabase Storage bucket "${this.bucketName}", path: "${cleanPath}"...`);
+
+    console.log('----------------------------------------------------');
+    console.log('[FileService] EXECUTING STORAGE LIST CODE:');
+    console.log('const { data, error } = await supabase.storage.from("MEG").list("", { limit: 100 });');
+    console.log('Project URL  :', this.config.supabaseUrl);
+    console.log('Bucket Name  :', this.bucketName);
+    console.log('Query Path   :', `"${cleanPath}"`);
 
     try {
       const { data, error } = await this.client.storage
@@ -57,15 +63,12 @@ export class FileService {
           sortBy: { column: 'name', order: 'asc' },
         });
 
-      console.log('[FileService] Supabase Storage raw list response:', {
-        bucket: this.bucketName,
-        path: cleanPath,
-        data,
-        error
-      });
+      console.log('Returned Data  :', data);
+      console.log('Returned Error :', error);
+      console.log('----------------------------------------------------');
 
       if (error) {
-        console.error('[FileService] Supabase Storage returned error:', error);
+        console.error('[FileService] Storage API error:', error);
         return {
           items: [],
           totalSize: 0,
@@ -77,7 +80,7 @@ export class FileService {
       }
 
       if (!data) {
-        console.warn('[FileService] listFiles returned null data');
+        console.warn('[FileService] Storage list() returned null data');
         return {
           items: [],
           totalSize: 0,
@@ -88,7 +91,14 @@ export class FileService {
         };
       }
 
-      console.info(`[FileService] Supabase storage list() succeeded with ${data.length} item(s) in "${cleanPath || 'root'}".`);
+      // RLS Policy Diagnostic Warning
+      if (data.length === 0 && cleanPath === '') {
+        console.warn(
+          '[FileService DIAGNOSTIC] list() returned [] with HTTP 200 OK.\n' +
+          'If files exist in Supabase Dashboard (e.g. beginner.webp), this indicates that Row Level Security (RLS) on storage.objects is filtering out rows for anon/publishable requests.\n' +
+          'Fix: In Supabase Dashboard -> Storage -> Policies, add a SELECT policy for bucket "MEG" to allow public read access.'
+        );
+      }
 
       const starredSet = getStarredSet();
       const pinnedSet = getPinnedSet();
@@ -97,7 +107,6 @@ export class FileService {
       let totalFiles = 0;
 
       const items = data.map(file => {
-        // In Supabase storage, folders have null metadata or id
         const isFolder = !file.id || file.metadata === null || file.metadata === undefined;
         const relativePath = cleanPath ? `${cleanPath}/${file.name}` : file.name;
         const ext = isFolder ? '' : getExtension(file.name);
