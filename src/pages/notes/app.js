@@ -350,7 +350,9 @@ let currentUser = null;
       if (saved) {
         settings = Object.assign(settings, JSON.parse(saved));
       } else {
-        settings.theme = 'light';
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          settings.theme = 'dark';
+        }
       }
     } catch (e) {
       console.warn('Failed to load settings from localStorage:', e);

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../../src/ui/cursor/cursor.css">
 <!-- Critical Theme Initializer — prevents Flash of Unstyled Theme (FOUT) -->
 <script>
-  (function(){try{var t=localStorage.getItem("theme");if(t==="dark"){document.documentElement.classList.add("dark-theme");document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("dark-theme");});}}catch(_){}})();
+  (function(){try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches)){document.documentElement.classList.add("dark-theme");document.addEventListener("DOMContentLoaded",function(){document.body.classList.add("dark-theme");});}}catch(_){}})();
 </script>
 <style>
   /* ===================== RESET & BASE ===================== */
