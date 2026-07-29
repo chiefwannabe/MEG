@@ -311,7 +311,7 @@ let currentUser = null;
     // Clicking outside the image closes the modal
     if (elements.animeModal) {
       elements.animeModal.addEventListener("click", (e) => {
-        if (e.target === elements.animeModal || e.target.classList.contains('anime-card-borderless')) {
+        if (e.target === elements.animeModal || e.target.classList.contains('anime-card-borderless') || e.target.classList.contains('anime-modal-layout')) {
           closeModal(elements.animeModal);
         }
       });

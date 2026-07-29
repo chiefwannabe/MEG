@@ -325,15 +325,25 @@
   <!-- Anime Image Modal -->
   <div id="anime-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
     <div class="modal-card anime-card-borderless">
-      <div id="anime-img-container" class="anime-img-container-borderless">
-        <button id="btn-download-anime" class="floating-download-btn" title="Download Image" aria-label="Download Image">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
+      <div class="anime-modal-layout">
+        <div class="anime-click-hint" title="Click image for next image">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
-        </button>
-        <img id="animeImage" src="" alt="Anime Image (Click for Next)" class="anime-img-borderless" title="Click image for Next" />
+          <span>Click On The image</span>
+        </div>
+        <div id="anime-img-container" class="anime-img-container-borderless">
+          <button id="btn-download-anime" class="floating-download-btn" title="Download Image" aria-label="Download Image">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+          <img id="animeImage" src="" alt="Anime Image (Click for Next)" class="anime-img-borderless" title="Click image for Next" />
+        </div>
       </div>
     </div>
   </div>
