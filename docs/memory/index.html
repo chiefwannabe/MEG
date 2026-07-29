@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGNOU Free Study Resource Hub</title>
+<meta name="description" content="Free IGNOU Previous Year Question Papers, Notes, Assignments, Syllabus and Study Resources for all courses.">
+
+<link rel="stylesheet" href="../../src/ui/cursor/cursor.css">
+<link rel="stylesheet" href="../../src/ui/cursor/cursor-panel.css">
+<style>
+  /* ===================== RESET & BASE ===================== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue: #1d5fbf;
+    --blue-dark: #123f82;
+    --green: #1f9d55;
+    --green-light: #e6f7ec;
+    --blue-light: #eaf2fd;
+    --text-dark: #1b2430;
+    --text-light: #5a6472;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 6px 20px rgba(20, 40, 80, 0.08);
+    --shadow-hover: 0 10px 28px rgba(20, 40, 80, 0.14);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
+    color: var(--text-dark);
+    background: var(--white);
+    line-height: 1.6;
+  }
+
+  img, svg { max-width: 100%; display: block; }
+
+  a { text-decoration: none; color: inherit; }
+
+  ul { list-style: none; }
+
+  section { padding: 70px 20px; }
+
+  .container {
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--blue-dark);
+    margin-bottom: 12px;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    font-size: 1rem;
+  }
+
+  /* ===================== HEADER / NAV ===================== */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  .navbar {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+  }
+
+  .logo span { color: var(--green); }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a {
+    font-weight: 500;
+    color: var(--text-dark);
+    padding: 6px 4px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--blue);
+    border-bottom-color: var(--green);
+  }
+
+  /* ===================== HERO ===================== */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-light) 0%, var(--green-light) 100%);
+    padding: 90px 20px 80px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.6rem;
+    color: var(--blue-dark);
+    margin-bottom: 18px;
+    line-height: 1.25;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-light);
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+
+  .btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  .btn-primary:hover {
+    background: var(--blue-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  .btn-secondary:hover {
+    background: var(--green);
+    color: var(--white);
+    transform: translateY(-3px);
+  }
+
+  /* ===================== ABOUT ===================== */
+  .about {
+    background: var(--white);
+  }
+
+  .about-content {
+    max-width: 780px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .about-content p {
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+  }
+
+  .about-highlight {
+    color: var(--blue-dark);
+    font-weight: 600;
+  }
+
+  /* ===================== CARD GRID (shared) ===================== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid #eef2f7;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .card-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 1.6rem;
+  }
+
+  .card h3 {
+    color: var(--blue-dark);
+    margin-bottom: 10px;
+    font-size: 1.15rem;
+  }
+
+  .card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+
+  .card-link {
+    display: inline-block;
+    padding: 9px 20px;
+    background: var(--green);
+    color: var(--white);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .card-link:hover { background: #157a41; }
+
+  /* ===================== RESOURCES SECTION ===================== */
+  .resources { background: var(--blue-light); }
+
+  /* ===================== COURSES SECTION ===================== */
+  .courses { background: var(--white); }
+
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+  }
+
+  .course-card {
+    background: var(--green-light);
+    border-radius: var(--radius);
+    padding: 26px 14px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--blue-dark);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s, background 0.25s;
+    border: 1px solid #d9efe1;
+  }
+
+  .course-card small {
+    display: block;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-top: 6px;
+    font-size: 0.8rem;
+  }
+
+  .course-card:hover {
+    transform: translateY(-5px);
+    background: var(--green);
+    color: var(--white);
+  }
+
+  .course-card:hover small { color: #eafff0; }
+
+  /* ===================== WHY CHOOSE US ===================== */
+  .why { background: var(--green-light); }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .why-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 26px 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .why-card .why-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .why-card h3 {
+    color: var(--blue-dark);
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .why-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+
+  /* ===================== FAQ ===================== */
+  .faq { background: var(--white); }
+
+  .faq-list {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .faq-item {
+    border: 1px solid #e4e9f0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--blue-light);
+  }
+
+  .faq-item summary {
+    padding: 18px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--blue-dark);
+    list-style: none;
+    position: relative;
+  }
+
+  .faq-item summary::-webkit-details-marker { display: none; }
+
+  .faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 22px;
+    top: 16px;
+    font-size: 1.3rem;
+    color: var(--green);
+    transition: transform 0.2s;
+  }
+
+  .faq-item[open] summary::after {
+    content: "−";
+  }
+
+  .faq-item p {
+    padding: 0 22px 20px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+  }
+
+  /* ===================== CTA ===================== */
+  .cta {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+    text-align: center;
+    color: var(--white);
+    padding: 70px 20px;
+  }
+
+  .cta h2 {
+    font-size: 2rem;
+    margin-bottom: 14px;
+  }
+
+  .cta p {
+    max-width: 600px;
+    margin: 0 auto 28px;
+    opacity: 0.95;
+  }
+
+  .cta .btn-primary {
+    background: var(--white);
+    color: var(--blue-dark);
+  }
+
+  .cta .btn-primary:hover {
+    background: #eaf2fd;
+    color: var(--blue-dark);
+  }
+
+  /* ===================== FOOTER ===================== */
+  footer {
+    background: #10192b;
+    color: #c6cedb;
+    padding: 50px 20px 20px;
+  }
+
+  .footer-grid {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #26324a;
+  }
+
+  .footer-col h3 {
+    color: var(--white);
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+  }
+
+  .footer-col ul li {
+    margin-bottom: 10px;
+  }
+
+  .footer-col ul li a:hover {
+    color: var(--green);
+  }
+
+  .footer-col p {
+    font-size: 0.9rem;
+    color: #a4adbd;
+  }
+
+  .footer-bottom {
+    max-width: 1160px;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 20px;
+    font-size: 0.85rem;
+    color: #8891a1;
+  }
+
+  .footer-disclaimer {
+    max-width: 1160px;
+    margin: 0 auto 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8891a1;
+    line-height: 1.7;
+  }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 2rem; }
+    .navbar { flex-direction: column; gap: 12px; }
+    .nav-links { justify-content: center; gap: 14px; }
+    section { padding: 50px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER / NAVIGATION ===================== -->
+<header>
+  <nav class="navbar" aria-label="Main navigation">
+    <div class="logo">IGNOU <span>Study Hub</span></div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#resources">Resources</a></li>
+      <li><a href="#courses">Courses</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <h1>Free IGNOU Study Resources</h1>
+      <p>Helping IGNOU students succeed with free Previous Year Question Papers, Notes, and Study Materials.</p>
+      <div class="btn-group">
+        <a href="../../src/pages/public/downloads.html" class="btn btn-primary">Download PYQs</a>
+        <a href="#resources" class="btn btn-secondary">Download Notes</a>
+        <a href="/games" class="btn btn-secondary">Games</a>
+        <a href="../../src/pages/public/uploads.html" class="btn btn-secondary">HTMLs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT US ===================== -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">About Us</h2>
+      <div class="about-content">
+        <p>
+          <span class="about-highlight">IGNOU Study Hub</span> is a
+          <span class="about-highlight">non-profit educational initiative</span>
+          created by students, for students. Our mission is simple — make quality
+          education accessible to everyone by offering free access to Previous Year
+          Question Papers, handwritten notes, solved assignments, and study guides.
+        </p>
+        <p>
+          We believe that financial barriers should never come in the way of learning.
+          That's why every resource on this platform is completely free, with no
+          hidden charges, no registration walls, and no restrictions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESOURCES SECTION ===================== -->
+  <section class="resources" id="resources">
+    <div class="container">
+      <h2 class="section-title">Free Study Resources</h2>
+      <p class="section-subtitle">Everything you need to prepare for your IGNOU exams, all in one place.</p>
+      <div class="grid">
+
+        <article class="card">
+          <div class="card-icon">📄</div>
+          <h3>Previous Year Question Papers</h3>
+          <p>Access PYQs from past sessions to understand exam patterns and important topics.</p>
+          <a href="../../src/pages/public/downloads.html" class="card-link">Download PYQs</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📝</div>
+          <h3>Handwritten Notes</h3>
+          <p>Well-organized, easy-to-understand handwritten notes prepared by fellow students.</p>
+          <a href="#" class="card-link">Get Notes</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">✅</div>
+          <h3>Solved Assignments</h3>
+          <p>Sample solved assignments to guide you in preparing your own submissions.</p>
+          <a href="#" class="card-link">View Assignments</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📘</div>
+          <h3>Study Guides</h3>
+          <p>Concise, exam-focused guides covering key concepts from every unit.</p>
+          <a href="#" class="card-link">Get Study Guide</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📚</div>
+          <h3>Syllabus</h3>
+          <p>Latest updated syllabus for all major IGNOU programmes and courses.</p>
+          <a href="#" class="card-link">View Syllabus</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📢</div>
+          <h3>Important Updates</h3>
+          <p>Stay informed about exam dates, assignment deadlines, and IGNOU notices.</p>
+          <a href="#" class="card-link">See Updates</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== POPULAR COURSES ===================== -->
+  <section class="courses" id="courses">
+    <div class="container">
+      <h2 class="section-title">Popular Courses</h2>
+      <p class="section-subtitle">Find resources tailored to your specific IGNOU programme.</p>
+      <div class="course-grid">
+        <a href="#" class="course-card">MEG <small>MA English</small></a>
+        <a href="#" class="course-card">MHD <small>MA Hindi</small></a>
+        <a href="#" class="course-card">BAG <small>BA General</small></a>
+        <a href="#" class="course-card">BCOMG <small>B.Com General</small></a>
+        <a href="#" class="course-card">BCA <small>Computer Applications</small></a>
+        <a href="#" class="course-card">MCA <small>Master in Computer Apps</small></a>
+        <a href="#" class="course-card">MBA <small>Business Administration</small></a>
+        <a href="#" class="course-card">MA English <small>Master's Programme</small></a>
+        <a href="#" class="course-card">BA English <small>Bachelor's Programme</small></a>
+        <a href="#" class="course-card">BSc <small>Bachelor of Science</small></a>
+        <a href="#" class="course-card">MCom <small>Master of Commerce</small></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHY CHOOSE US ===================== -->
+  <section class="why" id="why">
+    <div class="container">
+      <h2 class="section-title">Why Choose Us</h2>
+      <p class="section-subtitle">A platform built with students' needs at the core.</p>
+      <div class="why-grid">
+
+        <div class="why-card">
+          <div class="why-icon">🆓</div>
+          <h3>100% Free</h3>
+          <p>Every resource is free to access and download, always.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🚫</div>
+          <h3>No Registration Required</h3>
+          <p>Access all materials instantly without signing up or logging in.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🔄</div>
+          <h3>Regularly Updated</h3>
+          <p>New papers, notes, and updates added consistently every session.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">📱</div>
+          <h3>Mobile Friendly</h3>
+          <p>Fully responsive design so you can study from any device, anywhere.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">⚡</div>
+          <h3>Fast Downloads</h3>
+          <p>Lightweight pages and direct links for quick, hassle-free downloads.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🤝</div>
+          <h3>Community Driven</h3>
+          <p>Built and improved with contributions from IGNOU students like you.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ SECTION ===================== -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Quick answers to common questions about IGNOU Study Hub.</p>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Are the resources free?</summary>
+          <p>Yes, absolutely. All PYQs, notes, assignments, and study guides on this platform are 100% free to access and download, with no hidden charges.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Is registration required?</summary>
+          <p>No, you do not need to register or create an account. All resources are available instantly to everyone.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Are PYQs updated every year?</summary>
+          <p>Yes, we aim to update the Previous Year Question Papers section after every exam session so you always have access to the latest papers.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can I contribute notes?</summary>
+          <p>Yes! We welcome contributions from students. If you have quality notes or solved assignments to share, please reach out to us via the contact section.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CALL TO ACTION ===================== -->
+  <section class="cta">
+    <div class="container">
+      <h2>Start Learning Today — Completely Free</h2>
+      <p>Explore hundreds of free resources and take the next step towards exam success. No sign-up, no cost — just study material when you need it.</p>
+      <a href="#resources" class="btn btn-primary">Explore Free Resources</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer id="contact">
+  <div class="footer-grid">
+
+    <div class="footer-col">
+      <h3>About</h3>
+      <p>IGNOU Study Hub is an independent, non-profit educational initiative dedicated to providing free study resources for IGNOU students.</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#courses">Courses</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <ul>
+        <li><a href="mailto:contact@ignoustudyhub.example">contact@ignoustudyhub.example</a></li>
+        <li><a href="#">Submit Notes / Feedback</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Disclaimer</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <p class="footer-disclaimer">
+    Disclaimer: IGNOU Study Hub is an independent, student-run, non-profit educational
+    website and is <strong>not officially affiliated with or endorsed by IGNOU</strong>
+    (Indira Gandhi National Open University). All content is shared for educational
+    purposes only.
+  </p>
+
+  <div class="footer-bottom">
+    &copy; 2026 IGNOU Study Hub. All rights reserved.
+  </div>
+</footer>
+
+<!-- ── Custom Cursor ────────────────────────────── -->
+<script src="../../src/ui/cursor/cursor.js" defer></script>
+<script src="../../src/ui/cursor/cursor-panel.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,2812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elemental Slime Tower Defense</title>
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Design System and Variables */
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(22, 29, 49, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(99, 102, 241, 0.4);
+      --accent-color: #6366f1; /* Indigo */
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --text-color: #f1f5f9;
+      --text-muted: #94a3b8;
+      
+      --health-color: #ef4444;
+      --coin-color: #eab308;
+      --wave-color: #3b82f6;
+      
+      --green-slime: #4caf50;
+      --blue-slime: #2196f3;
+      --red-slime: #e53935;
+      --purple-slime: #9c27b0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Container holding the whole game */
+    .game-container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header Bar */
+    header {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-box.lives { color: var(--health-color); }
+    .stat-box.coins { color: var(--coin-color); }
+    .stat-box.wave { color: var(--wave-color); }
+    .stat-box.best-wave { color: var(--text-muted); font-size: 0.9rem; font-weight: 400; }
+
+    .countdown-text {
+      background: rgba(234, 179, 8, 0.15);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: var(--coin-color);
+      font-size: 0.9rem;
+      font-weight: 600;
+      animation: pulse 1s infinite alternate;
+      display: none;
+    }
+
+    /* Main Area layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Canvas Arena wrapper */
+    .arena-wrapper {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 10px;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      display: block;
+      background: #0d1222;
+      cursor: crosshair;
+    }
+
+    /* Upgrades Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sidebar-title span {
+      font-size: 0.8rem;
+      font-weight: 400;
+      text-transform: none;
+    }
+
+    .upgrade-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Custom Scrollbar for Upgrades List */
+    .upgrade-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .upgrade-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 3px;
+    }
+    .upgrade-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    .upgrade-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Upgrade Button / Card */
+    .upgrade-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upgrade-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--accent-color);
+      transform: scaleY(0);
+      transition: transform 0.2s ease;
+    }
+
+    .upgrade-card:hover:not(.disabled) {
+      border-color: var(--card-hover-border);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .upgrade-card:hover:not(.disabled)::before {
+      transform: scaleY(1);
+    }
+
+    .upgrade-card:active:not(.disabled) {
+      transform: translateY(0);
+    }
+
+    .upgrade-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .upgrade-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .upgrade-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    .upgrade-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .upgrade-level {
+      font-size: 0.75rem;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      align-self: flex-start;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .upgrade-cost-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .upgrade-cost {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+      color: var(--coin-color);
+      font-size: 1.05rem;
+    }
+
+    .upgrade-cost.maxed {
+      color: var(--accent-color);
+      font-size: 0.9rem;
+    }
+
+    /* Upgrade progress indicator */
+    .progress-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #818cf8);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Card purchase flash animation */
+    @keyframes purchaseFlash {
+      0% {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 0px rgba(99, 102, 241, 0.6);
+        transform: scale(0.97);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+      100% {
+        border-color: var(--card-border);
+        box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+        transform: scale(1);
+      }
+    }
+    .upgrade-card.just-purchased {
+      animation: purchaseFlash 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Modal / Overlay for Game Over */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: rgba(22, 29, 49, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .modal-stats {
+      margin: 25px 0;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-stat {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.1rem;
+    }
+
+    .modal-stat span:first-child {
+      color: var(--text-muted);
+    }
+
+    .modal-stat span:last-child {
+      font-weight: 600;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    /* Keyframe Animations */
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.9; }
+      to { transform: scale(1.05); opacity: 1; }
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr 320px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .arena-wrapper {
+        max-width: 500px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .upgrade-list {
+        max-height: none;
+      }
+    }
+
+    /* Beautiful Custom Toggle Switch */
+    .switch-container {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch-container input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .3s;
+      border-radius: 24px;
+      border: 1px solid var(--card-border);
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .switch-slider {
+      background-color: var(--accent-color);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    input:checked + .switch-slider:before {
+      transform: translateX(24px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <!-- Header with Stats -->
+    <header>
+      <div class="logo">SLIME TOWER DEFENSE</div>
+      <div class="stats-container">
+        <div class="stat-box lives" title="Lives">
+          ❤️ <span id="lives-value">20</span>
+        </div>
+        <div class="stat-box coins" title="Coins">
+          🪙 <span id="coins-value">0</span>
+        </div>
+        <div class="stat-box wave" title="Current Wave">
+          🌊 Wave <span id="wave-value">1</span>
+        </div>
+        <div class="stat-box best-wave" id="best-wave-container">
+          🏆 Best: Wave <span id="best-wave-value">0</span>
+        </div>
+        <div class="countdown-text" id="countdown-banner">
+          Next wave in 3.0s
+        </div>
+        <button class="btn" id="pause-btn" style="width: auto; padding: 6px 14px; font-size: 0.9rem; font-weight: 600; border-radius: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); box-shadow: none; display: flex; align-items: center; gap: 6px;">
+          <span id="pause-btn-icon">⏸</span> <span id="pause-btn-text">Pause</span>
+        </button>
+        <button class="btn" id="ingame-settings-btn" style="width: auto; padding: 6px 10px; font-size: 0.9rem; border-radius: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); box-shadow: none; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Settings">
+          ⚙️
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <div class="main-layout">
+      <!-- Left side: Canvas -->
+      <div class="arena-wrapper">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+      </div>
+
+      <!-- Right side: Sidebar Upgrades -->
+      <div class="sidebar">
+        <!-- Slime Evolution System -->
+        <div class="sidebar-title" style="margin-bottom: 10px;">Slime Evolution</div>
+        <div class="evolution-panel" style="padding: 15px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border: 1px solid var(--card-border); margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; font-size: 0.95rem; color: #a855f7;" id="evo-level-text">Evolution Lv. 0/20</span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--coin-color);" id="evo-cost-text">Cost: 🪙200</span>
+          </div>
+          <button class="btn" id="evolve-slime-btn" style="width: 100%; padding: 10px; font-weight: 600; background: linear-gradient(135deg, #a855f7, #6366f1); border: none; font-size: 0.95rem; cursor: pointer; border-radius: 6px;">Evolve Slime</button>
+          <div id="unlocked-evos-container" style="font-size: 0.8rem; max-height: 120px; overflow-y: auto; padding-right: 5px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; margin-top: 5px;">
+            <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Unlocked Perks:</div>
+            <ul id="unlocked-evos-list" style="margin: 0; padding-left: 15px; line-height: 1.4; color: var(--text-color);">
+              <li style="list-style-type: none; margin-left: -15px; color: var(--text-muted);">No evolutions unlocked yet.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-title">
+          Upgrades
+          <span id="lifetime-coins-stat">Lifetime: 🪙0</span>
+        </div>
+        <div class="upgrade-list" id="upgrade-list-container">
+          <!-- Upgrades will be generated dynamically here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Overlay -->
+  <div class="overlay" id="game-over-overlay">
+    <div class="modal">
+      <h2>GAME OVER</h2>
+      <p style="color: var(--text-muted)">The slimes breached your tower defenses!</p>
+      
+      <div class="modal-stats">
+        <div class="modal-stat">
+          <span>Waves Completed</span>
+          <span id="stat-waves-completed" style="color: var(--wave-color)">0</span>
+        </div>
+        <div class="modal-stat">
+          <span>Slimes Defeated</span>
+          <span id="stat-slimes-defeated" style="color: var(--health-color)">0</span>
+        </div>
+        <div class="modal-stat">
+          <span>Gold Earned This Run</span>
+          <span id="stat-gold-earned" style="color: var(--coin-color)">0</span>
+        </div>
+        <div class="modal-stat">
+          <span>Best Wave</span>
+          <span id="stat-best-wave">0</span>
+        </div>
+      </div>
+      
+      <button class="btn" id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Title Screen Overlay -->
+  <div class="overlay active" id="title-screen-overlay">
+    <div class="modal">
+      <h1 class="logo" style="font-size: 2.8rem; margin-bottom: 5px; line-height: 1.2;">SLIME TOWER DEFENSE</h1>
+      <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 30px;">Defend the energy core from elemental slimes</p>
+      
+      <button class="btn" id="start-game-btn" style="margin-bottom: 12px; font-size: 1.2rem; padding: 16px 28px;">Start Defense</button>
+      <button class="btn" id="open-settings-btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-color); border: 1px solid var(--card-border); box-shadow: none;">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div class="overlay" id="settings-overlay">
+    <div class="modal">
+      <h2>SETTINGS</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px;">Adjust game audio and graphics</p>
+      
+      <div class="modal-stats" style="text-align: left; gap: 18px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span style="font-size: 1.1rem; font-weight: 600;">Sound Effects</span>
+          <label class="switch-container">
+            <input type="checkbox" id="sound-effects-toggle" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span style="font-size: 1.1rem; font-weight: 600;">Ambient Particles</span>
+          <label class="switch-container">
+            <input type="checkbox" id="bg-particles-toggle" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div style="display: flex; flex-direction: column; width: 100%; gap: 10px; border-top: 1px solid var(--card-border); padding-top: 15px; margin-top: 10px; align-items: center;">
+          <button class="btn" id="reset-progress-btn" style="background: #ef4444; color: white; border: none; font-size: 0.95rem; padding: 10px 16px; width: 100%; box-shadow: none; font-weight: 600;">⚠️ Reset All Progress</button>
+        </div>
+      </div>
+      
+      <button class="btn" id="close-settings-btn" style="margin-top: 15px;">Save & Close</button>
+    </div>
+  </div>
+
+  <!-- Footer Version -->
+  <footer style="margin: 30px 0 20px 0; font-size: 0.85rem; color: var(--text-muted); text-align: center; letter-spacing: 0.5px; opacity: 0.7; width: 100%;">
+    Slime Tower Defense v1.0 • Built with ❤️
+  </footer>
+
+  <script>
+    // Game Configuration & Core Constants
+    const CANVA_SIZE = 600;
+    const TOWER_CENTER = { x: CANVA_SIZE / 2, y: CANVA_SIZE / 2 };
+    
+    // Slime configurations
+    const SLIME_TYPES = {
+      NORMAL: {
+        color: '#4caf50',
+        hpBase: 20,
+        speedMultiplier: 1.0,
+        baseCoins: 15,
+        radius: 13,
+        name: 'Normal Slime'
+      },
+      FAST: {
+        color: '#2196f3',
+        hpBase: 15,
+        speedMultiplier: 1.8,
+        baseCoins: 15,
+        radius: 10,
+        name: 'Fast Slime'
+      },
+      TANK: {
+        color: '#e53935',
+        hpBase: 50,
+        speedMultiplier: 0.7,
+        baseCoins: 15,
+        radius: 17,
+        name: 'Tank Slime'
+      },
+      GOLDEN: {
+        color: '#eab308',
+        hpBase: 25,
+        speedMultiplier: 1.3,
+        baseCoins: 80, // Keep its bonus reward higher than the others
+        radius: 12,
+        name: 'Golden Slime'
+      },
+      PURPLE: {
+        color: '#9c27b0',
+        hpBase: 300,
+        speedMultiplier: 0.6,
+        baseCoins: 30, // Boss Slime: 30 coins
+        radius: 28,
+        name: 'Boss Slime'
+      }
+    };
+
+    // Base Speed (pixels per second for 1x speed)
+    const BASE_SPEED = 40; 
+    
+    // Upgrades Specification
+    const UPGRADE_CONFIGS = {
+      damage: {
+        name: "Damage",
+        desc: "+5 damage",
+        baseCost: 10,
+        costScale: 1.15,
+        maxLevel: Infinity,
+        getValue: (lvl) => 10 + lvl * 5 + Math.floor(Math.pow(lvl, 1.8) * 0.2)
+      },
+      attackSpeed: {
+        name: "Attack Speed",
+        desc: "+0.1 attacks/sec",
+        baseCost: 15,
+        costScale: 1.15,
+        maxLevel: 40, // (5.0 - 1.0) / 0.1 = 40 levels
+        getValue: (lvl) => 1.0 + lvl * 0.1
+      },
+      range: {
+        name: "Range",
+        desc: "+10px",
+        baseCost: 12,
+        costScale: 1.18,
+        maxLevel: 30, // Capped at 30 (450px) to prevent off-screen targeting
+        getValue: (lvl) => 150 + lvl * 10
+      },
+      critChance: {
+        name: "Crit Chance",
+        desc: "+2% chance",
+        baseCost: 20,
+        costScale: 1.18,
+        maxLevel: 35, // (75% - 5%) / 2% = 35 levels
+        getValue: (lvl) => 0.05 + lvl * 0.02
+      },
+      critDamage: {
+        name: "Crit Damage",
+        desc: "+15% multiplier",
+        baseCost: 18,
+        costScale: 1.15,
+        maxLevel: Infinity,
+        getValue: (lvl) => 1.5 + lvl * 0.15
+      },
+      multiShot: {
+        name: "Multi Shot",
+        desc: "+1 target hit",
+        baseCost: 150,
+        costScale: 1.80,
+        maxLevel: 4, // Up to 5 targets total (1 + 4 levels)
+        getValue: (lvl) => 1 + lvl
+      },
+      splashDamage: {
+        name: "Splash Damage",
+        desc: "+10% damage, 40px radius",
+        baseCost: 40,
+        costScale: 1.20,
+        maxLevel: Infinity,
+        getValue: (lvl) => lvl * 0.10
+      },
+      coinBonus: {
+        name: "Coin Bonus",
+        desc: "+5% coins earned",
+        baseCost: 25,
+        costScale: 1.15,
+        maxLevel: Infinity,
+        getValue: (lvl) => lvl * 0.05
+      }
+    };
+
+    // Slime Evolution descriptions
+    const EVOLUTION_DESCS = {
+      1: "+10% damage",
+      2: "Unlock Laser Attack",
+      3: "Unlock Fire Damage (burn effect)",
+      4: "+10% attack speed",
+      5: "+10% range",
+      6: "Chain Laser (hits one extra enemy)",
+      7: "+15% critical damage",
+      8: "Small splash damage",
+      9: "+15% coin bonus",
+      10: "Freeze effect (briefly slows enemies)",
+      11: "+15% damage",
+      12: "Poison effect (damage over time)",
+      13: "+10% attack speed",
+      14: "Knockback effect",
+      15: "+20% critical chance",
+      16: "Double Laser",
+      17: "Stronger burn and poison effects",
+      18: "Larger splash radius",
+      19: "+20% overall damage",
+      20: "Ultimate Evolution: combine all unlocked abilities with stronger visual effects"
+    };
+
+    // --- State variables ---
+    let gameState = {
+      // High scores and persistent progress
+      highestWave: 0,
+      totalCoinsEarned: 0,
+      
+      // Current run stats
+      lives: 20,
+      coins: 0,
+      wave: 1,
+      evolution: 0, // Slime evolution level
+      
+      // Upgrades levels
+      upgrades: {
+        damage: 0,
+        attackSpeed: 0,
+        range: 0,
+        critChance: 0,
+        critDamage: 0,
+        multiShot: 0,
+        splashDamage: 0,
+        coinBonus: 0
+      }
+    };
+
+    // Runtime game engine variables
+    let slimes = [];
+    let spawnQueue = [];
+    let lasers = []; // { start: {x,y}, end: {x,y}, duration: ms, maxDuration: ms }
+    let projectiles = []; // Pre-laser projectiles: { x, y, target, speed, damage, isCrit, color, radius }
+    let floatingTexts = []; // { x, y, text, color, size, age: ms, maxAge: ms, vx, vy }
+    let shockwaves = []; // Critical hit shockwave indicators
+    let rangePulses = []; // Upgrade visual range ripples
+    let waveBanner = null; // Wave start/complete screen-center banner
+    let slimesDefeatedThisRun = 0;
+    let goldEarnedThisRun = 0;
+    
+    // Game controls & Settings states
+    let isPaused = false;
+    let hasGameStarted = false;
+    let soundEnabled = true;
+    let bgParticlesEnabled = true;
+    let ambientParticles = [];
+    
+    // Web Audio API Context & throttling
+    let audioCtx = null;
+    let lastHitSoundTime = 0;
+    
+    // Wave state
+    let waveSlimesTotal = 0;
+    let waveSlimesDefeated = 0;
+    let isWaveActive = false;
+    let isCountdownActive = false;
+    let countdownTimer = 0; // ms remaining
+    let spawnTimer = 0; // delta-time timer
+    let spawnCooldown = 800; // ms between slime spawns
+    
+    // Tower shooting loop
+    let attackCooldownTimer = 0; // seconds remaining
+    
+    // Visuals & Effects
+    let towerRotationAngle = 0;
+    let particles = []; // Visual particle effects for deaths or crits
+
+    // Loop timestamp
+    let lastTime = 0;
+
+    // --- DOM Elements ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const livesEl = document.getElementById('lives-value');
+    const coinsEl = document.getElementById('coins-value');
+    const waveEl = document.getElementById('wave-value');
+    const bestWaveEl = document.getElementById('best-wave-value');
+    const lifetimeCoinsEl = document.getElementById('lifetime-coins-stat');
+    const countdownBanner = document.getElementById('countdown-banner');
+    
+    const gameOverOverlay = document.getElementById('game-over-overlay');
+    const restartBtn = document.getElementById('restart-btn');
+    
+    const upgradeListContainer = document.getElementById('upgrade-list-container');
+
+    // --- Synthesized Audio Engine (Web Audio API) ---
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+    
+    function playLaserSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.12);
+      
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    }
+    
+    function playHitSound() {
+      if (!soundEnabled) return;
+      const now = Date.now();
+      if (now - lastHitSoundTime < 60) return; // Throttle to avoid audio clipping
+      lastHitSoundTime = now;
+      
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(250, audioCtx.currentTime + 0.05);
+      
+      gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    function playDeathSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.22);
+      
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.22);
+    }
+    
+    function playUpgradeSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const now = audioCtx.currentTime;
+      const notes = [261.63, 329.63, 392.00, 523.25]; // C major chord
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.04, now + idx * 0.05 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.25);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.25);
+      });
+    }
+
+    function playWaveCompleteSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const now = audioCtx.currentTime;
+      const notes = [329.63, 392.00, 523.25, 659.25]; // E, G, C, E
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.05, now + idx * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.35);
+      });
+    }
+
+    function playGameOverSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const now = audioCtx.currentTime;
+      const notes = [293.66, 277.18, 261.63, 220.00]; // descending sadness
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.07, now + idx * 0.15 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.15 + 0.4);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + idx * 0.15);
+        osc.stop(now + idx * 0.15 + 0.4);
+      });
+    }
+
+    // --- Ambient Background Particles (Sleek Visual Effect) ---
+    function initAmbientParticles() {
+      ambientParticles = [];
+      for (let i = 0; i < 18; i++) {
+        ambientParticles.push({
+          x: Math.random() * CANVA_SIZE,
+          y: Math.random() * CANVA_SIZE,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: 1 + Math.random() * 2.5,
+          baseAlpha: 0.03 + Math.random() * 0.08,
+          alpha: 0,
+          fadeSpeed: 0.005 + Math.random() * 0.005,
+          pulseSpeed: 0.001 + Math.random() * 0.002,
+          pulseOffset: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function updateAmbientParticles(dt) {
+      if (!bgParticlesEnabled) {
+        ambientParticles = [];
+        return;
+      }
+      
+      while (ambientParticles.length < 18) {
+        ambientParticles.push({
+          x: Math.random() * CANVA_SIZE,
+          y: Math.random() * CANVA_SIZE,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: 1 + Math.random() * 2.5,
+          baseAlpha: 0.03 + Math.random() * 0.08,
+          alpha: 0,
+          fadeSpeed: 0.005 + Math.random() * 0.005,
+          pulseSpeed: 0.001 + Math.random() * 0.002,
+          pulseOffset: Math.random() * Math.PI * 2
+        });
+      }
+      
+      const speedFactor = dt / 16.67;
+      ambientParticles.forEach(p => {
+        p.x += p.vx * speedFactor;
+        p.y += p.vy * speedFactor;
+        
+        // Wrap coordinates
+        if (p.x < -10) p.x = CANVA_SIZE + 10;
+        if (p.x > CANVA_SIZE + 10) p.x = -10;
+        if (p.y < -10) p.y = CANVA_SIZE + 10;
+        if (p.y > CANVA_SIZE + 10) p.y = -10;
+        
+        // Soft sine wave pulsing of opacity
+        p.alpha = p.baseAlpha * (0.6 + 0.4 * Math.sin(Date.now() * p.pulseSpeed + p.pulseOffset));
+      });
+    }
+
+    function drawAmbientParticles() {
+      if (!bgParticlesEnabled) return;
+      
+      ctx.save();
+      ambientParticles.forEach(p => {
+        ctx.beginPath();
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
+        grad.addColorStop(0, `rgba(99, 102, 241, ${p.alpha * 1.5})`);
+        grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+        ctx.fillStyle = grad;
+        ctx.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    function updateAmbientAndVisuals(dt) {
+      // Rotate tower core
+      towerRotationAngle += 0.015 * (dt / 16.67);
+      
+      // Update ambient background particles
+      updateAmbientParticles(dt);
+      
+      // Update active visual animations
+      lasers.forEach(laser => {
+        laser.duration = Math.max(0, laser.duration - dt);
+      });
+      lasers = lasers.filter(laser => laser.duration > 0);
+
+      floatingTexts.forEach(txt => {
+        txt.age += dt;
+        txt.x += txt.vx * (dt / 16.67);
+        txt.y += txt.vy * (dt / 16.67);
+      });
+      floatingTexts = floatingTexts.filter(txt => txt.age < txt.maxAge);
+
+      particles.forEach(p => {
+        p.x += p.vx * (dt / 16.67);
+        p.y += p.vy * (dt / 16.67);
+        p.vx *= Math.pow(0.94, dt / 16.67);
+        p.vy *= Math.pow(0.94, dt / 16.67);
+        p.radius = Math.max(0.1, p.radius - 0.05 * (dt / 16.67));
+        p.alpha -= p.decay * (dt / 16.67);
+      });
+      particles = particles.filter(p => p.alpha > 0 && p.radius > 0.1);
+
+      shockwaves.forEach(sw => {
+        sw.radius += 2.0 * (dt / 16.67);
+        sw.alpha -= sw.decay * (dt / 16.67);
+      });
+      shockwaves = shockwaves.filter(sw => sw.alpha > 0);
+
+      rangePulses.forEach(rp => {
+        rp.radius += rp.speed * (dt / 16.67);
+        rp.alpha = Math.max(0, 1 - rp.radius / rp.maxRadius);
+      });
+      rangePulses = rangePulses.filter(rp => rp.radius < rp.maxRadius && rp.alpha > 0);
+    }
+
+    // --- Save & Load ---
+    let isSaveInitialized = false;
+
+    function saveGame() {
+      // If the save was initialized but has now been cleared from localStorage (e.g. via DevTools),
+      // treat it as a hard reset and wipe the in-memory stats to keep it in sync.
+      if (isSaveInitialized && !localStorage.getItem('slimeTowerSave')) {
+        gameState.highestWave = 0;
+        gameState.totalCoinsEarned = 0;
+      }
+      
+      const dataToSave = {
+        highestWave: gameState.highestWave,
+        totalCoinsEarned: gameState.totalCoinsEarned
+      };
+      localStorage.setItem('slimeTowerSave', JSON.stringify(dataToSave));
+      updateUI();
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem('slimeTowerSave');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          gameState.highestWave = parsed.highestWave || 0;
+          gameState.totalCoinsEarned = parsed.totalCoinsEarned || 0;
+        } catch (e) {
+          console.error("Error loading save game", e);
+        }
+      } else {
+        // If there's no save file in localStorage, reset in-memory stats to ensure a fresh state
+        gameState.highestWave = 0;
+        gameState.totalCoinsEarned = 0;
+      }
+      isSaveInitialized = true;
+      updateUI();
+    }
+
+    // --- Upgrade Calculations ---
+    function getUpgradeCost(key, level) {
+      const config = UPGRADE_CONFIGS[key];
+      if (level >= config.maxLevel) return Infinity;
+      return Math.round(config.baseCost * Math.pow(config.costScale, level));
+    }
+
+    function buyUpgrade(key) {
+      const currentLvl = gameState.upgrades[key];
+      const cost = getUpgradeCost(key, currentLvl);
+      if (gameState.coins >= cost && currentLvl < UPGRADE_CONFIGS[key].maxLevel) {
+        gameState.coins -= cost;
+        gameState.upgrades[key]++;
+        
+        // Play upgrade sound
+        playUpgradeSound();
+        
+        // Spawn text effect near upgrade panel or at tower
+        addFloatingText(
+          TOWER_CENTER.x, 
+          TOWER_CENTER.y - 40, 
+          `Upgraded ${UPGRADE_CONFIGS[key].name}!`, 
+          '#6366f1', 
+          16
+        );
+        
+        // Small splash particles around the tower when upgrading
+        createExplosion(TOWER_CENTER.x, TOWER_CENTER.y, '#6366f1', 12);
+        
+        // Trigger range pulse ring expanding to current range
+        const currentRange = UPGRADE_CONFIGS.range.getValue(gameState.upgrades.range);
+        rangePulses.push({
+          radius: 0,
+          maxRadius: currentRange,
+          alpha: 1.0,
+          speed: 6.0,
+          color: '#6366f1'
+        });
+        
+        saveGame();
+        renderUpgradeButtons();
+        updateUI();
+        
+        // Add purchased animation to the card
+        const purchasedCard = upgradeListContainer.querySelector(`.upgrade-card[data-key="${key}"]`);
+        if (purchasedCard) {
+          purchasedCard.classList.add('just-purchased');
+        }
+      }
+    }
+
+    // --- Dynamic UI Rendering ---
+    function renderUpgradeButtons() {
+      upgradeListContainer.innerHTML = '';
+      
+      Object.keys(UPGRADE_CONFIGS).forEach(key => {
+        const config = UPGRADE_CONFIGS[key];
+        const level = gameState.upgrades[key];
+        const cost = getUpgradeCost(key, level);
+        const isMaxed = level >= config.maxLevel;
+        const canAfford = gameState.coins >= cost;
+        
+        const card = document.createElement('div');
+        card.className = `upgrade-card ${(!canAfford && !isMaxed) || isMaxed ? 'disabled' : ''}`;
+        card.setAttribute('data-key', key);
+        
+        // Build description with current dynamic value
+        let currentValueStr = "";
+        const nextVal = isMaxed ? "" : config.getValue(level + 1);
+        const currVal = config.getValue(level);
+        
+        if (key === 'damage') currentValueStr = `(Dmg: ${currVal})`;
+        else if (key === 'attackSpeed') currentValueStr = `(${currVal.toFixed(1)}/s)`;
+        else if (key === 'range') currentValueStr = `(${currVal}px)`;
+        else if (key === 'critChance') currentValueStr = `(${(currVal * 100).toFixed(0)}%)`;
+        else if (key === 'critDamage') currentValueStr = `(${(currVal * 100).toFixed(0)}%)`;
+        else if (key === 'multiShot') currentValueStr = `(${currVal} targets)`;
+        else if (key === 'splashDamage') currentValueStr = `(${Math.round(currVal * 100)}%)`;
+        else if (key === 'coinBonus') currentValueStr = `(+${Math.round(currVal * 100)}%)`;
+
+        let progressBarHtml = "";
+        if (config.maxLevel !== Infinity) {
+          const progressPercent = (level / config.maxLevel) * 100;
+          progressBarHtml = `
+            <div class="progress-bar-container" style="display: block;">
+              <div class="progress-bar-fill" style="width: ${progressPercent}%;"></div>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="upgrade-info" style="width: 100%; display: flex; flex-direction: column; gap: 2px;">
+            <span class="upgrade-name">${config.name} <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">${currentValueStr}</span></span>
+            <span class="upgrade-desc">${config.desc}</span>
+            <span class="upgrade-level">Lv. ${level}${isMaxed ? ' (MAX)' : ''}</span>
+            ${progressBarHtml}
+          </div>
+          <div class="upgrade-cost-wrapper" style="flex-shrink: 0;">
+            ${isMaxed 
+              ? `<span class="upgrade-cost maxed">MAX LEVEL</span>`
+              : `<span class="upgrade-cost">🪙 ${cost.toLocaleString()}</span>`
+            }
+          </div>
+        `;
+        
+        if (!isMaxed) {
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            buyUpgrade(key);
+          });
+        }
+        
+        upgradeListContainer.appendChild(card);
+      });
+    }
+
+    // --- Slime Evolution Logic ---
+    function renderEvolutionUI() {
+      const evoBtn = document.getElementById('evolve-slime-btn');
+      const evoLevelText = document.getElementById('evo-level-text');
+      const evoCostText = document.getElementById('evo-cost-text');
+      const listContainer = document.getElementById('unlocked-evos-list');
+      
+      if (!evoBtn || !evoLevelText || !evoCostText || !listContainer) return;
+      
+      const currentLvl = gameState.evolution;
+      const maxLvl = 20;
+      const cost = 200;
+      
+      evoLevelText.textContent = `Evolution Lv. ${currentLvl}/${maxLvl}`;
+      
+      if (currentLvl >= maxLvl) {
+        evoCostText.textContent = "MAX LEVEL";
+        evoBtn.classList.add('disabled');
+        evoBtn.setAttribute('disabled', 'true');
+      } else {
+        evoCostText.textContent = `Cost: 🪙${cost}`;
+        const canAfford = gameState.coins >= cost;
+        if (canAfford) {
+          evoBtn.classList.remove('disabled');
+          evoBtn.removeAttribute('disabled');
+        } else {
+          evoBtn.classList.add('disabled');
+          evoBtn.setAttribute('disabled', 'true');
+        }
+      }
+      
+      // Re-populate list
+      listContainer.innerHTML = '';
+      if (currentLvl === 0) {
+        const li = document.createElement('li');
+        li.style.listStyleType = 'none';
+        li.style.marginLeft = '-15px';
+        li.style.color = 'var(--text-muted)';
+        li.textContent = "No evolutions unlocked yet.";
+        listContainer.appendChild(li);
+      } else {
+        for (let l = 1; l <= currentLvl; l++) {
+          const li = document.createElement('li');
+          li.textContent = `Lv. ${l}: ${EVOLUTION_DESCS[l]}`;
+          if (l === currentLvl) {
+            li.style.fontWeight = 'bold';
+            li.style.color = '#a855f7'; // highlight last unlocked
+          }
+          listContainer.appendChild(li);
+        }
+      }
+    }
+
+    function evolveSlime() {
+      const currentLvl = gameState.evolution;
+      const maxLvl = 20;
+      const cost = 200;
+      if (gameState.coins >= cost && currentLvl < maxLvl) {
+        gameState.coins -= cost;
+        gameState.evolution++;
+        
+        playUpgradeSound();
+        createExplosion(TOWER_CENTER.x, TOWER_CENTER.y, '#a855f7', 20);
+        
+        // Spawn floating text
+        addFloatingText(
+          TOWER_CENTER.x, 
+          TOWER_CENTER.y - 50, 
+          `Evolved to Lv. ${gameState.evolution}!`, 
+          '#a855f7', 
+          18
+        );
+        
+        // Trigger visual effect
+        const currentRange = UPGRADE_CONFIGS.range.getValue(gameState.upgrades.range);
+        rangePulses.push({
+          radius: 0,
+          maxRadius: currentRange,
+          alpha: 1.0,
+          speed: 8.0,
+          color: '#a855f7'
+        });
+        
+        saveGame();
+        renderEvolutionUI();
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      const roundedCoins = Math.round(gameState.coins);
+      const roundedLifetime = Math.round(gameState.totalCoinsEarned);
+      
+      if (livesEl.textContent !== gameState.lives.toString()) {
+        livesEl.textContent = gameState.lives;
+      }
+      
+      const coinsStr = roundedCoins.toLocaleString();
+      if (coinsEl.textContent !== coinsStr) {
+        coinsEl.textContent = coinsStr;
+      }
+      
+      const waveStr = gameState.wave.toString();
+      if (waveEl.textContent !== waveStr) {
+        waveEl.textContent = waveStr;
+      }
+      
+      const bestWaveStr = gameState.highestWave.toString();
+      if (bestWaveEl.textContent !== bestWaveStr) {
+        bestWaveEl.textContent = bestWaveStr;
+      }
+      
+      const lifetimeStr = `Lifetime: 🪙${roundedLifetime.toLocaleString()}`;
+      if (lifetimeCoinsEl.textContent !== lifetimeStr) {
+        lifetimeCoinsEl.textContent = lifetimeStr;
+      }
+      
+      // Update check for affordances on upgrades
+      const cards = upgradeListContainer.querySelectorAll('.upgrade-card');
+      let index = 0;
+      Object.keys(UPGRADE_CONFIGS).forEach(key => {
+        const config = UPGRADE_CONFIGS[key];
+        const level = gameState.upgrades[key];
+        const cost = getUpgradeCost(key, level);
+        const card = cards[index];
+        if (card) {
+          const isMaxed = level >= config.maxLevel;
+          const canAfford = gameState.coins >= cost;
+          if (isMaxed || !canAfford) {
+            if (!card.classList.contains('disabled')) {
+              card.classList.add('disabled');
+            }
+          } else {
+            if (card.classList.contains('disabled')) {
+              card.classList.remove('disabled');
+            }
+          }
+        }
+        index++;
+      });
+      
+      renderEvolutionUI();
+    }
+
+    // --- Floating Text and Particles ---
+    function addFloatingText(x, y, text, color = '#ffffff', size = 16, isCrit = false) {
+      floatingTexts.push({
+        x: x,
+        y: y,
+        text: text,
+        color: color,
+        size: isCrit ? size * 1.4 : size,
+        isCrit: isCrit,
+        age: 0,
+        maxAge: 600, // ms
+        vx: (Math.random() - 0.5) * 1.0, // minor drift
+        vy: -1.2 - Math.random() * 0.8 // rise upwards
+      });
+    }
+
+    function createExplosion(x, y, color, count = 8, isCrit = false) {
+      const pCount = isCrit ? count * 1.8 : count;
+      for (let i = 0; i < pCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = isCrit ? (2.0 + Math.random() * 4.5) : (1.0 + Math.random() * 3.0);
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: color,
+          radius: (isCrit ? 3.5 : 2) + Math.random() * 3,
+          alpha: 1.0,
+          decay: (isCrit ? 0.015 : 0.02) + Math.random() * 0.03
+        });
+      }
+    }
+
+    // --- Wave Management ---
+    function startCountdown() {
+      isCountdownActive = true;
+      countdownTimer = 3000; // 3 seconds
+      countdownBanner.style.display = 'block';
+      countdownBanner.textContent = `Next wave in 3.0s`;
+    }
+
+    function getWaveComposition(waveNum) {
+      // Returns array of slime types to spawn
+      const count = 4 + waveNum * 2;
+      const queue = [];
+      
+      // Every 5th wave is a single Boss wave
+      if (waveNum % 5 === 0) {
+        queue.push('PURPLE');
+        return queue;
+      }
+      
+      // Adjust weights based on wave number
+      for (let i = 0; i < count; i++) {
+        // 5% chance of Golden slime
+        if (Math.random() < 0.05) {
+          queue.push('GOLDEN');
+          continue;
+        }
+        
+        const rand = Math.random();
+        
+        if (waveNum === 1) {
+          queue.push('NORMAL');
+        } else if (waveNum === 2) {
+          if (rand < 0.75) queue.push('NORMAL');
+          else queue.push('FAST');
+        } else if (waveNum === 3) {
+          if (rand < 0.60) queue.push('NORMAL');
+          else if (rand < 0.90) queue.push('FAST');
+          else queue.push('TANK');
+        } else {
+          // General wave algorithm for wave 4+
+          // Normal slimes become rarer, Fast/Tank dominate
+          const normalThreshold = Math.max(0.15, 0.4 - (waveNum * 0.02)); // decreasing normal
+          const fastThreshold = normalThreshold + 0.4; // flat fast distribution
+          
+          if (rand < normalThreshold) {
+            queue.push('NORMAL');
+          } else if (rand < fastThreshold) {
+            queue.push('FAST');
+          } else {
+            queue.push('TANK');
+          }
+        }
+      }
+      return queue;
+    }
+
+    function startNextWave() {
+      isCountdownActive = false;
+      countdownBanner.style.display = 'none';
+      
+      const composition = getWaveComposition(gameState.wave);
+      spawnQueue = composition;
+      waveSlimesTotal = composition.length;
+      waveSlimesDefeated = 0;
+      isWaveActive = true;
+      spawnTimer = spawnCooldown; // trigger immediate spawn
+      
+      waveBanner = {
+        title: `WAVE ${gameState.wave}`,
+        subtitle: gameState.wave % 5 === 0 ? "⚠️ BOSS ELIMINATION ⚠️" : "PREPARE YOUR DEFENSES",
+        age: 0,
+        duration: 2000,
+        color: gameState.wave % 5 === 0 ? '#d946ef' : '#3b82f6'
+      };
+    }
+
+    function triggerWaveComplete() {
+      isWaveActive = false;
+      
+      // Play wave complete sound
+      playWaveCompleteSound();
+      
+      waveBanner = {
+        title: `WAVE ${gameState.wave} CLEAR`,
+        subtitle: "🪙 REWARDS SECURED",
+        age: 0,
+        duration: 1800,
+        color: '#fbbf24'
+      };
+      
+      // Save wave progress
+      if (gameState.wave > gameState.highestWave) {
+        gameState.highestWave = gameState.wave;
+      }
+      
+      gameState.wave++;
+      saveGame();
+      startCountdown();
+    }
+
+    function spawnSlime() {
+      if (spawnQueue.length === 0) return;
+      
+      const typeKey = spawnQueue.shift();
+      const typeConfig = SLIME_TYPES[typeKey];
+      
+      // Calculate start position along the perimeter of the 600x600 arena
+      let x, y;
+      const border = Math.floor(Math.random() * 4); // 0: Top, 1: Right, 2: Bottom, 3: Left
+      const margin = 30; // spawn slightly outside canvas
+      
+      switch (border) {
+        case 0: // Top
+          x = Math.random() * CANVA_SIZE;
+          y = -margin;
+          break;
+        case 1: // Right
+          x = CANVA_SIZE + margin;
+          y = Math.random() * CANVA_SIZE;
+          break;
+        case 2: // Bottom
+          x = Math.random() * CANVA_SIZE;
+          y = CANVA_SIZE + margin;
+          break;
+        case 3: // Left
+        default:
+          x = -margin;
+          y = Math.random() * CANVA_SIZE;
+          break;
+      }
+      
+      // Scaling calculations (balanced progression formula)
+      const hpMultiplier = 1 + (gameState.wave - 1) * 0.25 + Math.pow(gameState.wave - 1, 1.6) * 0.05;
+      const maxHp = Math.round(typeConfig.hpBase * hpMultiplier);
+      
+      // Direction vector towards center
+      const angle = Math.atan2(TOWER_CENTER.y - y, TOWER_CENTER.x - x);
+      
+      slimes.push({
+        x: x,
+        y: y,
+        type: typeKey,
+        color: typeConfig.color,
+        radius: typeConfig.radius,
+        speed: typeConfig.speedMultiplier * BASE_SPEED,
+        maxHp: maxHp,
+        hp: maxHp,
+        baseCoins: typeConfig.baseCoins,
+        angle: angle,
+        flashTime: 0
+      });
+    }
+
+    // --- Combat System ---
+    function towerAttack(dt) {
+      // Calculate dynamic stats including upgrades and evolution level buffs
+      const baseRange = UPGRADE_CONFIGS.range.getValue(gameState.upgrades.range);
+      let rangeMult = 1.0;
+      if (gameState.evolution >= 5) rangeMult += 0.10;
+      const range = baseRange * rangeMult;
+      
+      const baseAttackSpeed = UPGRADE_CONFIGS.attackSpeed.getValue(gameState.upgrades.attackSpeed);
+      let attackSpeedMult = 1.0;
+      if (gameState.evolution >= 4) attackSpeedMult += 0.10;
+      if (gameState.evolution >= 13) attackSpeedMult += 0.10;
+      const attackSpeed = baseAttackSpeed * attackSpeedMult;
+      
+      // Cooldown decrement
+      if (attackCooldownTimer > 0) {
+        attackCooldownTimer -= dt;
+        return;
+      }
+      
+      // If cooldown is ready, find targets
+      // Auto-target nearest slimes within range
+      const inRangeSlimes = slimes.filter(slime => {
+        const dist = Math.hypot(slime.x - TOWER_CENTER.x, slime.y - TOWER_CENTER.y);
+        return dist <= range + slime.radius;
+      });
+      
+      if (inRangeSlimes.length === 0) return;
+      
+      playLaserSound();
+      
+      // Sort slimes by distance to tower
+      inRangeSlimes.sort((a, b) => {
+        const distA = Math.hypot(a.x - TOWER_CENTER.x, a.y - TOWER_CENTER.y);
+        const distB = Math.hypot(b.x - TOWER_CENTER.x, b.y - TOWER_CENTER.y);
+        return distA - distB;
+      });
+      
+      // Shoot at multiple targets depending on Multi Shot level + Evolution 16/20
+      let extraTargets = 0;
+      if (gameState.evolution >= 16) extraTargets += 1;
+      const maxTargets = UPGRADE_CONFIGS.multiShot.getValue(gameState.upgrades.multiShot) + extraTargets;
+      const targetCount = Math.min(maxTargets, inRangeSlimes.length);
+      
+      // Calculate base damage including upgrades + Evolution 1, 11, 19
+      const baseDmg = UPGRADE_CONFIGS.damage.getValue(gameState.upgrades.damage);
+      let dmgMult = 1.0;
+      if (gameState.evolution >= 1) dmgMult += 0.10;
+      if (gameState.evolution >= 11) dmgMult += 0.15;
+      if (gameState.evolution >= 19) dmgMult += 0.20;
+      const finalBaseDmg = Math.round(baseDmg * dmgMult);
+      
+      // Calculate crit chance + Evolution 15
+      const baseCritChance = UPGRADE_CONFIGS.critChance.getValue(gameState.upgrades.critChance);
+      let critChanceAdd = 0;
+      if (gameState.evolution >= 15) critChanceAdd += 0.20;
+      const critChance = Math.min(1.0, baseCritChance + critChanceAdd);
+      
+      // Calculate crit damage mult + Evolution 7
+      const baseCritDmgMult = UPGRADE_CONFIGS.critDamage.getValue(gameState.upgrades.critDamage);
+      let critDmgMultAdd = 0;
+      if (gameState.evolution >= 7) critDmgMultAdd += 0.15;
+      const critDmgMult = baseCritDmgMult + critDmgMultAdd;
+      
+      for (let i = 0; i < targetCount; i++) {
+        const target = inRangeSlimes[i];
+        
+        // Critical calculation
+        const isCrit = Math.random() < critChance;
+        const damage = isCrit ? Math.round(finalBaseDmg * critDmgMult) : finalBaseDmg;
+        
+        // Check if Laser Attack is unlocked (Lv. 2)
+        if (gameState.evolution >= 2) {
+          // Instant hit laser visual
+          let laserColor = isCrit ? '#f97316' : '#818cf8';
+          if (gameState.evolution >= 20) {
+            laserColor = 'rainbow'; // Ultimate rainbow laser
+          }
+          
+          lasers.push({
+            startX: TOWER_CENTER.x,
+            startY: TOWER_CENTER.y,
+            endX: target.x,
+            endY: target.y,
+            age: 0,
+            maxAge: 150, // 150 ms duration
+            color: laserColor
+          });
+          
+          // Apply damage instantly
+          executeDamageSequence(target, damage, isCrit);
+        } else {
+          // Shoot a projectile (Evo Lv. 0 and 1 pre-laser)
+          projectiles.push({
+            x: TOWER_CENTER.x,
+            y: TOWER_CENTER.y,
+            target: target,
+            speed: 380, // pixels per second
+            damage: damage,
+            isCrit: isCrit,
+            color: isCrit ? '#f97316' : '#818cf8',
+            radius: isCrit ? 6 : 4
+          });
+        }
+      }
+      
+      // Reset cooldown
+      attackCooldownTimer = 1 / attackSpeed;
+    }
+
+    function executeDamageSequence(target, damage, isCrit) {
+      applyDamage(target, damage, isCrit);
+      
+      // Chain Laser (Evolution Level 6 or 20)
+      if (gameState.evolution >= 6) {
+        // Find nearest slime within 120px to the target
+        let chainTarget = null;
+        let minChainDist = Infinity;
+        slimes.forEach(other => {
+          if (other === target || other.hp <= 0) return;
+          const distToTarget = Math.hypot(other.x - target.x, other.y - target.y);
+          if (distToTarget <= 120 && distToTarget < minChainDist) {
+            minChainDist = distToTarget;
+            chainTarget = other;
+          }
+        });
+        
+        if (chainTarget) {
+          const chainDmg = Math.round(damage * 0.50); // 50% damage for chain
+          // Draw chain laser visual
+          lasers.push({
+            startX: target.x,
+            startY: target.y,
+            endX: chainTarget.x,
+            endY: chainTarget.y,
+            age: 0,
+            maxAge: 150,
+            color: gameState.evolution >= 20 ? 'rainbow' : '#a855f7' // Rainbow or purple chain laser
+          });
+          applyDamage(chainTarget, chainDmg, false);
+        }
+      }
+      
+      // Splash damage handling
+      const splashMult = UPGRADE_CONFIGS.splashDamage.getValue(gameState.upgrades.splashDamage);
+      let splashDamageAdd = 0;
+      let splashRadiusAdd = 0;
+      
+      if (gameState.evolution >= 8) {
+        splashDamageAdd += 0.20;
+        splashRadiusAdd += 30;
+      }
+      if (gameState.evolution >= 18) {
+        splashRadiusAdd += 20;
+      }
+      
+      const totalSplashMult = splashMult + splashDamageAdd;
+      const totalSplashRadius = 40 + splashRadiusAdd;
+      
+      if (totalSplashMult > 0) {
+        const splashDmg = Math.round(damage * totalSplashMult);
+        createExplosion(target.x, target.y, '#fb7185', 5);
+        
+        slimes.forEach(other => {
+          if (other === target || other.hp <= 0) return;
+          const distToTarget = Math.hypot(other.x - target.x, other.y - target.y);
+          if (distToTarget <= totalSplashRadius + other.radius) {
+            applyDamage(other, splashDmg, false, true);
+          }
+        });
+      }
+    }
+
+    function applyDamage(slime, amount, isCrit = false, isSplash = false) {
+      if (slime.hp <= 0) return; // already dead
+      
+      slime.hp = Math.max(0, slime.hp - amount);
+      slime.flashTime = 100; // Trigger hit flash
+      
+      // Slime Evolution DOT & Slow statuses
+      // Fire burn status (Lv 3 or 17 or 20)
+      if (gameState.evolution >= 3) {
+        slime.burnTime = 3000; // 3 seconds
+        let burnDmg = amount * 0.15; // 15% of hit damage per second
+        if (gameState.evolution >= 17) burnDmg = amount * 0.30; // 30% of hit damage
+        slime.burnDmg = burnDmg;
+      }
+      
+      // Freeze/slow status (Lv 10 or 20)
+      if (gameState.evolution >= 10) {
+        slime.freezeTime = 1500; // 1.5 seconds freeze
+      }
+      
+      // Poison status (Lv 12 or 17 or 20)
+      if (gameState.evolution >= 12) {
+        slime.poisonTime = 5000; // 5 seconds poison
+        let poisonDmg = amount * 0.08; // 8% of hit damage per second
+        if (gameState.evolution >= 17) poisonDmg = amount * 0.16; // 16% of hit damage
+        slime.poisonDmg = poisonDmg;
+      }
+      
+      // Knockback status (Lv 14 or 20)
+      if (gameState.evolution >= 14 && Math.random() < 0.25) { // 25% chance of knockback
+        const dx = slime.x - TOWER_CENTER.x;
+        const dy = slime.y - TOWER_CENTER.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+          slime.x += (dx / dist) * 12;
+          slime.y += (dy / dist) * 12;
+        }
+      }
+      
+      // Ultimate Evolution hit sparks (Lv 20)
+      if (gameState.evolution >= 20) {
+        const hue = (Date.now() / 5) % 360;
+        createExplosion(slime.x, slime.y, `hsl(${hue}, 100%, 65%)`, 3);
+      }
+      
+      if (isCrit) {
+        shockwaves.push({
+          x: slime.x,
+          y: slime.y,
+          radius: slime.radius,
+          maxRadius: slime.radius * 2.8,
+          alpha: 1.0,
+          decay: 0.05,
+          color: '#f97316'
+        });
+      }
+      
+      // Floating damage number
+      const driftX = isSplash ? (Math.random() - 0.5) * 20 : 0;
+      addFloatingText(
+        slime.x + driftX, 
+        slime.y - 10, 
+        amount.toString(), 
+        isCrit ? '#f97316' : (isSplash ? '#fda4af' : '#fef08a'), // orange, light-red, yellow
+        isCrit ? 18 : 13,
+        isCrit
+      );
+      
+      // Death handling
+      if (slime.hp <= 0) {
+        handleSlimeDeath(slime, isCrit);
+      } else {
+        playHitSound();
+      }
+    }
+
+    function handleSlimeDeath(slime, isCrit = false) {
+      // Play death sound
+      playDeathSound();
+      
+      // Exploding particles
+      createExplosion(slime.x, slime.y, slime.color, slime.type === 'PURPLE' ? 24 : 10, isCrit);
+      
+      // Calculate coin drop (balanced progression formula)
+      const coinMultiplier = 1 + (gameState.wave - 1) * 0.15 + Math.pow(gameState.wave - 1, 1.2) * 0.02;
+      let evoCoinBonus = 0;
+      if (gameState.evolution >= 9) evoCoinBonus += 0.15;
+      const coinBonus = 1 + UPGRADE_CONFIGS.coinBonus.getValue(gameState.upgrades.coinBonus) + evoCoinBonus;
+      const earnedCoins = Math.round(slime.baseCoins * coinMultiplier * coinBonus);
+      
+      gameState.coins += earnedCoins;
+      gameState.totalCoinsEarned += earnedCoins;
+      goldEarnedThisRun += earnedCoins;
+      
+      addFloatingText(slime.x, slime.y - 25, `+🪙${earnedCoins}`, '#fbbf24', 14);
+      
+      // Remove slime from active array
+      const idx = slimes.indexOf(slime);
+      if (idx > -1) {
+        slimes.splice(idx, 1);
+      }
+      
+      // Wave completion check
+      waveSlimesDefeated++;
+      slimesDefeatedThisRun++;
+      
+      // Throttle saves slightly on coin pickups to avoid storage spam
+      // We will also save on wave completion
+      if (waveSlimesDefeated % 5 === 0 || spawnQueue.length === 0) {
+        saveGame();
+      }
+      
+      updateUI();
+    }
+
+    // --- Game Cycle & Overlays ---
+    function gameOver() {
+      // Play game over sound
+      playGameOverSound();
+      
+      // Stop loop actions, open panel
+      gameOverOverlay.classList.add('active');
+      
+      // Update statistics panel
+      const wavesCompleted = Math.max(0, gameState.wave - 1);
+      document.getElementById('stat-waves-completed').textContent = wavesCompleted;
+      document.getElementById('stat-slimes-defeated').textContent = slimesDefeatedThisRun.toLocaleString();
+      document.getElementById('stat-gold-earned').textContent = Math.round(goldEarnedThisRun).toLocaleString();
+      
+      if (gameState.wave > gameState.highestWave) {
+        gameState.highestWave = gameState.wave;
+      }
+      
+      document.getElementById('stat-best-wave').textContent = gameState.highestWave;
+      
+      saveGame();
+    }
+
+    function restartGame() {
+      // If save data was cleared externally, reset in-memory lifetime stats
+      if (isSaveInitialized && !localStorage.getItem('slimeTowerSave')) {
+        gameState.highestWave = 0;
+        gameState.totalCoinsEarned = 0;
+      }
+
+      // Clear game states for current run
+      slimes = [];
+      spawnQueue = [];
+      lasers = [];
+      projectiles = [];
+      floatingTexts = [];
+      particles = [];
+      shockwaves = [];
+      rangePulses = [];
+      waveBanner = null;
+      slimesDefeatedThisRun = 0;
+      goldEarnedThisRun = 0;
+      
+      gameState.lives = 20;
+      gameState.coins = 0;
+      gameState.wave = 1;
+      gameState.evolution = 0;
+      
+      // Reset upgrades
+      Object.keys(gameState.upgrades).forEach(key => {
+        gameState.upgrades[key] = 0;
+      });
+      
+      isWaveActive = false;
+      isCountdownActive = false;
+      attackCooldownTimer = 0;
+      spawnTimer = 0;
+      isPaused = false;
+      
+      const pIcon = document.getElementById('pause-btn-icon');
+      const pText = document.getElementById('pause-btn-text');
+      if (pIcon && pText) {
+        pIcon.textContent = "⏸";
+        pText.textContent = "Pause";
+      }
+      
+      gameOverOverlay.classList.remove('active');
+      
+      renderUpgradeButtons();
+      updateUI();
+      
+      startCountdown();
+    }
+
+    // --- Main Rendering and Loop Updates ---
+    function updatePhysics(dt) {
+      if (gameState.lives <= 0) return;
+      const dtSec = dt / 1000;
+      
+      // 1. Countdown timer updates
+      if (isCountdownActive) {
+        countdownTimer -= dt;
+        if (countdownTimer <= 0) {
+          startNextWave();
+        } else {
+          countdownBanner.textContent = `Next wave in ${(countdownTimer / 1000).toFixed(1)}s`;
+        }
+      }
+      
+      // 2. Spawn controller
+      // Only spawn if wave is active, we have queue remaining, and active slimes < 30 (cap)
+      if (isWaveActive && spawnQueue.length > 0 && slimes.length < 30) {
+        spawnTimer += dt;
+        if (spawnTimer >= spawnCooldown) {
+          spawnSlime();
+          spawnTimer = 0;
+        }
+      }
+      
+      // 3. Move slimes toward tower
+      for (let i = slimes.length - 1; i >= 0; i--) {
+        const slime = slimes[i];
+        
+        // Decrement flashTime
+        if (slime.flashTime > 0) {
+          slime.flashTime = Math.max(0, slime.flashTime - dt);
+        }
+        
+        // Recalculate target vector in case offsets change (though tower stays in center)
+        const dx = TOWER_CENTER.x - slime.x;
+        const dy = TOWER_CENTER.y - slime.y;
+        const dist = Math.hypot(dx, dy);
+        
+        // Check tower collision
+        const towerCollisionRadius = 25; // standard visual radius of tower crystal core
+        if (dist <= towerCollisionRadius + slime.radius) {
+          // Slime reached tower: disappears, lose 1 life
+          slimes.splice(i, 1);
+          gameState.lives = Math.max(0, gameState.lives - 1);
+          createExplosion(TOWER_CENTER.x, TOWER_CENTER.y, '#ef4444', 15);
+          addFloatingText(TOWER_CENTER.x, TOWER_CENTER.y - 40, "-1 HP", '#ef4444', 18, true);
+          
+          updateUI();
+          
+          if (gameState.lives <= 0) {
+            gameOver();
+            return;
+          }
+          
+          // Check wave completion if this was the last slime
+          if (slimes.length === 0 && spawnQueue.length === 0) {
+            triggerWaveComplete();
+          }
+          continue;
+        }
+        
+        // Slime Evolution DOT ticks & Slows
+        if (slime.burnTime > 0 && slime.hp > 0) {
+          slime.burnTime -= dt;
+          const burnTick = slime.burnDmg * dtSec;
+          slime.hp = Math.max(0, slime.hp - burnTick);
+          
+          // Spawn tiny flame particle occasionally
+          if (Math.random() < 0.15) {
+            particles.push({
+              x: slime.x + (Math.random() - 0.5) * slime.radius,
+              y: slime.y + (Math.random() - 0.5) * slime.radius,
+              vx: (Math.random() - 0.5) * 10,
+              vy: -15 - Math.random() * 15,
+              radius: Math.random() * 2 + 1,
+              color: '#ef4444',
+              alpha: 0.8,
+              decay: 0.03
+            });
+          }
+        }
+        
+        if (slime.poisonTime > 0 && slime.hp > 0) {
+          slime.poisonTime -= dt;
+          const poisonTick = slime.poisonDmg * dtSec;
+          slime.hp = Math.max(0, slime.hp - poisonTick);
+          
+          // Spawn tiny toxic particle occasionally
+          if (Math.random() < 0.15) {
+            particles.push({
+              x: slime.x + (Math.random() - 0.5) * slime.radius,
+              y: slime.y + (Math.random() - 0.5) * slime.radius,
+              vx: (Math.random() - 0.5) * 8,
+              vy: (Math.random() - 0.5) * 8,
+              radius: Math.random() * 1.5 + 0.8,
+              color: '#10b981',
+              alpha: 0.8,
+              decay: 0.02
+            });
+          }
+        }
+        
+        if (slime.freezeTime > 0) {
+          slime.freezeTime -= dt;
+        }
+        
+        // If slime dies from DOT
+        if (slime.hp <= 0) {
+          handleSlimeDeath(slime);
+          continue;
+        }
+
+        // Move towards tower
+        const angle = Math.atan2(dy, dx);
+        slime.angle = angle; // store actual heading angle for eyes rendering
+        
+        let currentSpeed = slime.speed;
+        if (slime.freezeTime > 0) {
+          currentSpeed *= 0.70; // 30% slow
+        }
+        
+        slime.x += Math.cos(angle) * currentSpeed * dtSec;
+        slime.y += Math.sin(angle) * currentSpeed * dtSec;
+      }
+      
+      // 4. Tower Auto-attacking
+      if (isWaveActive && slimes.length > 0) {
+        towerAttack(dtSec);
+      }
+      
+      // Check wave transition complete (no slimes left and spawn queue dry)
+      if (isWaveActive && slimes.length === 0 && spawnQueue.length === 0) {
+        triggerWaveComplete();
+      }
+      
+      // 5. Update visual lasers aging
+      for (let i = lasers.length - 1; i >= 0; i--) {
+        lasers[i].age += dt;
+        if (lasers[i].age >= lasers[i].maxAge) {
+          lasers.splice(i, 1);
+        }
+      }
+      
+      // 6. Update floating text animations
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.age += dt;
+        ft.x += ft.vx;
+        ft.y += ft.vy;
+        if (ft.age >= ft.maxAge) {
+          floatingTexts.splice(i, 1);
+        }
+      }
+      
+      // 7. Update visual particles with drag and size decay
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94; // drag
+        p.vy *= 0.94; // drag
+        p.radius = Math.max(0.1, p.radius - 0.05); // shrink
+        p.alpha -= p.decay;
+        if (p.alpha <= 0 || p.radius <= 0.1) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      // 8. Update visual critical shockwaves
+      for (let i = shockwaves.length - 1; i >= 0; i--) {
+        const sw = shockwaves[i];
+        sw.radius += 2.0; // expand
+        sw.alpha -= sw.decay;
+        if (sw.alpha <= 0) {
+          shockwaves.splice(i, 1);
+        }
+      }
+      
+      // 9. Update range pulses
+      for (let i = rangePulses.length - 1; i >= 0; i--) {
+        const rp = rangePulses[i];
+        rp.radius += rp.speed;
+        rp.alpha = Math.max(0, 1 - rp.radius / rp.maxRadius);
+        if (rp.radius >= rp.maxRadius || rp.alpha <= 0) {
+          rangePulses.splice(i, 1);
+        }
+      }
+      
+      // 10. Update Wave Banner
+      if (waveBanner) {
+        waveBanner.age += dt;
+        if (waveBanner.age >= waveBanner.duration) {
+          waveBanner = null;
+        }
+      }
+      
+      // 10.5 Update Projectiles (Evolution pre-laser)
+      for (let i = projectiles.length - 1; i >= 0; i--) {
+        const proj = projectiles[i];
+        
+        // Redirect target if it died
+        if (proj.target.hp <= 0) {
+          let newTarget = null;
+          let minD = Infinity;
+          slimes.forEach(s => {
+            if (s.hp > 0) {
+              const d = Math.hypot(s.x - proj.x, s.y - proj.y);
+              if (d < minD) {
+                minD = d;
+                newTarget = s;
+              }
+            }
+          });
+          if (newTarget) {
+            proj.target = newTarget;
+          } else {
+            projectiles.splice(i, 1);
+            continue;
+          }
+        }
+        
+        const dx = proj.target.x - proj.x;
+        const dy = proj.target.y - proj.y;
+        const dist = Math.hypot(dx, dy);
+        
+        const moveDist = proj.speed * dtSec;
+        if (dist <= moveDist + proj.target.radius) {
+          // Hit!
+          executeDamageSequence(proj.target, proj.damage, proj.isCrit);
+          projectiles.splice(i, 1);
+        } else {
+          proj.x += (dx / dist) * moveDist;
+          proj.y += (dy / dist) * moveDist;
+        }
+      }
+      
+      // 11. Tower graphics rotation
+      towerRotationAngle += 0.015 * (dt / 16.67);
+      
+      // 12. Update ambient background particles
+      updateAmbientParticles(dt);
+    }
+
+    function drawGame() {
+      // Clear Screen
+      ctx.clearRect(0, 0, CANVA_SIZE, CANVA_SIZE);
+      
+      // --- Background Grid Details (Sleek sci-fi styling) ---
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < CANVA_SIZE; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, CANVA_SIZE);
+        ctx.stroke();
+      }
+      for (let y = 0; y < CANVA_SIZE; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVA_SIZE, y);
+        ctx.stroke();
+      }
+      
+      // Draw outer boundary line helper
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.strokeRect(10, 10, CANVA_SIZE - 20, CANVA_SIZE - 20);
+      
+      // Draw ambient background particles
+      drawAmbientParticles();
+
+      // --- Draw Tower Range Visualizer ---
+      const range = UPGRADE_CONFIGS.range.getValue(gameState.upgrades.range);
+      ctx.beginPath();
+      ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, range, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.02)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.12)';
+      ctx.setLineDash([4, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]); // Reset dashed lines
+
+      // --- Draw Range Pulses (Rippling energy core circles) ---
+      rangePulses.forEach(rp => {
+        ctx.save();
+        ctx.globalAlpha = rp.alpha * 0.35;
+        ctx.strokeStyle = rp.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, rp.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // --- Draw Particle Effects ---
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // --- Draw Shockwaves (Crit blast expansions) ---
+      shockwaves.forEach(sw => {
+        ctx.save();
+        ctx.globalAlpha = sw.alpha;
+        ctx.strokeStyle = sw.color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // --- Draw Lasers / Projectiles (Neon beam visuals) ---
+      lasers.forEach(laser => {
+        const pctRemaining = 1 - (laser.age / laser.maxAge);
+        ctx.save();
+        
+        let laserColor = laser.color;
+        if (laser.color === 'rainbow') {
+          const hue = (Date.now() / 5) % 360;
+          laserColor = `hsl(${hue}, 100%, 60%)`;
+        }
+        
+        // 1. Thicker Outer Glow
+        ctx.strokeStyle = laserColor;
+        ctx.globalAlpha = pctRemaining * 0.18;
+        ctx.lineWidth = 12;
+        ctx.beginPath();
+        ctx.moveTo(laser.startX, laser.startY);
+        ctx.lineTo(laser.endX, laser.endY);
+        ctx.stroke();
+        
+        // 2. Main Energy Beam Glow
+        ctx.globalAlpha = pctRemaining * 0.55;
+        ctx.lineWidth = 4.5;
+        ctx.stroke();
+        
+        // 3. Bright White Energy Core
+        ctx.strokeStyle = '#ffffff';
+        ctx.globalAlpha = pctRemaining;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        
+        ctx.restore();
+      });
+
+      // --- Draw Projectiles (Pre-laser evolution) ---
+      projectiles.forEach(proj => {
+        ctx.save();
+        ctx.fillStyle = proj.color;
+        // Shadow glow
+        ctx.shadowBlur = proj.isCrit ? 12 : 6;
+        ctx.shadowColor = proj.color;
+        ctx.beginPath();
+        ctx.arc(proj.x, proj.y, proj.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // --- Draw Slimes ---
+      slimes.forEach(slime => {
+        ctx.save();
+        
+        // 3D Spherical/Gelatinous gradient fill
+        const gradient = ctx.createRadialGradient(
+          slime.x - slime.radius * 0.3, 
+          slime.y - slime.radius * 0.3, 
+          slime.radius * 0.1,
+          slime.x, 
+          slime.y, 
+          slime.radius
+        );
+        
+        // Lighten color for gradient highlight
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(0.25, slime.color);
+        gradient.addColorStop(1, darkenColor(slime.color, 40));
+        
+        ctx.fillStyle = gradient;
+        
+        // Draw main body
+        ctx.beginPath();
+        ctx.arc(slime.x, slime.y, slime.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add subtle gelatinous reflection shine
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath();
+        ctx.arc(slime.x - slime.radius * 0.3, slime.y - slime.radius * 0.3, slime.radius * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw Cute Slime Eyes pointing towards their direction of travel (slime.angle)
+        const eyeOffsetDist = slime.radius * 0.35;
+        const eyeRadius = slime.radius * 0.15;
+        const pupilRadius = eyeRadius * 0.5;
+        
+        // Left Eye and Right Eye coordinates rotated relative to travel heading angle
+        // We use perpendicular shifts for side-by-side spacing
+        const perpAngle = slime.angle + Math.PI / 2;
+        
+        const eyeSpacing = slime.radius * 0.35;
+        const leftEyeX = slime.x + Math.cos(slime.angle) * eyeOffsetDist + Math.cos(perpAngle) * eyeSpacing;
+        const leftEyeY = slime.y + Math.sin(slime.angle) * eyeOffsetDist + Math.sin(perpAngle) * eyeSpacing;
+        
+        const rightEyeX = slime.x + Math.cos(slime.angle) * eyeOffsetDist - Math.cos(perpAngle) * eyeSpacing;
+        const rightEyeY = slime.y + Math.sin(slime.angle) * eyeOffsetDist - Math.sin(perpAngle) * eyeSpacing;
+        
+        // Draw left eye white
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw right eye white
+        ctx.beginPath();
+        ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw black pupils looking slightly forward
+        ctx.fillStyle = '#000000';
+        const pupilDx = Math.cos(slime.angle) * (eyeRadius * 0.25);
+        const pupilDy = Math.sin(slime.angle) * (eyeRadius * 0.25);
+        
+        ctx.beginPath();
+        ctx.arc(leftEyeX + pupilDx, leftEyeY + pupilDy, pupilRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(rightEyeX + pupilDx, rightEyeY + pupilDy, pupilRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw hit flash overlay
+        if (slime.flashTime > 0) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${slime.flashTime / 100})`;
+          ctx.beginPath();
+          ctx.arc(slime.x, slime.y, slime.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Slime Evolution Freeze icy tint overlay (Lv 10)
+        if (slime.freezeTime > 0) {
+          ctx.fillStyle = 'rgba(14, 165, 233, 0.28)'; // translucent icy cyan blue
+          ctx.strokeStyle = '#38bdf8'; // bright cyan outline
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(slime.x, slime.y, slime.radius + 1.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        
+        ctx.restore();
+
+        // Draw Health Bar
+        const barW = slime.radius * 2;
+        const barH = 4;
+        const barX = slime.x - slime.radius;
+        const barY = slime.y - slime.radius - 10;
+        
+        // Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(barX, barY, barW, barH);
+        
+        // Foreground Fill
+        const hpPct = slime.hp / slime.maxHp;
+        // Color shifts green -> orange -> red
+        let barColor = '#4caf50';
+        if (hpPct < 0.25) {
+          barColor = '#f44336';
+        } else if (hpPct < 0.55) {
+          barColor = '#ff9800';
+        }
+        ctx.fillStyle = barColor;
+        ctx.fillRect(barX, barY, barW * hpPct, barH);
+      });
+
+      // --- Draw Central Defense Tower ---
+      ctx.save();
+      
+      // Draw outer range ring (faint helper visual around base)
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.2)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, 45, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Draw spinning orbital shielding rings
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([8, 12]);
+      
+      ctx.beginPath();
+      ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, 35, towerRotationAngle, towerRotationAngle + Math.PI * 2);
+      ctx.stroke();
+      
+      // Counter-rotating ring
+      ctx.strokeStyle = 'rgba(167, 139, 250, 0.3)';
+      ctx.beginPath();
+      ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, 40, -towerRotationAngle * 0.8, -towerRotationAngle * 0.8 + Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.setLineDash([]); // Reset dash
+
+      // Draw stylized tower base pediment
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      // Octagon base
+      for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI) / 4;
+        const x = TOWER_CENTER.x + Math.cos(angle) * 25;
+        const y = TOWER_CENTER.y + Math.sin(angle) * 25;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Glowing energy core center crystal
+      const coreGradient = ctx.createRadialGradient(
+        TOWER_CENTER.x - 3, 
+        TOWER_CENTER.y - 3, 
+        2, 
+        TOWER_CENTER.x, 
+        TOWER_CENTER.y, 
+        18
+      );
+      
+      let coreColor1 = '#a5b4fc';
+      let coreColor2 = '#6366f1';
+      let glowColor = 'rgba(99, 102, 241, 0)';
+      
+      if (gameState.evolution >= 20) {
+        const hue = (Date.now() / 15) % 360;
+        coreColor1 = `hsl(${hue}, 100%, 75%)`;
+        coreColor2 = `hsl(${hue}, 100%, 50%)`;
+        glowColor = `hsla(${hue}, 100%, 50%, 0)`;
+      }
+      
+      coreGradient.addColorStop(0, '#ffffff');
+      coreGradient.addColorStop(0.3, coreColor1);
+      coreGradient.addColorStop(0.8, coreColor2);
+      coreGradient.addColorStop(1, glowColor);
+      
+      ctx.fillStyle = coreGradient;
+      ctx.beginPath();
+      ctx.arc(TOWER_CENTER.x, TOWER_CENTER.y, 18, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+
+      // --- Draw Floating Text ---
+      floatingTexts.forEach(ft => {
+        ctx.save();
+        
+        const pctRemaining = 1 - (ft.age / ft.maxAge);
+        ctx.globalAlpha = pctRemaining;
+        ctx.fillStyle = ft.color;
+        
+        if (ft.isCrit) {
+          ctx.font = `800 ${ft.size}px 'Outfit', sans-serif`;
+          // Draw dark outline for critical text to pop
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 3;
+          ctx.strokeText(ft.text, ft.x, ft.y);
+          ctx.fillText(ft.text, ft.x, ft.y);
+        } else {
+          ctx.font = `600 ${ft.size}px 'Outfit', sans-serif`;
+          ctx.fillText(ft.text, ft.x, ft.y);
+        }
+        
+        ctx.restore();
+      });
+
+      // --- Next Wave Canvas Countdown Label ---
+      if (isCountdownActive) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = "800 24px 'Outfit', sans-serif";
+        ctx.textAlign = 'center';
+        
+        const text = `NEXT WAVE IN ${(countdownTimer / 1000).toFixed(1)}s`;
+        ctx.strokeStyle = '#0b0f19';
+        ctx.lineWidth = 4;
+        ctx.strokeText(text, TOWER_CENTER.x, TOWER_CENTER.y - 120);
+        ctx.fillText(text, TOWER_CENTER.x, TOWER_CENTER.y - 120);
+        ctx.restore();
+      }
+
+      // --- Draw Wave Banner ---
+      if (waveBanner) {
+        ctx.save();
+        
+        let alpha = 1.0;
+        const fadeIn = 300;
+        const fadeOut = 300;
+        if (waveBanner.age < fadeIn) {
+          alpha = waveBanner.age / fadeIn;
+        } else if (waveBanner.age > waveBanner.duration - fadeOut) {
+          alpha = (waveBanner.duration - waveBanner.age) / fadeOut;
+        }
+        
+        ctx.globalAlpha = alpha;
+        
+        // Horizontal black strip across center
+        ctx.fillStyle = 'rgba(11, 15, 25, 0.85)';
+        ctx.fillRect(0, TOWER_CENTER.y - 75, CANVA_SIZE, 110);
+        
+        // Borders on the strip
+        ctx.strokeStyle = waveBanner.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, TOWER_CENTER.y - 75);
+        ctx.lineTo(CANVA_SIZE, TOWER_CENTER.y - 75);
+        ctx.moveTo(0, TOWER_CENTER.y + 35);
+        ctx.lineTo(CANVA_SIZE, TOWER_CENTER.y + 35);
+        ctx.stroke();
+        
+        // Text rendering
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Scale/zoom effect: text scales up slowly
+        const progress = waveBanner.age / waveBanner.duration;
+        const scale = 1.0 + progress * 0.1;
+        
+        ctx.translate(TOWER_CENTER.x, TOWER_CENTER.y - 20);
+        ctx.scale(scale, scale);
+        
+        ctx.fillStyle = waveBanner.color;
+        ctx.font = "800 36px 'Outfit', sans-serif";
+        ctx.shadowColor = waveBanner.color;
+        ctx.shadowBlur = 10;
+        ctx.fillText(waveBanner.title, 0, 0);
+        ctx.shadowBlur = 0; // Reset
+        
+        ctx.fillStyle = '#94a3b8'; // muted text
+        ctx.font = "600 13px 'Outfit', sans-serif";
+        ctx.fillText(waveBanner.subtitle, 0, 28);
+        
+        ctx.restore();
+      }
+
+      // --- Draw Pause Overlay ---
+      if (isPaused) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(11, 15, 25, 0.65)';
+        ctx.fillRect(0, 0, CANVA_SIZE, CANVA_SIZE);
+        
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#6366f1';
+        ctx.shadowColor = '#6366f1';
+        ctx.shadowBlur = 15;
+        ctx.font = "800 48px 'Outfit', sans-serif";
+        ctx.fillText("GAME PAUSED", TOWER_CENTER.x, TOWER_CENTER.y - 15);
+        
+        ctx.fillStyle = '#94a3b8';
+        ctx.shadowBlur = 0;
+        ctx.font = "600 16px 'Outfit', sans-serif";
+        ctx.fillText("Click Resume to continue", TOWER_CENTER.x, TOWER_CENTER.y + 25);
+        ctx.restore();
+      }
+    }
+
+    // --- Helper Math/Graphics Utilities ---
+    function darkenColor(hex, percent) {
+      // Simple hex darkener
+      hex = hex.replace(/^\s*#|\s*$/g, '');
+      if(hex.length == 3){
+        hex = hex.replace(/(.)/g, '$1$1');
+      }
+      let r = parseInt(hex.substr(0, 2), 16),
+          g = parseInt(hex.substr(2, 2), 16),
+          b = parseInt(hex.substr(4, 2), 16);
+
+      r = Math.max(0, Math.floor(r * (1 - percent / 100)));
+      g = Math.max(0, Math.floor(g * (1 - percent / 100)));
+      b = Math.max(0, Math.floor(b * (1 - percent / 100)));
+
+      return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    }
+
+    // --- Main Game Loop ---
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      let dt = timestamp - lastTime;
+      
+      // Cap delta time to prevent massive jumps when tab is inactive
+      if (dt > 100) dt = 16.67;
+      
+      if (hasGameStarted && !isPaused && gameState.lives > 0) {
+        updatePhysics(dt);
+      } else {
+        updateAmbientAndVisuals(dt);
+      }
+      drawGame();
+      
+      lastTime = timestamp;
+      requestAnimationFrame(gameLoop);
+    }
+
+    // --- Event Listeners and Initializations ---
+    restartBtn.addEventListener('click', () => {
+      restartGame();
+    });
+
+    const titleOverlay = document.getElementById('title-screen-overlay');
+    const settingsOverlay = document.getElementById('settings-overlay');
+    
+    // Play / Start Game
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+      titleOverlay.classList.remove('active');
+      hasGameStarted = true;
+      initAudio();
+      playUpgradeSound(); // pleasant startup chime
+      startCountdown();
+    });
+
+    // Pause / Resume Game
+    const pauseBtn = document.getElementById('pause-btn');
+    const pauseBtnIcon = document.getElementById('pause-btn-icon');
+    const pauseBtnText = document.getElementById('pause-btn-text');
+
+    pauseBtn.addEventListener('click', () => {
+      if (!hasGameStarted || gameState.lives <= 0) return;
+      isPaused = !isPaused;
+      if (isPaused) {
+        pauseBtnIcon.textContent = "▶";
+        pauseBtnText.textContent = "Resume";
+      } else {
+        pauseBtnIcon.textContent = "⏸";
+        pauseBtnText.textContent = "Pause";
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      }
+    });
+
+    // Settings Modal toggles
+    document.getElementById('open-settings-btn').addEventListener('click', () => {
+      settingsOverlay.classList.add('active');
+    });
+
+    document.getElementById('ingame-settings-btn').addEventListener('click', () => {
+      // Pause game automatically when settings opens
+      if (hasGameStarted && !isPaused && gameState.lives > 0) {
+        isPaused = true;
+        pauseBtnIcon.textContent = "▶";
+        pauseBtnText.textContent = "Resume";
+      }
+      settingsOverlay.classList.add('active');
+    });
+
+    document.getElementById('close-settings-btn').addEventListener('click', () => {
+      settingsOverlay.classList.remove('active');
+    });
+
+    document.getElementById('reset-progress-btn').addEventListener('click', () => {
+      if (confirm("Are you sure you want to reset all lifetime progress (Best Wave, Lifetime Coins)? This cannot be undone!")) {
+        localStorage.removeItem('slimeTowerSave');
+        gameState.highestWave = 0;
+        gameState.totalCoinsEarned = 0;
+        restartGame();
+        
+        // Close settings modal
+        settingsOverlay.classList.remove('active');
+        
+        // Play click sound as validation
+        playUpgradeSound();
+      }
+    });
+
+    // Audio & Graphics Toggles
+    const soundToggle = document.getElementById('sound-effects-toggle');
+    const particlesToggle = document.getElementById('bg-particles-toggle');
+
+    soundToggle.addEventListener('change', () => {
+      soundEnabled = soundToggle.checked;
+      if (soundEnabled) {
+        initAudio();
+        playHitSound(); // short validation chirp
+      }
+    });
+
+    particlesToggle.addEventListener('change', () => {
+      bgParticlesEnabled = particlesToggle.checked;
+      if (bgParticlesEnabled) {
+        initAmbientParticles();
+      } else {
+        ambientParticles = [];
+      }
+    });
+
+    // Page Initialisation
+    window.addEventListener('DOMContentLoaded', () => {
+      loadGame();
+      renderUpgradeButtons();
+      renderEvolutionUI();
+      
+      // Evolve Slime click handler
+      document.getElementById('evolve-slime-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        evolveSlime();
+      });
+      
+      // Initialize ambient background particles
+      initAmbientParticles();
+      
+      // Launch standard requestAnimationFrame loop
+      requestAnimationFrame(gameLoop);
+    });
+
+  </script>
+</body>
+</html>
