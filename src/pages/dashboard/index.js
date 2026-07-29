@@ -156,7 +156,7 @@ let cachedResources = [];
     if (bookmarkIds.length === 0) {
       container.innerHTML = `
         <li class="empty-state" style="padding: 32px; text-align: center; color: var(--color-text-soft);">
-          <i class="fa-regular fa-star" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.5;"></i>
+          <svg class="icon" aria-hidden="true" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.5;"><use href="#icon-star"></use></svg>
           <p>You haven't bookmarked any resources yet.</p>
         </li>
       `;
@@ -169,13 +169,13 @@ let cachedResources = [];
         const li = document.createElement("li");
         li.className = "resource-row";
         li.innerHTML = `
-          <i class="fa-regular fa-star" aria-hidden="true" style="color: #f59e0b;"></i>
+          <svg class="icon" aria-hidden="true" style="color: #f59e0b;"><use href="#icon-star"></use></svg>
           <div class="resource-info">
             <a href="../#resources" target="_blank">${escapeHtml(res.title)}</a>
             <span class="text-faint">${escapeHtml(res.course)} · ${escapeHtml(res.type)}</span>
           </div>
           <button class="icon-btn remove-bookmark-btn" data-id="${res.id}" aria-label="Remove bookmark">
-            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
           </button>
         `;
 
@@ -206,7 +206,7 @@ let cachedResources = [];
     if (downloadIds.length === 0) {
       container.innerHTML = `
         <li class="empty-state" style="padding: 32px; text-align: center; color: var(--color-text-soft);">
-          <i class="fa-solid fa-download" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.5;"></i>
+          <svg class="icon" aria-hidden="true" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.5;"><use href="#icon-download"></use></svg>
           <p>No downloads recorded yet.</p>
         </li>
       `;
@@ -219,17 +219,17 @@ let cachedResources = [];
         const li = document.createElement("li");
         li.className = "resource-row";
         
-        let fileIcon = "fa-solid fa-file-pdf";
-        if (res.type && res.type.toLowerCase().includes("book")) fileIcon = "fa-solid fa-book";
+        let fileIcon = "icon-file-pdf";
+        if (res.type && res.type.toLowerCase().includes("book")) fileIcon = "icon-book";
 
         li.innerHTML = `
-          <i class="${fileIcon}" aria-hidden="true"></i>
+          <svg class="icon" aria-hidden="true"><use href="#${fileIcon}"></use></svg>
           <div class="resource-info">
             <a href="${res.fileUrl}" target="_blank" download>${escapeHtml(res.title)}</a>
             <span class="text-faint">${escapeHtml(res.course)} · ${escapeHtml(res.type)}</span>
           </div>
           <button class="icon-btn download-btn" data-url="${res.fileUrl}" data-id="${res.id}" aria-label="Download">
-            <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
+            <svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"></use></svg>
           </button>
         `;
 

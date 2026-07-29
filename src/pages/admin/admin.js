@@ -287,10 +287,10 @@ import {
         <td data-label="Actions">
           <div class="action-buttons">
             <button class="icon-action-btn edit" data-id="${res.id}" title="Edit Resource">
-              <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+              <svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg>
             </button>
             <button class="icon-action-btn delete" data-id="${res.id}" title="Delete Resource">
-              <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+              <svg class="icon" aria-hidden="true"><use href="#icon-trash"></use></svg>
             </button>
           </div>
         </td>

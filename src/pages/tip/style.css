@@ -65,7 +65,7 @@
   --gradient:       linear-gradient(135deg, #7c6df5 0%, #f06292 100%);
 
   /* — Typography — */
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* — Spacing — */
   --section-v: 110px;
