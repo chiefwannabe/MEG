@@ -389,30 +389,45 @@ export async function getResourcesByType(type) {
 }
 
 /**
- * Gets related published resources (same course, excluding current resource ID)
- * Uses native Firestore query filtering on course and limit(4)
+ * Gets related published resources (same course or subject, excluding current resource ID).
+ * Uses native Firestore query on course with graceful in-memory fallback.
  */
 export async function getRelatedResources(res) {
-  if (!res || !res.course) return [];
+  if (!res) return [];
   try {
-    const resourcesCol = collection(db, "resources");
-    const q = query(
-      resourcesCol,
-      where("published", "==", true),
-      where("course", "==", res.course),
-      limit(4)
-    );
-    const querySnapshot = await getDocs(q);
-    const resources = [];
-    querySnapshot.forEach((doc) => {
-      if (doc.id !== res.id) {
-        resources.push({ id: doc.id, ...doc.data() });
-      }
-    });
-    return resources.slice(0, 3);
+    if (res.course) {
+      const resourcesCol = collection(db, "resources");
+      const q = query(
+        resourcesCol,
+        where("published", "==", true),
+        where("course", "==", res.course),
+        limit(4)
+      );
+      const querySnapshot = await getDocs(q);
+      const resources = [];
+      querySnapshot.forEach((doc) => {
+        if (doc.id !== res.id) {
+          resources.push({ id: doc.id, ...doc.data() });
+        }
+      });
+      if (resources.length > 0) return resources.slice(0, 3);
+    }
+    const all = await getPublishedResources();
+    return all.filter((r) => 
+      r.id !== res.id && 
+      ((res.course && r.course === res.course) || (res.subject && r.subject === res.subject))
+    ).slice(0, 3);
   } catch (error) {
-    console.error("[Firestore] Error finding related resources:", error);
-    return [];
+    console.warn("[Firestore] Falling back to client-side filter for getRelatedResources:", error?.message || error);
+    try {
+      const all = await getPublishedResources();
+      return all.filter((r) => 
+        r.id !== res.id && 
+        ((res.course && r.course === res.course) || (res.subject && r.subject === res.subject))
+      ).slice(0, 3);
+    } catch (_) {
+      return [];
+    }
   }
 }
 

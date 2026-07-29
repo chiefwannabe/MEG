@@ -416,12 +416,21 @@
     if (isPanelLoading) return;
     isPanelLoading = true;
 
-    // Resolve relative path to cursor-panel.js based on cursor.js location
+    // Resolve relative path to cursor-panel.js & cursor-panel.css based on cursor.js location
     let panelScriptUrl = 'src/ui/cursor/cursor-panel.js';
+    let panelCssUrl = 'src/ui/cursor/cursor-panel.css';
     const scripts = Array.from(document.querySelectorAll('script'));
     const cursorScript = scripts.find(s => s.src && s.src.includes('cursor.js'));
     if (cursorScript) {
       panelScriptUrl = cursorScript.src.replace(/cursor\.js(\?.*)?$/, 'cursor-panel.js$1');
+      panelCssUrl = cursorScript.src.replace(/cursor\.js(\?.*)?$/, 'cursor-panel.css$1');
+    }
+
+    if (!document.querySelector('link[href*="cursor-panel.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = panelCssUrl;
+      document.head.appendChild(link);
     }
 
     const panelScript = document.createElement('script');
