@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node src/pages/offline/generate-games.js && node scripts/generate-uploads.js",
     "generate": "bun src/pages/offline/generate-games.js",
-    "dev": "bun server/server.js"
+    "dev": "node server/server.js"
   },
   "engines": {
     "node": ">=18"

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ZenPad - A minimalist, professional, distraction-free Notepad web application with auto-save, stats, dark mode, and local storage support.">
+  <title>ZenPad — Distraction-Free Professional Notepad</title>
+  
+  <!-- Google Fonts Import -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Changa+One&family=Fjalla+One&family=Fira+Sans:wght@400;500;600;700&family=Heebo:wght@400;500;600;700&family=Hibur+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Hanifi+Rohingya:wght@400;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase v12 CDN importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "firebase/app":       "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+      "firebase/auth":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div class="app-container" id="app-container">
+    
+    <!-- Top Header Navigation -->
+    <header class="app-header" role="banner">
+      <div class="header-left">
+        <button id="btn-toggle-sidebar" class="icon-btn" aria-label="Toggle Sidebar Notes Drawer" title="Toggle Notes Sidebar (Alt + S)">
+          <svg class="icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </button>
+
+        <div class="brand">
+          <svg class="brand-logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <h1 class="brand-title">ZenPad</h1>
+        </div>
+
+        <!-- Auto-save Live Status Badge -->
+        <div id="save-status-badge" class="status-badge saved" title="Auto-save status">
+          <span class="status-dot"></span>
+          <span id="save-status-text" class="status-text">Saved</span>
+        </div>
+
+        <!-- Anime Button -->
+        <button id="animeBtn" class="cute-btn" title="Anime Gallery" aria-label="Anime Gallery">
+          <span class="cute-btn-label">Anime</span>
+        </button>
+
+        <!-- Cool Spark Button on the side of Anime -->
+        <button id="coolBtn" class="cool-btn" title="Inspiring Zen Spark" aria-label="Inspiring Zen Spark">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Spark</span>
+        </button>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="header-actions" role="toolbar" aria-label="Notepad Controls">
+        
+        <!-- Font Selection -->
+        <div class="select-wrapper" title="Font Family">
+          <svg class="icon select-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+            <line x1="9" y1="20" x2="15" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+          </svg>
+          <select id="font-family-select" aria-label="Select Font Family">
+            <optgroup label="Sans-Serif">
+              <option value="sans" selected>Inter</option>
+              <option value="archivo">Archivo</option>
+              <option value="fira-sans">Fira Sans</option>
+              <option value="heebo">Heebo</option>
+              <option value="noto-sans-rohingya">Noto Sans Hanifi Rohingya</option>
+              <option value="titillium">Titillium Web</option>
+              <option value="space-grotesk">Space Grotesk</option>
+            </optgroup>
+            <optgroup label="Serif">
+              <option value="serif">Lora</option>
+              <option value="noto-serif">Noto Serif</option>
+              <option value="pt-serif">PT Serif</option>
+              <option value="libre-baskerville">Libre Baskerville</option>
+            </optgroup>
+            <optgroup label="Monospace">
+              <option value="mono">JetBrains Mono</option>
+              <option value="hibur-mono">Hibur Mono</option>
+            </optgroup>
+            <optgroup label="Display / Unique">
+              <option value="fjalla">Fjalla One</option>
+              <option value="changa">Changa One</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Font Size Controls -->
+        <div class="btn-group" role="group" aria-label="Font Size Controls">
+          <button id="btn-font-decrease" class="icon-btn" aria-label="Decrease Font Size" title="Decrease Font Size">
+            <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+          <span id="font-size-display" class="font-size-label" title="Current Font Size">16px</span>
+          <button id="btn-font-increase" class="icon-btn" aria-label="Increase Font Size" title="Increase Font Size">
+            <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Copy Text -->
+        <button id="btn-copy" class="action-btn" aria-label="Copy to Clipboard" title="Copy to Clipboard (Ctrl+Shift+C)">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span class="btn-text">Copy</span>
+        </button>
+
+        <!-- Download .txt -->
+        <button id="btn-download" class="action-btn primary" aria-label="Download as Text File" title="Download .txt File (Ctrl + S)">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span class="btn-text">Download .txt</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <!-- Focus Mode Toggle -->
+        <button id="btn-focus-mode" class="icon-btn" aria-label="Toggle Distraction-Free Focus Mode" title="Focus Mode (Alt + F)">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 2 2h3"></path>
+          </svg>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="btn-theme-toggle" class="icon-btn" aria-label="Toggle Light/Dark Theme" title="Toggle Theme (Alt + T)">
+          <svg class="icon sun-icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon moon-icon hidden" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <!-- User Account / Auth Link -->
+        <a id="btn-auth-user" href="../auth/index.html" class="icon-btn" aria-label="Account Settings / Sign In" title="Account / Cloud Sync">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </a>
+
+        <!-- Help / Shortcuts -->
+        <button id="btn-help" class="icon-btn" aria-label="Keyboard Shortcuts & Help" title="Keyboard Shortcuts (?)">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Layout (Sidebar + Editor Area) -->
+    <div class="app-layout">
+      
+      <!-- Notes Drawer / Sidebar -->
+      <aside id="sidebar" class="sidebar" aria-label="Saved Notes Drawer">
+        <div class="sidebar-header">
+          <button id="btn-new-note" class="new-note-btn">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>New Note</span>
+            <kbd class="shortcut-kbd">Alt + N</kbd>
+          </button>
+          
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-notes" placeholder="Search notes..." aria-label="Search Notes">
+            <button id="btn-clear-search" class="clear-search-btn hidden" aria-label="Clear Search">&times;</button>
+          </div>
+        </div>
+
+        <!-- Note Items List -->
+        <nav class="sidebar-content">
+          <ul id="notes-list" class="notes-list" aria-label="Notes List">
+            <!-- Dynamically Populated -->
+          </ul>
+          <div id="no-notes-state" class="empty-state hidden">
+            <p>No notes found matching your search.</p>
+          </div>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+          <div class="storage-info">
+            <span id="notes-count-badge">0 notes</span>
+            <span class="dot-separator">•</span>
+            <span id="storage-used">0 KB</span>
+          </div>
+          <button id="btn-clear-all" class="text-link-danger" title="Delete all notes">Clear All</button>
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop for Mobile -->
+      <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+      <!-- Main Notepad Workspace -->
+      <main class="main-editor-area">
+        
+        <!-- Editor Header (Title & Meta Actions) -->
+        <div class="editor-header">
+          <div class="title-input-wrapper">
+            <input 
+              type="text" 
+              id="note-title-input" 
+              class="note-title-input" 
+              placeholder="Note Title..." 
+              value="" 
+              aria-label="Note Title"
+              maxlength="120"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="editor-meta-actions">
+            <span id="last-edited-time" class="last-edited-tag" title="Last auto-saved time">Edited just now</span>
+            
+            <button id="btn-delete-note" class="icon-btn danger" aria-label="Delete Current Note" title="Delete Note">
+              <svg class="icon" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Text Area Main Editor Canvas -->
+        <div class="editor-body">
+          <textarea 
+            id="note-content-area" 
+            class="note-content-area font-sans" 
+            placeholder="Type your notes here..." 
+            aria-label="Note Text Editor" 
+            spellcheck="true"
+          ></textarea>
+        </div>
+
+        <!-- Exit Focus Mode Overlay Button (visible only in focus mode) -->
+        <button id="btn-exit-focus" class="exit-focus-btn hidden" title="Exit Focus Mode (Esc)">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M4 14h6v6M20 10h-6V4M14 20l6-6M10 4L4 10"></path>
+          </svg>
+          Exit Focus Mode (Esc)
+        </button>
+      </main>
+    </div>
+
+    <!-- Footer Stats Bar -->
+    <footer class="app-footer" role="contentinfo">
+      <div class="footer-stats">
+        <div class="stat-item" title="Total Words">
+          <span class="stat-value" id="stat-words">0</span>
+          <span class="stat-label">words</span>
+        </div>
+        <span class="dot-separator">•</span>
+        <div class="stat-item" title="Characters excluding spaces / including spaces">
+          <span class="stat-value" id="stat-chars">0</span>
+          <span class="stat-label">characters</span>
+          <span class="stat-sub" id="stat-chars-nospace">(0 w/o spaces)</span>
+        </div>
+        <span class="dot-separator">•</span>
+        <div class="stat-item" title="Total Lines">
+          <span class="stat-value" id="stat-lines">1</span>
+          <span class="stat-label">lines</span>
+        </div>
+        <span class="dot-separator">•</span>
+        <div class="stat-item" title="Estimated Reading Time">
+          <span class="stat-value" id="stat-readtime">0 min</span>
+          <span class="stat-label">read time</span>
+        </div>
+      </div>
+
+      <div class="footer-credits">
+        <span>ZenPad — Calm, Private & Local</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Anime Image Modal -->
+  <div id="anime-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
+    <div class="modal-card anime-card-borderless">
+      <div id="anime-img-container" class="anime-img-container-borderless">
+        <button id="btn-download-anime" class="floating-download-btn" title="Download Image" aria-label="Download Image">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+        <img id="animeImage" src="" alt="Anime Image (Click for Next)" class="anime-img-borderless" title="Click image for Next" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Cool Spark Quote Modal -->
+  <div id="quote-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
+    <div class="modal-card mini quote-card">
+      <div class="modal-header">
+        <h3 id="quote-modal-title">✨ Zen Spark</h3>
+        <button id="btn-close-quote-modal" class="close-btn" aria-label="Close Modal">&times;</button>
+      </div>
+      <div class="modal-body quote-body">
+        <blockquote id="quote-text" class="quote-text">"Simplicity is the ultimate sophistication."</blockquote>
+        <p id="quote-author" class="quote-author">— Leonardo da Vinci</p>
+      </div>
+      <div class="modal-footer quote-footer">
+        <button id="btn-insert-quote" class="action-btn">Insert in Note</button>
+        <button id="btn-next-quote" class="action-btn primary">New Spark</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="shortcuts-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Keyboard Shortcuts</h3>
+        <button id="btn-close-modal" class="close-btn" aria-label="Close Modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <ul class="shortcuts-list">
+          <li><span class="shortcut-desc">New Note</span> <kbd>Alt + N</kbd></li>
+          <li><span class="shortcut-desc">Save / Download .txt</span> <kbd>Ctrl + S</kbd></li>
+          <li><span class="shortcut-desc">Copy Note Text</span> <kbd>Ctrl + Shift + C</kbd></li>
+          <li><span class="shortcut-desc">Toggle Notes Sidebar</span> <kbd>Alt + S</kbd></li>
+          <li><span class="shortcut-desc">Toggle Focus Mode</span> <kbd>Alt + F</kbd></li>
+          <li><span class="shortcut-desc">Toggle Light / Dark Mode</span> <kbd>Alt + T</kbd></li>
+          <li><span class="shortcut-desc">Insert Indent / Tab</span> <kbd>Tab</kbd></li>
+          <li><span class="shortcut-desc">Exit Focus Mode</span> <kbd>Esc</kbd></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-modal-ok" class="action-btn primary">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay hidden" aria-hidden="true" role="dialog">
+    <div class="modal-card mini">
+      <div class="modal-header">
+        <h3>Delete Note?</h3>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-modal-message">Are you sure you want to delete this note? This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-confirm-cancel" class="action-btn">Cancel</button>
+        <button id="btn-confirm-delete" class="action-btn danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- JS Script -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
