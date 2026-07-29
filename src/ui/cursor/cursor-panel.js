@@ -587,12 +587,10 @@
       }
 
       e.preventDefault();
-      
       // Toggle custom cursor system when user presses ESC
       settings.disabled = !settings.disabled;
       saveSetting(KEYS.disabled, settings.disabled);
       applySettingsToDOM();
-
       togglePanel();
     }
   };
