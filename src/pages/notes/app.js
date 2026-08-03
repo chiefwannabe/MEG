@@ -169,6 +169,7 @@ let currentUser = null;
         if (btnAuthUser) {
           btnAuthUser.title = `Signed in as ${user.displayName || user.email || 'User'} (Cloud Synced)`;
           btnAuthUser.classList.add('synced');
+          btnAuthUser.href = "/src/pages/dashboard/index.html";
         }
         setSaveStatus('cloud');
         await syncNotesWithCloud(user.uid);
@@ -176,6 +177,7 @@ let currentUser = null;
         if (btnAuthUser) {
           btnAuthUser.title = 'Sign In to sync notes across devices';
           btnAuthUser.classList.remove('synced');
+          btnAuthUser.href = "/index.html?login=true";
         }
         setSaveStatus('saved');
       }
