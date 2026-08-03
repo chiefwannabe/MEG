@@ -163,6 +163,7 @@
     ripples:    [],
     rafId:      null,
     themeEl:    null,                    // <style> injected for theme vars
+    lastTarget: null,                    // cached last evaluated hover target
   };
 
   let listenersAttached = false;
@@ -265,6 +266,7 @@
 
   const disable = () => {
     state.enabled = false;
+    state.lastTarget = null; // Prevent memory leak by releasing element reference
     document.documentElement.setAttribute('data-cursor-disabled', 'true');
     document.documentElement.removeAttribute('data-cursor-ready');
     detachListeners();
@@ -304,6 +306,13 @@
    * the correct cursor mode.  Checks text first (higher priority).
    */
   const applyHoverState = (target) => {
+    // ⚡ Optimization: Skip recalculations if mouse is still over the same target.
+    // This avoids extremely expensive getComputedStyle() and DOM tree walking on every mousemove event.
+    if (state.lastTarget === target) {
+      return;
+    }
+    state.lastTarget = target;
+
     const wantsText  = ancestorMatches(CONFIG.textSelectors,  target);
     const wantsHover = !wantsText && ancestorMatches(CONFIG.hoverSelectors, target);
 
