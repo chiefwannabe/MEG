@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Previous Year Question Papers</title>
+  <style>
+    /* -------------------------------------------------
+       Design Tokens
+       ------------------------------------------------- */
+    :root {
+      --bg-warm: #F8F6F2;
+      --text-dark: #1E1E1E;
+      --gray-light: #E0E0E0;
+      --gray-mid: #B0B0B0;
+      --border-radius: 14px;
+      --transition-speed: 200ms;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+                     'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* -------------------------------------------------
+       Global Styles
+       ------------------------------------------------- */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-warm);
+      color: var(--text-dark);
+      font-family: var(--font-family);
+      line-height: 1.5;
+    }
+
+    /* -------------------------------------------------
+       Header
+       ------------------------------------------------- */
+    .site-header {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .site-title {
+      font-size: 2.2rem;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .site-subtitle {
+      font-size: 1rem;
+      margin-top: .5rem;
+      color: var(--gray-mid);
+    }
+
+    /* -------------------------------------------------
+       Search Box
+       ------------------------------------------------- */
+    .search-section {
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #year-search {
+      width: 100%;
+      max-width: 320px;
+      padding: .6rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-light);
+      border-radius: var(--border-radius);
+      outline: none;
+      transition: border var(--transition-speed) ease;
+    }
+
+    #year-search:focus {
+      border-color: var(--text-dark);
+    }
+
+    /* -------------------------------------------------
+       Cards Grid
+       ------------------------------------------------- */
+    .cards-container {
+      display: grid;
+      gap: 1.5rem;
+      padding: 1rem;
+      justify-items: stretch;
+    }
+
+    @media (min-width: 1200px) {
+      .cards-container { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (min-width: 768px) and (max-width: 1199px) {
+      .cards-container { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 480px) and (max-width: 767px) {
+      .cards-container { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 479px) {
+      .cards-container { grid-template-columns: 1fr; }
+    }
+
+    /* -------------------------------------------------
+       Card Component
+       ------------------------------------------------- */
+    .card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid var(--gray-light);
+      border-radius: var(--border-radius);
+      padding: 1rem 1.2rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition:
+        transform var(--transition-speed) ease,
+        border-color var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease;
+      color: inherit;
+    }
+
+    .card:focus-visible {
+      outline: 3px solid var(--gray-mid);
+      outline-offset: 2px;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--text-dark);
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+
+    .card-arrow {
+      font-size: 1.4rem;
+      transition: transform var(--transition-speed) ease;
+      margin-left: .5rem;
+    }
+
+    .card:hover .card-arrow,
+    .card:focus-visible .card-arrow {
+      transform: translateX(4px);
+    }
+
+    .card-year {
+      font-size: 1.5rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    .card-subtitle {
+      font-size: .9rem;
+      color: var(--gray-mid);
+      margin: .3rem 0 0;
+    }
+
+    /* -------------------------------------------------
+       Empty State
+       ------------------------------------------------- */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--gray-mid);
+      padding: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-title">Previous Year Question Papers</h1>
+    <p class="site-subtitle">Access question papers from previous sessions to prepare effectively.</p>
+  </header>
+
+  <section class="search-section">
+    <input type="search" id="year-search" placeholder="Search years..."
+           aria-label="Search years">
+  </section>
+
+  <main class="cards-container" id="cards-container" aria-live="polite">
+    <!-- Cards rendered by JavaScript -->
+  </main>
+
+  <!-- Template for a card (cloned via JS) -->
+  <template id="card-template">
+    <a class="card" href="#" tabindex="0">
+      <div class="card-content">
+        <h2 class="card-year"></h2>
+        <p class="card-subtitle">Previous Year Questions</p>
+      </div>
+      <span class="card-arrow" aria-hidden="true">→</span>
+    </a>
+  </template>
+
+  <script>
+    /* -------------------------------------------------
+       Data – add or remove years here only
+       ------------------------------------------------- */
+    const papers = [
+      { year: 2025, link: "https://www.ignou.ac.in/studentService/download/questionPapers/June2025" },
+      { year: 2024, link: "https://webservices.ignou.ac.in/Pre-Question/Question%20Paper%20June%202024/QP%20June%202024.htm" },
+      { year: 2023, link: "https://webservices.ignou.ac.in/Pre-Question/Question%20Paper%20June%202023/QP%20June%202023.htm" },
+      { year: 2022, link: "pyqs/2022/" },
+      { year: 2021, link: "pyqs/2021/" },
+      { year: 2020, link: "pyqs/2020/" }
+      // Add more entries as needed
+    ];
+
+    /* -------------------------------------------------
+       DOM references
+       ------------------------------------------------- */
+    const container    = document.getElementById('cards-container');
+    const searchInput  = document.getElementById('year-search');
+    const cardTemplate = document.getElementById('card-template');
+
+    /* -------------------------------------------------
+       Rendering function
+       ------------------------------------------------- */
+    function renderCards(filter = '') {
+      container.innerHTML = '';               // clear previous cards
+
+      const filtered = papers.filter(p =>
+        p.year.toString().includes(filter)
+      );
+
+      if (filtered.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'No Previous Year Papers Found';
+        container.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(p => {
+        const clone   = cardTemplate.content.cloneNode(true);
+        const anchor  = clone.querySelector('a');
+        const yearEl  = clone.querySelector('.card-year');
+
+        anchor.href = p.link;
+        if (p.link.startsWith('http')) {
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+        }
+        anchor.setAttribute('aria-label', `Open question papers for ${p.year}`);
+        yearEl.textContent = `PYQs ${p.year}`;
+
+        container.appendChild(clone);
+      });
+    }
+
+    /* -------------------------------------------------
+       Search handling – instant filtering
+       ------------------------------------------------- */
+    searchInput.addEventListener('input', e => {
+      const term = e.target.value.trim();
+      renderCards(term);
+    });
+
+    /* Initial render */
+    renderCards();
+  </script>
+</body>
+</html>
