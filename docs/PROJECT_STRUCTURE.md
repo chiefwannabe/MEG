@@ -28,7 +28,7 @@ The following items are intentionally preserved at the workspace root:
 | `.vercel/` | Deployment | Local Vercel deployment cache metadata. |
 | `skills-lock.json` | Lockfile | Agent skills dependency lockfile. |
 | `api/` | Serverless API | Vercel zero-config serverless function endpoint (`api/imagekit-auth.js`). |
-| `archive/` | Storage Archive | Static reference file repository (`archive/Html_files/`). |
+| `assets/` | Storage Assets | Static reference file repository (`assets/Html_files/`). |
 | `config/` | Project Config | Centralized build and framework config files (`firebase.json`, `vercel.json`, etc.). |
 | `docs/` | Documentation | Central documentation workspace (architecture, audits, logs). |
 | `scripts/` | Utility Scripts | Standalone Node.js build and generation tools. |
@@ -70,8 +70,8 @@ The following items are intentionally preserved at the workspace root:
 
 ---
 
-### Archive & Document Store (`archive/` & `docs/`)
-- `Html_files/` → `archive/Html_files/`
+### Assets & Document Store (`assets/` & `docs/`)
+- `Html_files/` → `assets/Html_files/`
 - `memory/*` → `docs/memory/*`
 - `HEARTBEAT.md` → `docs/architecture/HEARTBEAT.md`
 - `FIREBASE_AUDIT_REPORT.md` → `docs/audits/FIREBASE_AUDIT_REPORT.md`
@@ -93,12 +93,12 @@ The following items are intentionally preserved at the workspace root:
 | `package.json` `"generate"` | `offline/generate-games.js` | `src/pages/offline/generate-games.js` |
 | `config/vercel.json` rewrites | `/offline/` | `/src/pages/offline/` |
 | `server/server.js` rewrites | `/offline/` | `/src/pages/offline/` |
-| `scripts/generate-uploads.js` | `../Html_files` | `../archive/Html_files` |
+| `scripts/generate-uploads.js` | `../Html_files` | `../assets/Html_files` |
 | `src/pages/auth/auth.js` | `../src/firebase.js`, `../src/firestore.js` | `../../firebase.js`, `../../firestore.js` |
 | `src/pages/admin/admin.js` | `../src/firebase.js`, `../src/firestore.js` | `../../firebase.js`, `../../firestore.js` |
 | `src/pages/dashboard/index.js` | `../src/firebase.js`, `../src/firestore.js` | `../../firebase.js`, `../../firestore.js` |
 | `src/pages/public/notes-app.html` | `../src/firebase.js`, `../src/firestore.js` | `../../firebase.js`, `../../firestore.js` |
-| `src/pages/public/uploads.html` | `../Html_files/` | `../../../archive/Html_files/` |
+| `src/pages/public/uploads.html` | `../Html_files/` | `../../../assets/Html_files/` |
 | Default avatar images | `/assets/images/default-avatar.svg` | `/src/assets/images/default-avatar.svg` |
 
 ---
@@ -120,7 +120,7 @@ The following items are intentionally preserved at the workspace root:
 ├── .temp/                               (UNCHANGED)
 ├── api/
 │   └── imagekit-auth.js
-├── archive/
+├── assets/
 │   └── Html_files/
 │       ├── contacts-manager-debug.apk
 │       └── files.json
