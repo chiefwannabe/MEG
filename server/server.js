@@ -2,17 +2,17 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
 
 const PORT = process.env.PORT || 8080;
-const API_PORT = 3001;
 const PUBLIC_DIR = path.join(__dirname, '..');
 
-let apiApp = null;
+let imagesHandler = null;
+let uploadHandler = null;
 try {
-  apiApp = require('../api/index.js');
+  imagesHandler = require('../api/images.js');
+  uploadHandler = require('../api/upload.js');
 } catch (err) {
-  console.warn('API handler not loaded:', err.message);
+  console.warn('API handlers not loaded:', err.message);
 }
 
 const MIME_TYPES = {
@@ -37,12 +37,18 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Handle API routes directly via Express app
-  if (reqPath.startsWith('/api/')) {
-    if (apiApp) {
-      return apiApp(req, res);
+  // Handle API routes
+  if (reqPath === '/api/images' || reqPath.startsWith('/api/images/')) {
+    if (imagesHandler) {
+      return imagesHandler(req, res);
     }
   }
+  if (reqPath === '/api/upload') {
+    if (uploadHandler) {
+      return uploadHandler(req, res);
+    }
+  }
+
 
 
   // Handle /download/* route for native HTML file download
