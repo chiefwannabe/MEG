@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGNOU Free Study Resource Hub</title>
+<meta name="description" content="Free IGNOU Previous Year Question Papers, Notes, Assignments, Syllabus and Study Resources for all courses.">
+<link rel="stylesheet" href="src/ui/tokens.css">
+<link rel="stylesheet" href="src/pages/auth/auth.css">
+<link rel="stylesheet" href="src/ui/cursor/cursor.css">
+<script src="scripts/theme-toggle.js"></script>
+
+<!-- Firebase v12 CDN importmap — resolves bare module specifiers without a bundler -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":       "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+    "firebase/auth":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+    "firebase/storage":   "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js"
+  }
+}
+</script>
+
+<style>
+  /* ===================== RESET & BASE ===================== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue: #1d5fbf;
+    --blue-dark: #123f82;
+    --green: #1f9d55;
+    --green-light: #e6f7ec;
+    --blue-light: #eaf2fd;
+    --text-dark: #1b2430;
+    --text-light: #5a6472;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 6px 20px rgba(20, 40, 80, 0.08);
+    --shadow-hover: 0 10px 28px rgba(20, 40, 80, 0.14);
+
+    /* Theme border & element variables */
+    --card-border: #eef2f7;
+    --course-card-border: #d9efe1;
+    --faq-item-border: #e4e9f0;
+    --mobile-nav-border: #f1f3f8;
+    --user-dropdown-border: #e0e8f4;
+    --user-dropdown-divider: #eef2f7;
+    --user-dropdown-header-bg: #f7f9fd;
+    --input-border: #d8e2f0;
+    --input-bg: #f9fbff;
+    --user-avatar-hover-bg: #eaf2fd;
+    --header-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  :root[data-theme="dark"],
+  html.dark-theme,
+  body.dark-theme,
+  .dark-theme {
+    --white: #0f172a; /* Slate 900 */
+    --blue-light: #1e293b; /* Slate 800 */
+    --green-light: #064e3b; /* Emerald 900 */
+    --text-dark: #f8fafc; /* Slate 50 */
+    --text-light: #94a3b8; /* Slate 400 */
+
+    /* Adapt brand colors for visibility on dark background */
+    --blue: #3b82f6; /* Blue 500 */
+    --blue-dark: #93c5fd; /* Blue 300 */
+    --green: #10b981; /* Emerald 500 */
+
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    --shadow-hover: 0 10px 28px rgba(0, 0, 0, 0.4);
+
+    /* Dark theme equivalents for borders and elements */
+    --card-border: #1e293b;
+    --course-card-border: #064e3b;
+    --faq-item-border: #1e293b;
+    --mobile-nav-border: #1e293b;
+    --user-dropdown-border: #1e293b;
+    --user-dropdown-divider: #1e293b;
+    --user-dropdown-header-bg: #1e293b;
+    --input-border: #334155;
+    --input-bg: #1e293b;
+    --user-avatar-hover-bg: #1e293b;
+    --header-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  /* Transition for theme change */
+  body, header, section, .card, .course-card, .why-card, .faq-item, .faq-item summary, .hamburger-btn, .mobile-nav-drawer, .btn, .auth-card, .user-dropdown {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
+    color: var(--text-dark);
+    background: var(--white);
+    line-height: 1.6;
+  }
+
+  img, svg { max-width: 100%; display: block; }
+
+  a { text-decoration: none; color: inherit; }
+
+  ul { list-style: none; }
+
+  section { padding: 70px 20px; }
+
+  .container {
+    max-width: 1160px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    color: var(--blue-dark);
+    margin-bottom: 12px;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-light);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    font-size: 1rem;
+  }
+
+  /* ===================== HEADER / NAV ===================== */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    box-shadow: var(--header-shadow);
+  }
+
+  .navbar {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+  }
+
+  .logo span { color: var(--green); }
+
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .nav-links a {
+    font-weight: 500;
+    color: var(--text-dark);
+    padding: 6px 4px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--blue);
+    border-bottom-color: var(--green);
+  }
+
+  /* ===================== HERO ===================== */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-light) 0%, var(--green-light) 100%);
+    padding: 90px 20px 80px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 2.6rem;
+    color: var(--blue-dark);
+    margin-bottom: 18px;
+    line-height: 1.25;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-light);
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+
+  .btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: var(--white);
+    box-shadow: var(--shadow);
+  }
+
+  .btn-primary:hover {
+    background: var(--blue-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  .btn-secondary:hover {
+    background: var(--green);
+    color: var(--white);
+    transform: translateY(-3px);
+  }
+
+  /* ===================== ABOUT ===================== */
+  .about {
+    background: var(--white);
+  }
+
+  .about-content {
+    max-width: 780px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .about-content p {
+    color: var(--text-light);
+    margin-bottom: 16px;
+    font-size: 1.05rem;
+  }
+
+  .about-highlight {
+    color: var(--blue-dark);
+    font-weight: 600;
+  }
+
+  /* ===================== CARD GRID (shared) ===================== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 26px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--card-border);
+    transition: transform 0.25s, box-shadow 0.25s, background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .card-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 1.6rem;
+  }
+
+  .card h3 {
+    color: var(--blue-dark);
+    margin-bottom: 10px;
+    font-size: 1.15rem;
+  }
+
+  .card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+
+  .card-link {
+    display: inline-block;
+    padding: 9px 20px;
+    background: var(--green);
+    color: var(--white);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .card-link:hover { background: #157a41; }
+
+  /* ===================== RESOURCES SECTION ===================== */
+  .resources { background: var(--blue-light); }
+
+  /* ===================== COURSES SECTION ===================== */
+  .courses { background: var(--white); }
+
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+  }
+
+  .course-card {
+    background: var(--green-light);
+    border-radius: var(--radius);
+    padding: 26px 14px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--blue-dark);
+    box-shadow: var(--shadow);
+    transition: transform 0.25s, background 0.25s, background-color 0.3s ease, border-color 0.3s ease;
+    border: 1px solid var(--course-card-border);
+  }
+
+  .course-card small {
+    display: block;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-top: 6px;
+    font-size: 0.8rem;
+  }
+
+  .course-card:hover {
+    transform: translateY(-5px);
+    background: var(--green);
+    color: var(--white);
+  }
+
+  .course-card:hover small { color: #eafff0; }
+
+  /* ===================== WHY CHOOSE US ===================== */
+  .why { background: var(--green-light); }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  .why-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 26px 20px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .why-card .why-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .why-card h3 {
+    color: var(--blue-dark);
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+  }
+
+  .why-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+
+  /* ===================== FAQ ===================== */
+  .faq { background: var(--white); }
+
+  .faq-list {
+    max-width: 780px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .faq-item {
+    border: 1px solid var(--faq-item-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--blue-light);
+  }
+
+  .faq-item summary {
+    padding: 18px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--blue-dark);
+    list-style: none;
+    position: relative;
+  }
+
+  .faq-item summary::-webkit-details-marker { display: none; }
+
+  .faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 22px;
+    top: 16px;
+    font-size: 1.3rem;
+    color: var(--green);
+    transition: transform 0.2s;
+  }
+
+  .faq-item[open] summary::after {
+    content: "−";
+  }
+
+  .faq-item p {
+    padding: 0 22px 20px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+  }
+
+  /* ===================== CTA ===================== */
+  .cta {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+    text-align: center;
+    color: var(--white);
+    padding: 70px 20px;
+  }
+
+  .cta h2 {
+    font-size: 2rem;
+    margin-bottom: 14px;
+  }
+
+  .cta p {
+    max-width: 600px;
+    margin: 0 auto 28px;
+    opacity: 0.95;
+  }
+
+  .cta .btn-primary {
+    background: var(--white);
+    color: var(--blue-dark);
+  }
+
+  .cta .btn-primary:hover {
+    background: #eaf2fd;
+    color: var(--blue-dark);
+  }
+
+  /* ===================== FOOTER ===================== */
+  footer {
+    background: #10192b;
+    color: #c6cedb;
+    padding: 50px 20px 20px;
+  }
+
+  .footer-grid {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #26324a;
+  }
+
+  .footer-col h3 {
+    color: var(--white);
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+  }
+
+  .footer-col ul li {
+    margin-bottom: 10px;
+  }
+
+  .footer-col ul li a:hover {
+    color: var(--green);
+  }
+
+  .footer-col p {
+    font-size: 0.9rem;
+    color: #a4adbd;
+  }
+
+  .footer-bottom {
+    max-width: 1160px;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 20px;
+    font-size: 0.85rem;
+    color: #8891a1;
+  }
+
+  .footer-disclaimer {
+    max-width: 1160px;
+    margin: 0 auto 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #8891a1;
+    line-height: 1.7;
+  }
+
+  /* ===================== RESPONSIVE ===================== */
+  .hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    padding: 8px;
+    touch-action: manipulation;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  /* ===================== THEME TOGGLE ===================== */
+  .theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--text-dark);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .theme-toggle-btn:hover {
+    background: var(--blue-light);
+  }
+
+  .theme-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    stroke: currentColor;
+  }
+
+  /* Light theme state: Moon icon is hidden, Sun is shown */
+  :root:not([data-theme="dark"]):not(.dark-theme) .theme-toggle-btn .sun-icon,
+  body:not(.dark-theme) .theme-toggle-btn .sun-icon {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  :root:not([data-theme="dark"]):not(.dark-theme) .theme-toggle-btn .moon-icon,
+  body:not(.dark-theme) .theme-toggle-btn .moon-icon {
+    transform: rotate(90deg) scale(0);
+    opacity: 0;
+  }
+
+  /* Dark theme state: Sun icon is hidden, Moon is shown */
+  :root[data-theme="dark"] .theme-toggle-btn .sun-icon,
+  .dark-theme .theme-toggle-btn .sun-icon,
+  body.dark-theme .theme-toggle-btn .sun-icon {
+    transform: rotate(-90deg) scale(0);
+    opacity: 0;
+  }
+  :root[data-theme="dark"] .theme-toggle-btn .moon-icon,
+  .dark-theme .theme-toggle-btn .moon-icon,
+  body.dark-theme .theme-toggle-btn .moon-icon {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  .hamburger-btn:active {
+    background: var(--blue-light);
+  }
+
+  .mobile-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(27, 36, 48, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .mobile-nav-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .mobile-nav-drawer {
+    width: min(280px, 80vw);
+    height: 100%;
+    background: var(--white);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .mobile-nav-overlay.open .mobile-nav-drawer {
+    transform: translateX(0);
+  }
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--mobile-nav-border);
+    padding-bottom: 16px;
+  }
+  .mobile-nav-close {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: var(--text-light);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .mobile-nav-links li a {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    padding: 10px 14px;
+    display: block;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-nav-links li a:hover {
+    background: var(--blue-light);
+    color: var(--blue);
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none !important;
+    }
+    .hamburger-btn {
+      display: inline-flex;
+    }
+    .navbar {
+      padding: 10px 16px;
+    }
+    .hero {
+      padding: 60px 16px 50px;
+    }
+    .hero h1 {
+      font-size: 2rem;
+    }
+    .btn-group {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn {
+      width: 100%;
+      text-align: center;
+      min-height: 44px;
+    }
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.8rem; }
+    section { padding: 40px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER / NAVIGATION ===================== -->
+<header>
+  <nav class="navbar" aria-label="Main navigation">
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav-overlay">
+      &#9776;
+    </button>
+    <div class="logo">IGNOU <span>Study Hub</span></div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#resources">Resources</a></li>
+      <li><a href="#courses">Courses</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <!-- ── AUTH AREA (Sign In button / User menu) ── -->
+    <div class="auth-nav-area">
+
+      <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Sign In Button (shown when logged out) -->
+      <button class="btn-signin" id="btn-signin" aria-label="Sign in to your account">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Sign In
+      </button>
+
+      <!-- User Menu (shown when logged in) -->
+      <div class="user-menu" id="user-menu" role="navigation" aria-label="User account menu">
+        <button class="user-avatar-btn" id="user-avatar-btn" aria-haspopup="true" aria-expanded="false" aria-label="Account options">
+          <div class="user-avatar" aria-hidden="true">?</div>
+        </button>
+
+        <div class="user-dropdown" role="menu">
+          <div class="user-dropdown-header">
+            <div class="ud-name"></div>
+            <div class="ud-email"></div>
+          </div>
+          <ul>
+            <li><a href="src/pages/dashboard/index.html" class="ud-nav-link" role="menuitem">&#128202; Dashboard</a></li>
+            <li class="ud-admin-link" style="display: none;"><a href="src/pages/admin/admin.html" role="menuitem">👑 Admin Panel</a></li>
+            <li><a href="#" class="ud-nav-link" data-page="settings"  role="menuitem">&#9881;&#65039; Settings</a></li>
+            <li class="ud-divider" role="separator"></li>
+            <li class="ud-logout"><button id="btn-logout" role="menuitem">&#128274; Logout</button></li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /auth-nav-area -->
+  </nav>
+</header>
+
+<!-- Mobile Slide-out Menu Overlay -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" hidden>
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+    <div class="mobile-nav-header">
+      <div class="logo">IGNOU <span>Study Hub</span></div>
+      <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">&times;</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#resources">Resources</a></li>
+      <li><a href="#courses">Courses</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li class="mobile-nav-item-dashboard" style="display: none;"><a href="src/pages/dashboard/index.html">Dashboard</a></li>
+      <li class="mobile-nav-item-admin" style="display: none;"><a href="src/pages/admin/admin.html">Admin Panel</a></li>
+      <li class="mobile-nav-item-logout" style="display: none;"><a href="#" id="mobile-logout-btn">Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<main>
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <h1>Free IGNOU Study Resources</h1>
+      <p>Helping IGNOU students succeed with free Previous Year Question Papers, Notes, and Study Materials.</p>
+      <div class="btn-group">
+        <a href="src/pages/notes/notes.html" class="btn btn-secondary">Create Notes</a>
+        <a href="/games" class="btn btn-secondary">Games</a>
+        <a href="archive_2/index.html" class="btn btn-secondary">Archive</a>
+        <a href="src/pages/public/uploads.html" class="btn btn-secondary">BOX</a>
+        <a href="/games/slime%20td.html" class="btn btn-secondary">Tower Defence</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ABOUT US ===================== -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">About Us</h2>
+      <div class="about-content">
+        <p>
+          <span class="about-highlight">IGNOU Study Hub</span> is a
+          <span class="about-highlight">non-profit educational initiative</span>
+          created by students, for students. Our mission is simple — make quality
+          education accessible to everyone by offering free access to Previous Year
+          Question Papers, handwritten notes, solved assignments, and study guides.
+        </p>
+        <p>
+          We believe that financial barriers should never come in the way of learning.
+          That's why every resource on this platform is completely free, with no
+          hidden charges, no registration walls, and no restrictions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESOURCES SECTION ===================== -->
+  <section class="resources" id="resources">
+    <div class="container">
+      <h2 class="section-title">Free Study Resources</h2>
+      <p class="section-subtitle">Everything you need to prepare for your IGNOU exams, all in one place.</p>
+      <div class="grid">
+
+        <article class="card">
+          <div class="card-icon">📄</div>
+          <h3>Previous Year Question Papers</h3>
+          <p>Access PYQs from past sessions to understand exam patterns and important topics.</p>
+          <a href="src/pages/PYQs/PYQ.html" class="card-link">Download PYQs</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📝</div>
+          <h3>Handwritten Notes</h3>
+          <p>Well-organized, easy-to-understand handwritten notes prepared by fellow students.</p>
+          <a href="#" class="card-link">Get Notes</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">✅</div>
+          <h3>All Assignments</h3>
+          <p>Sample solved assignments to guide you in preparing your own submissions.</p>
+          <a href="https://www.ignou.ac.in/studentService/download/assignments" target="_blank" rel="noopener noreferrer" class="card-link">All Assignments</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📘</div>
+          <h3>Study Guides</h3>
+          <p>Concise, exam-focused guides covering key concepts from every unit.</p>
+          <a href="#" class="card-link">Get Study Guide</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📚</div>
+          <h3>Syllabus</h3>
+          <p>Latest updated syllabus for all major IGNOU programmes and courses.</p>
+          <a href="#" class="card-link">View Syllabus</a>
+        </article>
+
+        <article class="card">
+          <div class="card-icon">📢</div>
+          <h3>Important Updates</h3>
+          <p>Stay informed about exam dates, assignment deadlines, and IGNOU notices.</p>
+          <a href="#" class="card-link">See Updates</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== POPULAR COURSES ===================== -->
+  <section class="courses" id="courses">
+    <div class="container">
+      <h2 class="section-title">Popular Courses</h2>
+      <p class="section-subtitle">Find resources tailored to your specific IGNOU programme.</p>
+      <div class="course-grid">
+        <a href="#" class="course-card">MEG <small>MA English</small></a>
+        <a href="#" class="course-card">MHD <small>MA Hindi</small></a>
+        <a href="#" class="course-card">BAG <small>BA General</small></a>
+        <a href="#" class="course-card">BCOMG <small>B.Com General</small></a>
+        <a href="#" class="course-card">BCA <small>Computer Applications</small></a>
+        <a href="#" class="course-card">MCA <small>Master in Computer Apps</small></a>
+        <a href="#" class="course-card">MBA <small>Business Administration</small></a>
+        <a href="#" class="course-card">MA English <small>Master's Programme</small></a>
+        <a href="#" class="course-card">BA English <small>Bachelor's Programme</small></a>
+        <a href="#" class="course-card">BSc <small>Bachelor of Science</small></a>
+        <a href="#" class="course-card">MCom <small>Master of Commerce</small></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== WHY CHOOSE US ===================== -->
+  <section class="why" id="why">
+    <div class="container">
+      <h2 class="section-title">Why Choose Us</h2>
+      <p class="section-subtitle">A platform built with students' needs at the core.</p>
+      <div class="why-grid">
+
+        <div class="why-card">
+          <div class="why-icon">🆓</div>
+          <h3>100% Free</h3>
+          <p>Every resource is free to access and download, always.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🚫</div>
+          <h3>No Registration Required</h3>
+          <p>Access all materials instantly without signing up or logging in.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🔄</div>
+          <h3>Regularly Updated</h3>
+          <p>New papers, notes, and updates added consistently every session.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">📱</div>
+          <h3>Mobile Friendly</h3>
+          <p>Fully responsive design so you can study from any device, anywhere.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">⚡</div>
+          <h3>Fast Downloads</h3>
+          <p>Lightweight pages and direct links for quick, hassle-free downloads.</p>
+        </div>
+
+        <div class="why-card">
+          <div class="why-icon">🤝</div>
+          <h3>Community Driven</h3>
+          <p>Built and improved with contributions from IGNOU students like you.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ SECTION ===================== -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Quick answers to common questions about IGNOU Study Hub.</p>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Are the resources free?</summary>
+          <p>Yes, absolutely. All PYQs, notes, assignments, and study guides on this platform are 100% free to access and download, with no hidden charges.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Is registration required?</summary>
+          <p>No, you do not need to register or create an account. All resources are available instantly to everyone.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Are PYQs updated every year?</summary>
+          <p>Yes, we aim to update the Previous Year Question Papers section after every exam session so you always have access to the latest papers.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can I contribute notes?</summary>
+          <p>Yes! We welcome contributions from students. If you have quality notes or solved assignments to share, please reach out to us via the contact section.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CALL TO ACTION ===================== -->
+  <section class="cta">
+    <div class="container">
+      <h2>Start Learning Today — Completely Free</h2>
+      <p>Explore hundreds of free resources and take the next step towards exam success. No sign-up, no cost — just study material when you need it.</p>
+      <a href="#resources" class="btn btn-primary">Explore Free Resources</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer id="contact">
+  <div class="footer-grid">
+
+    <div class="footer-col">
+      <h3>About</h3>
+      <p>IGNOU Study Hub is an independent, non-profit educational initiative dedicated to providing free study resources for IGNOU students.</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Quick Links</h3>
+      <ul>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#courses">Courses</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <ul>
+        <li><a href="mailto:contact@ignoustudyhub.example">contact@ignoustudyhub.example</a></li>
+        <li><a href="#">Submit Notes / Feedback</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Disclaimer</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <p class="footer-disclaimer">
+    Disclaimer: IGNOU Study Hub is an independent, student-run, non-profit educational
+    website and is <strong>not officially affiliated with or endorsed by IGNOU</strong>
+    (Indira Gandhi National Open University). All content is shared for educational
+    purposes only.
+  </p>
+
+  <div class="footer-bottom">
+    &copy; 2026 IGNOU Study Hub. All rights reserved.
+  </div>
+</footer>
+
+<!-- ================================================================
+     AUTH MODAL
+     ================================================================ -->
+<div class="auth-overlay" id="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-card-header">
+      <button class="auth-close-btn" id="auth-close-btn" aria-label="Close sign-in dialog">&#10005;</button>
+      <div class="auth-logo-mark" aria-hidden="true">&#127891;</div>
+      <h2 id="auth-modal-title">Welcome Back</h2>
+      <p>Sign in to your account</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" data-tab="signin"   role="tab" aria-selected="true"  aria-controls="panel-signin">Sign In</button>
+      <button class="auth-tab"        data-tab="register" role="tab" aria-selected="false" aria-controls="panel-register">Create Account</button>
+    </div>
+
+    <!-- Body -->
+    <div class="auth-body">
+
+      <!-- ── Panel: Sign In ── -->
+      <div class="auth-panel active" id="panel-signin" role="tabpanel">
+        <div class="auth-message" aria-live="polite"></div>
+
+        <form id="form-signin" novalidate autocomplete="on">
+          <div class="auth-field">
+            <label for="signin-username">Username</label>
+            <input type="text" id="signin-username" name="username" placeholder="Enter your username" autocomplete="username" required />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <div class="auth-field">
+            <label for="signin-password">Password</label>
+            <div class="pw-wrapper">
+              <input type="password" id="signin-password" name="password" placeholder="Your password" autocomplete="current-password" required />
+              <button type="button" class="pw-toggle" aria-label="Toggle password visibility">Show</button>
+            </div>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <button type="button" class="auth-forgot-link" id="link-forgot-pw" style="display: none;">Forgot password?</button>
+          <button type="submit" class="auth-submit-btn">Sign In</button>
+        </form>
+
+        <div class="auth-switch">
+          Don&rsquo;t have an account?
+          <button id="link-go-register">Create one free</button>
+        </div>
+      </div>
+
+      <!-- ── Panel: Create Account ── -->
+      <div class="auth-panel" id="panel-register" role="tabpanel">
+        <div class="auth-message" aria-live="polite"></div>
+
+        <form id="form-register" novalidate autocomplete="on">
+          <div class="auth-field">
+            <label for="reg-name">Full name</label>
+            <input type="text" id="reg-name" name="name" placeholder="Your name" autocomplete="name" required />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <div class="auth-field">
+            <label for="reg-username">Username</label>
+            <input type="text" id="reg-username" name="username" placeholder="Choose a username" autocomplete="username" required />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <div class="auth-field">
+            <label for="reg-password">Password</label>
+            <div class="pw-wrapper">
+              <input type="password" id="reg-password" name="password" placeholder="Min. 6 characters" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" aria-label="Toggle password visibility">Show</button>
+            </div>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <div class="auth-field">
+            <label for="reg-password2">Confirm password</label>
+            <div class="pw-wrapper">
+              <input type="password" id="reg-password2" name="password2" placeholder="Repeat your password" autocomplete="new-password" required />
+              <button type="button" class="pw-toggle" aria-label="Toggle confirm password visibility">Show</button>
+            </div>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn">Create Account</button>
+        </form>
+
+        <p class="auth-terms">
+          By creating an account you agree to our
+          <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        </p>
+
+        <div class="auth-switch">
+          Already have an account?
+          <button id="link-go-signin">Sign in</button>
+        </div>
+      </div>
+
+      <!-- ── Panel: Forgot Password ── -->
+      <div class="auth-panel" id="panel-forgot" role="tabpanel">
+        <div class="auth-message" aria-live="polite"></div>
+
+        <button class="auth-back-btn" id="link-back-signin" type="button">&#8592; Back to Sign In</button>
+
+        <form id="form-forgot" novalidate>
+          <div class="auth-field">
+            <label for="forgot-email">Email address</label>
+            <input type="email" id="forgot-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn">Send Reset Link</button>
+        </form>
+
+        <div class="auth-switch">
+          Remembered it?
+          <button id="link-back-signin2">Sign in instead</button>
+        </div>
+      </div>
+
+    </div><!-- /auth-body -->
+  </div><!-- /auth-card -->
+</div><!-- /auth-overlay -->
+
+<script type="module" src="src/pages/auth/auth.js"></script>
+
+<!-- ── Custom Cursor ────────────────────────────── -->
+<script src="src/ui/cursor/cursor.js" defer></script>
+</body>
+</html>

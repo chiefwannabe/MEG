@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEG Cloud File Vault</title>
+<meta name="description" content="Production Cloud File Vault for IGNOU MEG Study Hub powered by Supabase Storage. Direct drag-and-drop, rich media previews, search, multi-selection, and security.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../ui/tokens.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor.css">
+<script src="../../../scripts/theme-toggle.js"></script>
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    --bg: #080b14;
+    --bg-surface: #0d1220;
+    --card-bg: #0f1524;
+    --card-hover: #151d30;
+    --border-color: rgba(0, 240, 255, 0.18);
+    --border-glow: rgba(0, 240, 255, 0.4);
+    --cyan: #00f0ff;
+    --magenta: #ff3ec9;
+    --violet: #8b5cf6;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --text-primary: #e8f1ff;
+    --text-muted: #647089;
+    --shadow-cyan: rgba(0, 240, 255, 0.15);
+  }
+
+  /* Light theme overrides */
+  :root:not([data-theme="dark"]):not(.dark-theme),
+  html:not(.dark-theme) {
+    --bg: #f4f6fa;
+    --bg-surface: #ffffff;
+    --card-bg: #ffffff;
+    --card-hover: #f0f4f9;
+    --border-color: rgba(0, 100, 200, 0.18);
+    --border-glow: rgba(0, 100, 200, 0.4);
+    --cyan: #0284c7;
+    --magenta: #d946ef;
+    --violet: #7c3aed;
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+    --shadow-cyan: rgba(2, 132, 199, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Ambient Grid Background */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .glow-orb {
+    position: fixed;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.22;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .glow-orb.one { background: var(--cyan); top: -200px; left: -150px; }
+  .glow-orb.two { background: var(--magenta); bottom: -250px; right: -150px; }
+
+  /* Top Navigation Bar */
+  .vault-navbar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: rgba(13, 18, 32, 0.7);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .nav-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .back-home-btn:hover {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--cyan);
+    transform: translateX(-2px);
+  }
+
+  .nav-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--cyan);
+  }
+
+  .nav-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .theme-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.2s ease;
+  }
+  .theme-toggle-btn:hover { border-color: var(--cyan); }
+
+  /* Header Section */
+  header.vault-header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 48px 24px 28px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  h1.vault-heading {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 6vw, 56px);
+    letter-spacing: 1px;
+    margin-top: 12px;
+    background: linear-gradient(90deg, var(--cyan), var(--violet) 50%, var(--magenta));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 30px var(--shadow-cyan);
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 10px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* Main Container & Toolbar */
+  main.vault-main {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  .vault-toolbar-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+
+  .toolbar-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .vault-breadcrumbs {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .vault-breadcrumbs .crumb {
+    color: var(--cyan);
+    cursor: pointer;
+  }
+  .vault-breadcrumbs .crumb.active {
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: default;
+  }
+  .vault-breadcrumbs .sep { color: var(--text-muted); }
+
+  .vault-metrics-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 240, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+  }
+  .vault-metrics-badge .dot { color: var(--cyan); }
+
+  .toolbar-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .search-box-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+  }
+  .search-box-wrapper .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .search-box-wrapper input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .search-box-wrapper input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px var(--shadow-cyan);
+  }
+
+  .toolbar-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .vault-select {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .view-toggle-buttons {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .view-toggle-buttons .toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .view-toggle-buttons .toggle-btn.active {
+    background: var(--cyan);
+    color: #031014;
+    font-weight: 600;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+  .btn-primary { background: var(--cyan); color: #031014; }
+  .btn-primary:hover { box-shadow: 0 0 16px var(--shadow-cyan); }
+  .btn-secondary { background: transparent; border-color: var(--cyan); color: var(--cyan); }
+  .btn-secondary:hover { background: rgba(0,240,255,0.1); }
+  .btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border-color); }
+  .btn-danger { background: var(--red); color: white; }
+
+  .toolbar-chips-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .chip.active, .chip:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: rgba(0, 240, 255, 0.08);
+  }
+
+  /* Grid & List View Containers */
+  .vault-items-container.view-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .vault-items-container.view-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Vault Cards (Grid) */
+  .vault-card {
+    background: linear-gradient(160deg, var(--card-bg), #0a0e1a);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .vault-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-glow);
+    box-shadow: 0 12px 32px var(--shadow-cyan);
+  }
+  .vault-card.is-selected {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px var(--shadow-cyan);
+    background: rgba(0, 240, 255, 0.06);
+  }
+  .vault-card.is-pinned {
+    border-top: 3px solid var(--amber);
+  }
+
+  .card-select-checkbox {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+  }
+
+  .card-star-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .card-star-btn.starred { color: var(--amber); }
+
+  .card-icon-container {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: rgba(0, 240, 255, 0.04);
+    overflow: hidden;
+  }
+  .vault-file-icon { font-size: 36px; }
+  .vault-card-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .vault-preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-name {
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .ext-badge {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--cyan);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* List View Overrides */
+  .view-list .vault-card {
+    display: flex;
+    align-items: center;
+    padding: 12px 18px;
+    gap: 16px;
+  }
+  .view-list .card-icon-container {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+  .view-list .card-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Bulk Floating Action Bar */
+  .vault-bulk-bar {
+    position: sticky;
+    top: 20px;
+    z-index: 15;
+    background: var(--bg-surface);
+    border: 1px solid var(--cyan);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,240,255,0.2);
+  }
+
+  /* Modals & Overlay */
+  .vault-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 7, 15, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .vault-modal-overlay.hidden { display: none; }
+
+  .vault-modal-container {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .vault-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .vault-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 200px;
+  }
+
+  .vault-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .vault-preview-img {
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+    border-radius: 8px;
+  }
+
+  .vault-preview-video-wrapper video {
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 8px;
+  }
+
+  .vault-preview-pdf-iframe {
+    width: 100%;
+    height: 60vh;
+    border: none;
+    border-radius: 8px;
+  }
+
+  .vault-code-block, .vault-text-block {
+    background: #05070d;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    overflow-x: auto;
+    max-height: 50vh;
+  }
+
+  /* Context Menu */
+  .vault-context-menu {
+    position: fixed;
+    z-index: 120;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 180px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+  .vault-context-menu.hidden { display: none; }
+  .context-item {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+  .context-item:hover {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--cyan);
+  }
+  .context-item.danger { color: var(--red); }
+  .context-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 4px 0;
+  }
+
+  /* Dropzone Overlay */
+  .vault-dropzone-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(0, 240, 255, 0.15);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px dashed var(--cyan);
+  }
+  .vault-dropzone-overlay.hidden { display: none; }
+  .dropzone-content {
+    text-align: center;
+    color: var(--cyan);
+    font-weight: 700;
+  }
+  .dropzone-icon { font-size: 64px; margin-bottom: 12px; }
+
+  /* Queue Widget */
+  .upload-queue-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 80;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .upload-queue-widget.hidden { display: none; }
+  .queue-widget-header {
+    padding: 10px 14px;
+    background: rgba(0, 240, 255, 0.08);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Toast Notification */
+  .vault-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 150;
+    background: var(--bg-surface);
+    border: 1px solid var(--cyan);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    box-shadow: 0 10px 30px var(--shadow-cyan);
+    animation: toastIn 0.3s ease;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  /* Empty & Error States */
+  .vault-empty-state, .vault-error-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    border: 1px dashed var(--border-color);
+    border-radius: 14px;
+    grid-column: 1 / -1;
+  }
+  .empty-icon, .error-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* Skeletons */
+  .skeleton-card {
+    height: 180px;
+    background: var(--card-bg);
+    animation: skeletonPulse 1.5s infinite ease-in-out;
+  }
+  @keyframes skeletonPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.2; }
+  }
+
+  @media (max-width: 640px) {
+    header.vault-header { padding: 32px 16px 20px; }
+    main.vault-main { padding: 0 16px 60px; }
+    .toolbar-controls-row { flex-direction: column; align-items: stretch; }
+    .toolbar-actions-group { justify-content: space-between; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="glow-orb one"></div>
+<div class="glow-orb two"></div>
+
+<!-- Top Navigation Header -->
+<nav class="vault-navbar">
+  <div class="nav-brand-group">
+    <a href="../../../index.html" class="back-home-btn">← Back to Home</a>
+    <span class="nav-title">MEG VAULT</span>
+  </div>
+  <div class="nav-right-controls">
+    <button id="themeToggleBtn" class="theme-toggle-btn">
+      <span class="theme-icon">🌙</span> <span class="theme-label">Dark Theme</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Page Header -->
+<header class="vault-header">
+  <span class="eyebrow">Cloud Storage Synchronization</span>
+  <h1 class="vault-heading">MEG FILE VAULT</h1>
+  <p class="subtitle">Securely view, stream, download, and manage your IGNOU MEG documents, media, and resources directly from Supabase Storage.</p>
+</header>
+
+<!-- Main Vault App Container -->
+<main class="vault-main">
+  <!-- Toolbar Container -->
+  <div id="toolbarContainer" class="vault-toolbar-container"></div>
+
+  <!-- Grid / List Container -->
+  <div id="gridContainer"></div>
+</main>
+
+<!-- Main Vault Application ES Module Initialization -->
+<script type="module">
+  import { VAULT_CONFIG } from './vault/vault.config.js';
+  import { FileService } from './vault/services/FileService.js';
+  import { VaultToolbar } from './vault/components/VaultToolbar.js';
+  import { VaultGrid } from './vault/components/VaultGrid.js';
+  import { PreviewModal } from './vault/components/PreviewModal.js';
+  import { UploadManager } from './vault/components/UploadManager.js';
+  import { ContextMenu } from './vault/components/ContextMenu.js';
+  import { formatBytes, copyToClipboard, sortItems, filterItems } from './vault/utils/fileUtils.js';
+  import { toggleStarred, togglePinned, initNetworkMonitor } from './vault/utils/storageUtils.js';
+
+  class VaultApp {
+    constructor() {
+      this.fileService = new FileService(VAULT_CONFIG);
+      this.currentFolder = '';
+      this.rawItems = [];
+      this.filteredItems = [];
+      this.currentCategory = 'all';
+      this.currentSearch = '';
+      this.sortBy = VAULT_CONFIG.defaultSortBy;
+      this.sortOrder = VAULT_CONFIG.defaultSortOrder;
+      this.viewMode = VAULT_CONFIG.defaultView;
+      this.autoRefreshTimer = null;
+
+      this.initComponents();
+      this.initAutoRefresh();
+      this.initNetwork();
+
+      this.loadVaultFiles();
+    }
+
+    showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `vault-toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    }
+
+    initComponents() {
+      // 1. Preview Modal
+      this.previewModal = new PreviewModal(
+        (file) => this.fileService.downloadFile(file.relativePath, file.name),
+        (file) => this.copyFileLink(file)
+      );
+
+      // 2. Upload Manager
+      this.uploadManager = new UploadManager(
+        this.fileService,
+        () => this.loadVaultFiles(),
+        (msg, type) => this.showToast(msg, type)
+      );
+
+      // 3. Context Menu
+      this.contextMenu = new ContextMenu({
+        onOpen: (file) => this.handleOpenItem(file),
+        onDownload: (file) => this.fileService.downloadFile(file.relativePath, file.name),
+        onCopyLink: (file) => this.copyFileLink(file),
+        onStar: (file) => {
+          toggleStarred(file.relativePath);
+          this.loadVaultFiles();
+        },
+        onPin: (file) => {
+          togglePinned(file.relativePath);
+          this.loadVaultFiles();
+        },
+        onRename: (file) => this.handleRenameFile(file),
+        onDelete: (file) => this.handleDeleteFiles([file]),
+      });
+
+      // 4. Toolbar
+      const toolbarContainer = document.getElementById('toolbarContainer');
+      this.toolbar = new VaultToolbar(toolbarContainer, {
+        onSearch: (q) => {
+          this.currentSearch = q;
+          this.applyFiltersAndRender();
+        },
+        onFilterCategory: (cat) => {
+          this.currentCategory = cat;
+          this.applyFiltersAndRender();
+        },
+        onSortChange: (by, order) => {
+          this.sortBy = by;
+          this.sortOrder = order;
+          this.applyFiltersAndRender();
+        },
+        onViewChange: (mode) => {
+          this.viewMode = mode;
+          this.grid.setViewMode(mode);
+        },
+        onRefresh: () => this.loadVaultFiles(),
+        onNavigateFolder: (path) => this.navigateToFolder(path),
+      });
+
+      // 5. Grid / List
+      const gridContainer = document.getElementById('gridContainer');
+      this.grid = new VaultGrid(gridContainer, {
+        onItemClick: (item) => this.handleOpenItem(item),
+        onItemDoubleClick: (item) => this.previewModal.open(item),
+        onItemContextMenu: (e, item) => this.contextMenu.show(e, item),
+        onStarToggle: (file) => {
+          toggleStarred(file.relativePath);
+          this.loadVaultFiles();
+        },
+        onBulkDownload: (files) => {
+          files.forEach(f => this.fileService.downloadFile(f.relativePath, f.name));
+        },
+        onBulkDelete: (files) => this.handleDeleteFiles(files),
+      });
+    }
+
+    async loadVaultFiles() {
+      this.grid.showSkeleton();
+      const res = await this.fileService.listFiles(this.currentFolder);
+
+      if (res.error) {
+        this.grid.showErrorState(res.error);
+        this.showToast(`Storage Error: ${res.error}`, 'error');
+        return;
+      }
+
+      this.rawItems = res.items;
+      this.toolbar.updateMetrics(res.totalFiles, formatBytes(res.totalSize));
+      this.toolbar.updateBreadcrumbs(this.currentFolder);
+      this.uploadManager.setCurrentFolder(this.currentFolder);
+
+      this.applyFiltersAndRender();
+    }
+
+    applyFiltersAndRender() {
+      let filtered = [...this.rawItems];
+
+      // Category filter
+      if (this.currentCategory !== 'all') {
+        filtered = filtered.filter(item => item.isFolder || item.category === this.currentCategory);
+      }
+
+      // Search query filter
+      filtered = filterItems(filtered, this.currentSearch);
+
+      // Sorting
+      filtered = sortItems(filtered, this.sortBy, this.sortOrder);
+
+      this.filteredItems = filtered;
+      this.grid.render(this.filteredItems);
+    }
+
+    handleOpenItem(item) {
+      if (item.isFolder) {
+        this.navigateToFolder(item.relativePath);
+      } else {
+        this.previewModal.open(item);
+      }
+    }
+
+    navigateToFolder(path) {
+      this.currentFolder = path || '';
+      this.loadVaultFiles();
+    }
+
+    async copyFileLink(file) {
+      const success = await copyToClipboard(file.url);
+      if (success) {
+        this.showToast('Public link copied to clipboard!', 'success');
+      } else {
+        this.showToast('Failed to copy link', 'error');
+      }
+    }
+
+    async handleRenameFile(file) {
+      const newName = prompt('Enter new filename:', file.name);
+      if (!newName || newName === file.name) return;
+
+      const folder = file.folderPath;
+      const newPath = folder ? `${folder}/${newName}` : newName;
+
+      const res = await this.fileService.renameFile(file.relativePath, newPath);
+      if (res.success) {
+        this.showToast(`Renamed ${file.name} to ${newName}`, 'success');
+        this.loadVaultFiles();
+      } else {
+        this.showToast(`Rename failed: ${res.error}`, 'error');
+      }
+    }
+
+    async handleDeleteFiles(files) {
+      if (!files || files.length === 0) return;
+      const names = files.map(f => f.name).join(', ');
+      if (!confirm(`Are you sure you want to delete ${files.length} file(s)?\n${names}`)) return;
+
+      const paths = files.map(f => f.relativePath);
+      const res = await this.fileService.deleteFiles(paths);
+
+      if (res.success) {
+        this.showToast(`Deleted ${files.length} file(s)`, 'success');
+        this.loadVaultFiles();
+      } else {
+        this.showToast(`Delete failed: ${res.error}`, 'error');
+      }
+    }
+
+    initAutoRefresh() {
+      if (VAULT_CONFIG.autoRefreshIntervalMs > 0) {
+        this.autoRefreshTimer = setInterval(() => {
+          this.loadVaultFiles();
+        }, VAULT_CONFIG.autoRefreshIntervalMs);
+      }
+    }
+
+    initNetwork() {
+      initNetworkMonitor((isOnline) => {
+        if (!isOnline) {
+          this.showToast('Offline Mode - Showing cached vault state', 'error');
+        }
+      });
+    }
+  }
+
+  // Initialize app on DOMReady
+  document.addEventListener('DOMContentLoaded', () => {
+    window.vaultApp = new VaultApp();
+  });
+</script>
+
+<!-- Custom Cursor Component -->
+<script src="../../ui/cursor/cursor.js" defer></script>
+</body>
+</html>

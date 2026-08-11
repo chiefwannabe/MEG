@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEG Admin</title>
+<meta name="description" content="Secure administrative panel for MEGOL IGNOU Study Hub. Manage resources, users, and track platform analytics.">
+
+<link rel="stylesheet" href="../../ui/tokens.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="../../ui/cursor/cursor.css">
+<script src="../../../scripts/theme-toggle.js"></script>
+
+<!-- Firebase v12 CDN importmap -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":       "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+    "firebase/auth":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+    "firebase/storage":   "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js"
+  }
+}
+</script>
+</head>
+<body style="display: none;"> <!-- Hidden by default, shown after verification -->
+<svg style="display:none;" aria-hidden="true">
+  <symbol id="icon-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="icon-gauge" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></symbol>
+  <symbol id="icon-folder" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="icon-graduation" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M22 10v6M2 10l10-5 10 5-10 5zM6 12v5c0 2 6 2 6 2s6 0 6-2v-5"/></symbol>
+  <symbol id="icon-file-text" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></symbol>
+  <symbol id="icon-edit" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 20V10M12 20V4M6 20v-6"/></symbol>
+  <symbol id="icon-gear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="icon-logout" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="icon-bars" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="icon-wrench" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="icon-user-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24"><polygon fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+  <symbol id="icon-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="icon-house" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline fill="none" stroke="currentColor" stroke-width="2" points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="icon-file-pdf" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M10 12h2a1 1 0 0 0 0-2h-2v4M16 12h-2v4M16 14h1.5"/></symbol>
+</svg>
+<div class="app-shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar" aria-label="Admin navigation">
+    <div class="sidebar-top">
+      <a href="../../../index.html" class="brand" aria-label="MEGOL home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-text">MEG Admin</span>
+      </a>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+        <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+      </button>
+    </div>
+
+    <nav class="side-nav">
+      <ul>
+        <li><a href="#" class="nav-link active" data-nav="dashboard"><svg class="icon" aria-hidden="true"><use href="#icon-gauge"></use></svg><span>Dashboard</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="games"><svg class="icon" aria-hidden="true"><use href="#icon-gauge"></use></svg><span>Games</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="vault"><svg class="icon" aria-hidden="true"><use href="#icon-folder"></use></svg><span>Vault</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="media"><svg class="icon" aria-hidden="true"><use href="#icon-file-text"></use></svg><span>Media Library</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="announcements"><svg class="icon" aria-hidden="true"><use href="#icon-edit"></use></svg><span>Posts &amp; Announcements</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="categories"><svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg><span>Categories</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="users"><svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg><span>Users</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="analytics"><svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg><span>Analytics</span></a></li>
+        <li><a href="#" class="nav-link" data-nav="activity"><svg class="icon" aria-hidden="true"><use href="#icon-clock"></use></svg><span>Activity Logs</span></a></li>
+      </ul>
+
+      <div class="nav-divider" role="separator"></div>
+
+      <ul>
+        <li><a href="#" class="nav-link" data-nav="settings"><svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg><span>Settings</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="#" class="nav-link logout" data-nav="logout">
+        <svg class="icon" aria-hidden="true"><use href="#icon-logout"></use></svg><span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-col">
+
+    <!-- ============ TOP BAR ============ -->
+    <header class="topbar">
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
+        <svg class="icon" aria-hidden="true"><use href="#icon-bars"></use></svg>
+      </button>
+
+      <form class="search-form" role="search" action="#" onsubmit="return false;">
+        <label class="sr-only" for="globalSearch">Search resources, users...</label>
+        <svg class="icon search-icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+        <input type="search" id="globalSearch" placeholder="Search everything…" autocomplete="off">
+        <kbd class="search-kbd">Ctrl K</kbd>
+      </form>
+
+      <div class="topbar-actions">
+        <button class="icon-btn notification-btn" aria-label="Notifications"><svg class="icon" aria-hidden="true"><use href="#icon-bell"></use></svg><span class="badge-dot"></span></button>
+        <button class="btn btn-primary topbar-upload" id="openAddResourceModalBtnTop"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg>Upload</button>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <div class="user-menu">
+          <button class="user-menu-btn" id="userMenuBtn" aria-haspopup="true" aria-expanded="false" aria-label="Admin profile menu">
+            <img class="avatar" src="/src/assets/images/default-avatar.svg" alt="Admin Avatar" width="36" height="36" id="topbar-admin-avatar" loading="lazy">
+          </button>
+
+          <ul class="dropdown-menu" id="userDropdown" role="menu" hidden>
+            <li role="none"><a role="menuitem" href="#" data-nav="settings"><svg class="icon" aria-hidden="true"><use href="#icon-gear"></use></svg>Settings</a></li>
+            <li class="dropdown-divider" role="none"></li>
+            <li role="none"><a role="menuitem" href="#" class="danger logout" data-nav="logout"><svg class="icon" aria-hidden="true"><use href="#icon-logout"></use></svg>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main id="main-content" class="content">
+
+      <!-- ============ 1. DASHBOARD PANEL ============ -->
+      <div id="panel-dashboard" class="admin-panel">
+        <section class="welcome-card">
+          <div class="welcome-text">
+            <p class="eyebrow">Workspace overview · <span id="currentDate"></span></p>
+            <h1 id="welcomeHeading">Good morning, <span id="admin-welcome-name">Admin</span>.</h1>
+            <p class="quote">Everything your community needs, in one quietly capable workspace.</p>
+          </div>
+          <div class="welcome-actions"><button class="btn btn-primary" id="quickUpload">Upload file</button><button class="btn btn-secondary" data-nav="games">Add game</button></div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid" aria-label="Administrative statistics">
+          <article class="card stat-card">
+            <div class="stat-icon icon-blue"><svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg></div>
+            <div class="stat-body">
+              <span class="stat-value" id="stat-total-users">0</span>
+              <span class="stat-label">Registered users</span>
+            </div>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-icon icon-violet"><svg class="icon" aria-hidden="true"><use href="#icon-folder"></use></svg></div>
+            <div class="stat-body">
+              <span class="stat-value" id="stat-total-resources">0</span>
+              <span class="stat-label">Vault files</span>
+            </div>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-icon icon-amber"><svg class="icon" aria-hidden="true"><use href="#icon-file-text"></use></svg></div>
+            <div class="stat-body">
+              <span class="stat-value" id="stat-total-notes">0</span>
+              <span class="stat-label">Notes</span>
+            </div>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-icon icon-green"><svg class="icon" aria-hidden="true"><use href="#icon-clock"></use></svg></div>
+            <div class="stat-body">
+              <span class="stat-value" id="stat-total-pyqs">0</span>
+              <span class="stat-label">PYQs</span>
+            </div>
+          </article>
+          <article class="card stat-card">
+            <div class="stat-icon icon-cyan"><svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg></div>
+            <div class="stat-body">
+              <span class="stat-value" id="stat-total-books">0</span>
+              <span class="stat-label">Books</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- Dynamic Quick Logs / Shortcuts -->
+        <div class="content-grid" style="margin-top: 24px;">
+          <div class="content-main">
+            <section class="card section-card activity-card">
+              <div class="section-head">
+                <h2>Recent activity</h2><a href="#" data-nav="activity">View all</a>
+              </div>
+              <ul class="task-list" id="activity-list" aria-live="polite"><li class="task-item activity-empty">Loading recent changes…</li></ul>
+            </section>
+          </div>
+          <aside class="content-side">
+            <section class="card section-card quick-card">
+              <div class="section-head">
+                <h2>System status</h2>
+              </div>
+              <div class="system-status"><span class="status-dot" id="dashboard-status-dot"></span><p id="dashboard-status">Loading content data…</p><small id="dashboard-last-login"></small></div>
+              <div class="quick-actions"><button id="quickUploadAction"><svg class="icon"><use href="#icon-plus"></use></svg>Upload file</button><button data-nav="vault"><svg class="icon"><use href="#icon-folder"></use></svg>Open vault</button><button data-nav="users"><svg class="icon"><use href="#icon-users"></use></svg>Manage users</button><button data-nav="settings"><svg class="icon"><use href="#icon-gear"></use></svg>Settings</button></div>
+            </section>
+          </aside>
+        </div>
+      </div>
+
+      <!-- ============ 2. RESOURCE MANAGEMENT PANEL ============ -->
+      <div id="panel-resources" class="admin-panel" hidden>
+        <div class="panel-header-actions">
+          <h2>Resource Repository</h2>
+          <button class="btn btn-primary" id="openAddResourceModalBtn">
+            <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg> Add Resource
+          </button>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="card filters-card">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label for="filter-search">Search</label>
+              <input type="text" id="filter-search" placeholder="Search by title or tags...">
+            </div>
+            <div class="filter-group">
+              <label for="filter-type">Type</label>
+              <select id="filter-type">
+                <option value="">All Types</option>
+                <option value="Notes">Notes</option>
+                <option value="PYQs">PYQs</option>
+                <option value="Assignments">Assignments</option>
+                <option value="Books">Books</option>
+                <option value="Videos">Videos</option>
+                <option value="External Links">External Links</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-course">Course</label>
+              <select id="filter-course">
+                <option value="">All Courses</option>
+                <option value="MEG-01">MEG-01</option>
+                <option value="MEG-02">MEG-02</option>
+                <option value="MEG-03">MEG-03</option>
+                <option value="MEG-04">MEG-04</option>
+                <option value="MEG-05">MEG-05</option>
+                <option value="BEGC-132">BEGC-132</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-subject">Subject</label>
+              <input type="text" id="filter-subject" placeholder="e.g. British Poetry">
+            </div>
+          </div>
+        </div>
+
+        <!-- Resource Table Grid -->
+        <div class="card table-card">
+          <div class="table-responsive">
+            <table class="admin-table" id="resources-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Course</th>
+                  <th>Subject</th>
+                  <th>Semester</th>
+                  <th>Published</th>
+                  <th>Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resources-list-tbody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+          <div class="table-empty" id="resources-empty" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#icon-folder"></use></svg>
+            <p>No resources found matching the query.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ 3. USER MANAGEMENT PANEL ============ -->
+      <div id="panel-users" class="admin-panel" hidden>
+        <div class="panel-header-actions">
+          <h2>User Accounts & Permissions</h2>
+        </div>
+
+        <div class="card table-card">
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Provider</th>
+                  <th>Registered</th>
+                  <th>Last Active</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody id="users-list-tbody">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-games" class="admin-panel" hidden>
+        <div class="panel-header-actions"><h2>Games</h2><button class="btn btn-primary" id="openGameModalBtn"><svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg> Add game</button></div>
+        <div class="card filters-card"><div class="filters-grid"><div class="filter-group"><label for="game-search">Search</label><input id="game-search" type="search" placeholder="Search games"></div><div class="filter-group"><label for="game-status">Status</label><select id="game-status"><option value="">All statuses</option><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select></div></div></div>
+        <div class="card table-card"><div class="table-responsive"><table class="admin-table"><thead><tr><th>Name</th><th>Status</th><th>Visibility</th><th>Featured</th><th>Updated</th><th>Actions</th></tr></thead><tbody id="games-list-tbody"></tbody></table></div><div class="table-empty" id="games-empty" hidden><p>No games have been created yet.</p></div></div>
+      </div>
+
+      <!-- ============ PLACEHOLDER / COMING SOON VIEWS ============ -->
+      <div id="panel-placeholder" class="admin-panel" hidden>
+        <div class="card placeholder-card">
+          <svg class="icon" aria-hidden="true" style="font-size: 48px; color: var(--color-accent); margin-bottom: 20px;"><use href="#icon-wrench"></use></svg>
+          <h2 id="placeholder-title">Under Construction</h2>
+          <p>This administrative section is currently being constructed. Stay tuned!</p>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="copyrightYear">2026</span> MEGOL — IGNOU Study Hub. Administrative Console.</p>
+    </footer>
+  </div>
+</div>
+
+<div class="command-palette" id="commandPalette" hidden>
+  <div class="command-dialog" role="dialog" aria-modal="true" aria-labelledby="commandPaletteLabel">
+    <label id="commandPaletteLabel" class="sr-only" for="commandSearch">Search the admin workspace</label>
+    <input id="commandSearch" type="search" placeholder="Search pages, files, and users…" autocomplete="off">
+    <ul id="commandResults" role="listbox"></ul>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- 1. ADD RESOURCE MODAL -->
+<div class="modal-backdrop" id="addResourceModal" hidden>
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="addResourceTitle">
+    <div class="modal-header">
+      <h2 id="addResourceTitle">Add New Content Asset</h2>
+      <button class="modal-close-btn" id="closeAddResourceModalBtn" aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
+    </div>
+    <form id="addResourceForm" novalidate>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="add-title">Title *</label>
+          <input type="text" id="add-title" required placeholder="e.g. MEG-01 Block 1 Lecture Notes">
+        </div>
+        <div class="form-group full-width">
+          <label for="add-description">Description</label>
+          <textarea id="add-description" rows="3" placeholder="Summary or details about this asset..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="add-type">Type *</label>
+          <select id="add-type" required>
+            <option value="Notes">Notes</option>
+            <option value="PYQs">PYQs</option>
+            <option value="Assignments">Assignments</option>
+            <option value="Books">Books</option>
+            <option value="Videos">Videos</option>
+            <option value="External Links">External Links</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="add-course">Course *</label>
+          <select id="add-course" required>
+            <option value="MEG-01">MEG-01</option>
+            <option value="MEG-02">MEG-02</option>
+            <option value="MEG-03">MEG-03</option>
+            <option value="MEG-04">MEG-04</option>
+            <option value="MEG-05">MEG-05</option>
+            <option value="BEGC-132">BEGC-132</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="add-subject">Subject *</label>
+          <input type="text" id="add-subject" required placeholder="e.g. British Poetry">
+        </div>
+        <div class="form-group">
+          <label for="add-semester">Semester / Year</label>
+          <input type="text" id="add-semester" placeholder="e.g. 1st Year">
+        </div>
+        <div class="form-group">
+          <label for="add-fileUrl">File / Link URL *</label>
+          <input type="url" id="add-fileUrl" required placeholder="https://drive.google.com/... or pdf link">
+        </div>
+        <div class="form-group">
+          <label for="add-thumbnail">Thumbnail Image URL</label>
+          <input type="url" id="add-thumbnail" placeholder="https://example.com/cover.jpg">
+        </div>
+        <div class="form-group">
+          <label for="add-tags">Tags (Comma Separated)</label>
+          <input type="text" id="add-tags" placeholder="poetry, romantic, block1">
+        </div>
+        <div class="form-group row-align" style="flex-direction: row; align-items: center; gap: 8px;">
+          <input type="checkbox" id="add-published" checked style="width: auto;">
+          <label for="add-published" style="margin: 0; cursor: pointer;">Publish immediately</label>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="submit" class="btn btn-primary" id="addResourceSubmitBtn">Create Resource</button>
+        <span id="add-form-message" class="form-message" aria-live="polite"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. EDIT RESOURCE MODAL -->
+<div class="modal-backdrop" id="editResourceModal" hidden>
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="editResourceTitle">
+    <div class="modal-header">
+      <h2 id="editResourceTitle">Edit Content Asset</h2>
+      <button class="modal-close-btn" id="closeEditResourceModalBtn" aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
+    </div>
+    <form id="editResourceForm" novalidate>
+      <input type="hidden" id="edit-id">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="edit-title">Title *</label>
+          <input type="text" id="edit-title" required>
+        </div>
+        <div class="form-group full-width">
+          <label for="edit-description">Description</label>
+          <textarea id="edit-description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-type">Type *</label>
+          <select id="edit-type" required>
+            <option value="Notes">Notes</option>
+            <option value="PYQs">PYQs</option>
+            <option value="Assignments">Assignments</option>
+            <option value="Books">Books</option>
+            <option value="Videos">Videos</option>
+            <option value="External Links">External Links</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-course">Course *</label>
+          <select id="edit-course" required>
+            <option value="MEG-01">MEG-01</option>
+            <option value="MEG-02">MEG-02</option>
+            <option value="MEG-03">MEG-03</option>
+            <option value="MEG-04">MEG-04</option>
+            <option value="MEG-05">MEG-05</option>
+            <option value="BEGC-132">BEGC-132</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-subject">Subject *</label>
+          <input type="text" id="edit-subject" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-semester">Semester / Year</label>
+          <input type="text" id="edit-semester">
+        </div>
+        <div class="form-group">
+          <label for="edit-fileUrl">File / Link URL *</label>
+          <input type="url" id="edit-fileUrl" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-thumbnail">Thumbnail Image URL</label>
+          <input type="url" id="edit-thumbnail">
+        </div>
+        <div class="form-group">
+          <label for="edit-tags">Tags (Comma Separated)</label>
+          <input type="text" id="edit-tags">
+        </div>
+        <div class="form-group row-align" style="flex-direction: row; align-items: center; gap: 8px;">
+          <input type="checkbox" id="edit-published" style="width: auto;">
+          <label for="edit-published" style="margin: 0; cursor: pointer;">Published</label>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top: 24px;">
+        <button type="submit" class="btn btn-primary" id="editResourceSubmitBtn">Save Changes</button>
+        <span id="edit-form-message" class="form-message" aria-live="polite"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="gameModal" hidden>
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle">
+    <div class="modal-header"><h2 id="gameModalTitle">Add game</h2><button class="modal-close-btn" id="closeGameModalBtn" aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button></div>
+    <form id="gameForm" novalidate><input id="game-id" type="hidden"><div class="form-grid">
+      <div class="form-group full-width"><label for="game-title">Name *</label><input id="game-title" required maxlength="120"></div>
+      <div class="form-group"><label for="game-slug">Slug *</label><input id="game-slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="my-game"></div>
+      <div class="form-group"><label for="game-launch-url">Launch URL *</label><input id="game-launch-url" required type="url" placeholder="https://…"></div>
+      <div class="form-group"><label for="game-status-input">Status</label><select id="game-status-input"><option value="draft">Draft</option><option value="published">Published</option><option value="archived">Archived</option></select></div>
+      <div class="form-group"><label for="game-visibility">Visibility</label><select id="game-visibility"><option value="public">Public</option><option value="private">Private</option></select></div>
+      <div class="form-group full-width"><label for="game-tags">Tags</label><input id="game-tags" placeholder="arcade, puzzle"></div>
+      <div class="form-group row-align"><input id="game-featured" type="checkbox"><label for="game-featured">Featured on the homepage</label></div>
+    </div><div class="form-actions"><button class="btn btn-primary" type="submit">Save game</button><span class="form-message" id="game-message" aria-live="polite"></span></div></form>
+  </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+
+<!-- ── Custom Cursor ────────────────────────────── -->
+<script src="../../ui/cursor/cursor.js" defer></script>
+</body>
+</html>

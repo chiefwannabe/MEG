@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null && firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Admin-only working files. Public publication must use the explicit media/public path.
+    match /vault/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /media/private/{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+
+    match /media/public/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.size < 25 * 1024 * 1024
+        && request.resource.contentType.matches('^(image|video|audio|application)/.*');
+    }
+  }
+}

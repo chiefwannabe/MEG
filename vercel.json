@@ -1,0 +1,62 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "framework": null,
+  "headers": [
+    {
+      "source": "/download/(.*)",
+      "headers": [
+        { "key": "Content-Disposition", "value": "attachment" },
+        { "key": "Content-Type", "value": "application/octet-stream" },
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.css",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/play/:path*",
+      "destination": "https://raw.githubusercontent.com/chiefwannabe/Games/master/offline/:path*",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/games",
+      "destination": "/src/pages/games/index.html"
+    },
+    {
+      "source": "/games/:path*",
+      "destination": "/src/pages/games/index.html"
+    },
+    {
+      "source": "/download/:path*",
+      "destination": "https://raw.githubusercontent.com/chiefwannabe/Games/master/offline/:path*"
+    },
+    {
+      "source": "/notes",
+      "destination": "/src/pages/notes/notes.html"
+    },
+    {
+      "source": "/notes/:path*",
+      "destination": "/src/pages/notes/:path*"
+    }
+  ]
+}

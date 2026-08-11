@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overview · Workspace</title>
+<meta name="description" content="A clean, minimal workspace dashboard.">
+<link rel="stylesheet" href="index.css">
+<!-- Firebase v12 CDN importmap -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app":       "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js",
+    "firebase/auth":      "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js",
+    "firebase/storage":   "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- SVG Icon Sprite -->
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="icon-search" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <line x1="15.3" y1="15.3" x2="20.5" y2="20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <g stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <line x1="12" y1="2.3" x2="12" y2="4.6"/>
+        <line x1="12" y1="19.4" x2="12" y2="21.7"/>
+        <line x1="2.3" y1="12" x2="4.6" y2="12"/>
+        <line x1="19.4" y1="12" x2="21.7" y2="12"/>
+        <line x1="4.9" y1="4.9" x2="6.5" y2="6.5"/>
+        <line x1="17.5" y1="17.5" x2="19.1" y2="19.1"/>
+        <line x1="4.9" y1="19.1" x2="6.5" y2="17.5"/>
+        <line x1="17.5" y1="6.5" x2="19.1" y2="4.9"/>
+      </g>
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24">
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24">
+      <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-storage" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <rect x="3" y="14" width="18" height="6" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <line x1="6.5" y1="7" x2="8.5" y2="7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <line x1="6.5" y1="17" x2="8.5" y2="17" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-logo" viewBox="0 0 32 32">
+      <rect x="2" y="2" width="28" height="28" rx="8" fill="currentColor"/>
+      <path d="M10 21V11l6 6 6-6v10" fill="none" stroke="var(--surface)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- ================= HEADER ================= -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#icon-logo"></use></svg></span>
+      <span class="brand-name">MEG</span>
+    </div>
+
+    <div class="topbar__search">
+      <label class="search-field" for="global-search">
+        <svg class="icon search-field__icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+        <input id="global-search" type="search" placeholder="Search workspace…" autocomplete="off" aria-label="Search workspace">
+        <kbd class="search-field__kbd">/</kbd>
+      </label>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+
+    <div class="topbar__actions">
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark mode">
+        <svg class="icon icon--sun"><use href="#icon-sun"></use></svg>
+        <svg class="icon icon--moon"><use href="#icon-moon"></use></svg>
+      </button>
+
+      <div class="profile-chip" aria-label="User profile">
+        <span class="avatar avatar--sm" style="--avatar-bg:#6C6CF4">JL</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= BODY ================= -->
+  <div class="app-body">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+      <nav class="sidebar__nav">
+        <a href="#home" class="sidebar__link is-active" data-target-view="view-home">
+          <svg class="icon"><use href="#icon-home"></use></svg>
+          <span>Home</span>
+        </a>
+        <a href="#storage" class="sidebar__link" data-target-view="view-storage">
+          <svg class="icon"><use href="#icon-storage"></use></svg>
+          <span>Storage</span>
+        </a>
+        <a href="#settings" class="sidebar__link" data-target-view="view-settings">
+          <svg class="icon"><use href="#icon-settings"></use></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="dashboard" id="main-content">
+
+      <!-- HOME VIEW -->
+      <div id="view-home" class="dashboard-view">
+        <section class="welcome" aria-labelledby="welcome-heading">
+          <div class="welcome__glow" aria-hidden="true"></div>
+          <div class="welcome__text">
+            <p class="welcome__eyebrow" id="welcome-date">Loading date…</p>
+            <h1 class="welcome__heading" id="welcome-heading">Good morning, Jordan</h1>
+          </div>
+        </section>
+      </div>
+
+      <!-- STORAGE VIEW -->
+      <div id="view-storage" class="dashboard-view" hidden>
+        <section class="section panel">
+          <div class="section__head">
+            <h2 class="section__title">All Storage</h2>
+            <button class="btn btn--primary" type="button">
+              <svg class="icon"><use href="#icon-plus"></use></svg>
+              Upload item
+            </button>
+          </div>
+          <div class="projects-list" id="all-storage-list">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      </div>
+
+      <!-- SETTINGS VIEW -->
+      <div id="view-settings" class="dashboard-view" hidden>
+        <div class="settings-header">
+          <p class="settings-eyebrow">Preferences</p>
+          <h1 class="settings-title">Settings</h1>
+          <p class="settings-sub">Manage how your account works.</p>
+        </div>
+
+        <div class="panel settings-panel">
+          <div class="settings-row">
+            <div class="settings-row__info">
+              <p class="settings-row__title">Email notifications</p>
+              <p class="settings-row__desc">Get an email when new PYQs or notes are added.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-email-notif" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-row__info">
+              <p class="settings-row__title">Dark mode</p>
+              <p class="settings-row__desc">Switch the interface to a darker theme.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-dark-mode">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-row__info">
+              <p class="settings-row__title">Change password</p>
+              <p class="settings-row__desc">Update the password used to sign in.</p>
+            </div>
+            <button type="button" class="btn btn--ghost">Change</button>
+          </div>
+
+          <div class="settings-row settings-row--danger">
+            <div class="settings-row__info">
+              <p class="settings-row__title">Delete account</p>
+              <p class="settings-row__desc">Permanently remove your account and saved data.</p>
+            </div>
+            <button type="button" class="btn btn--danger">Delete</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<script type="module" src="index.js"></script>
+</body>
+</html>
