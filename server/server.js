@@ -2,9 +2,31 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 const PORT = process.env.PORT || 8080;
+const API_PORT = 3001;
 const PUBLIC_DIR = path.join(__dirname, '..');
+
+// Start Cloud API backend if present
+const cloudServerPath = path.join(__dirname, '..', 'cloud-src', 'server', 'index.js');
+let apiProcess = null;
+
+if (fs.existsSync(cloudServerPath)) {
+  apiProcess = spawn(process.execPath, ['server/index.js'], {
+    cwd: path.join(__dirname, '..', 'cloud-src'),
+    stdio: 'inherit',
+  });
+  const cleanup = () => {
+    if (apiProcess) {
+      apiProcess.kill();
+      apiProcess = null;
+    }
+  };
+  process.on('exit', cleanup);
+  process.on('SIGINT', () => { cleanup(); process.exit(); });
+  process.on('SIGTERM', () => { cleanup(); process.exit(); });
+}
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -25,6 +47,29 @@ const server = http.createServer((req, res) => {
   } catch {
     res.statusCode = 400;
     res.end('Bad Request');
+    return;
+  }
+
+  // Handle API reverse proxy to backend
+  if (reqPath.startsWith('/api/')) {
+    const proxyReq = http.request({
+      hostname: '127.0.0.1',
+      port: API_PORT,
+      path: req.url,
+      method: req.method,
+      headers: req.headers,
+    }, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', () => {
+      res.statusCode = 502;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: 'Cloud API backend unavailable' }));
+    });
+
+    req.pipe(proxyReq);
     return;
   }
 
