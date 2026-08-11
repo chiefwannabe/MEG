@@ -66,6 +66,13 @@ const server = http.createServer((req, res) => {
     reqPath = '/src/pages/games/index.html';
   }
 
+  // Handle /cloud route
+  if (reqPath === '/cloud' || reqPath === '/cloud/' || reqPath === '/cloud/index.html') {
+    reqPath = '/cloud/dist/index.html';
+  } else if (reqPath.startsWith('/cloud/')) {
+    reqPath = '/cloud/dist/' + reqPath.substring(7);
+  }
+
   // Fallback to index.html for directory routes or root
   if (reqPath === '/') {
     reqPath = '/index.html';
