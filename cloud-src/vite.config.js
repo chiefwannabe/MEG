@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/cloud/',
   plugins: [react()],
+  build: {
+    outDir: '../cloud',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       '/api': {
@@ -14,3 +18,4 @@ export default defineConfig({
     },
   },
 })
+

@@ -60,19 +60,11 @@
     },
     {
       "source": "/cloud",
-      "destination": "/cloud/dist/index.html"
+      "destination": "/cloud/index.html"
     },
     {
       "source": "/cloud/",
-      "destination": "/cloud/dist/index.html"
-    },
-    {
-      "source": "/cloud/index.html",
-      "destination": "/cloud/dist/index.html"
-    },
-    {
-      "source": "/cloud/:path*",
-      "destination": "/cloud/dist/:path*"
+      "destination": "/cloud/index.html"
     }
   ]
 }
