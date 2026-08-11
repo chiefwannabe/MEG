@@ -7,6 +7,13 @@
     "build": "node scripts/generate-uploads.js",
     "dev": "node server/server.js"
   },
+  "dependencies": {
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.2.0"
+  },
   "engines": {
     "node": ">=18"
   }

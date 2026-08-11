@@ -8,24 +8,11 @@ const PORT = process.env.PORT || 8080;
 const API_PORT = 3001;
 const PUBLIC_DIR = path.join(__dirname, '..');
 
-// Start Cloud API backend if present
-const cloudServerPath = path.join(__dirname, '..', 'cloud-src', 'server', 'index.js');
-let apiProcess = null;
-
-if (fs.existsSync(cloudServerPath)) {
-  apiProcess = spawn(process.execPath, ['server/index.js'], {
-    cwd: path.join(__dirname, '..', 'cloud-src'),
-    stdio: 'inherit',
-  });
-  const cleanup = () => {
-    if (apiProcess) {
-      apiProcess.kill();
-      apiProcess = null;
-    }
-  };
-  process.on('exit', cleanup);
-  process.on('SIGINT', () => { cleanup(); process.exit(); });
-  process.on('SIGTERM', () => { cleanup(); process.exit(); });
+let apiApp = null;
+try {
+  apiApp = require('../api/index.js');
+} catch (err) {
+  console.warn('API handler not loaded:', err.message);
 }
 
 const MIME_TYPES = {
@@ -50,28 +37,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Handle API reverse proxy to backend
+  // Handle API routes directly via Express app
   if (reqPath.startsWith('/api/')) {
-    const proxyReq = http.request({
-      hostname: '127.0.0.1',
-      port: API_PORT,
-      path: req.url,
-      method: req.method,
-      headers: req.headers,
-    }, (proxyRes) => {
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      proxyRes.pipe(res);
-    });
-
-    proxyReq.on('error', () => {
-      res.statusCode = 502;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ error: 'Cloud API backend unavailable' }));
-    });
-
-    req.pipe(proxyReq);
-    return;
+    if (apiApp) {
+      return apiApp(req, res);
+    }
   }
+
 
   // Handle /download/* route for native HTML file download
   if (reqPath.startsWith('/download/')) {

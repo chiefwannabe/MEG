@@ -65,6 +65,10 @@
     {
       "source": "/cloud/",
       "destination": "/cloud/index.html"
+    },
+    {
+      "source": "/api/:match*",
+      "destination": "/api/index.js"
     }
   ]
 }
